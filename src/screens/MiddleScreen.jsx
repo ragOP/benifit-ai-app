@@ -7,9 +7,11 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Platform,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import TestimonialSlider from '../component/TestimonialSlider';
+
 const COLORS = {
   black: '#000000',
   dark: '#0c1a17',
@@ -41,22 +43,52 @@ const PRICE_BY_TAG = {
 const roundToThousands = n => Math.floor((Number(n) || 0) / 1000) * 1000;
 
 const MiddleScreen = ({ route, navigation }) => {
-  //   const { fullName, tags = [] } = route.params;
-  //   const total = tags.reduce((sum, tag) => sum + (PRICE_BY_TAG[tag] || 0), 0);
-  //   const roundedTotal = roundToThousands(total);
-  //   console.log('Actual benefit amount:', total);
-  //   console.log('Rounded (display) amount:', roundedTotal);
+  const { fullName, tags = [] } = route.params || {};
+  const total = tags.reduce((sum, tag) => sum + (PRICE_BY_TAG[tag] || 0), 0);
+  const roundedTotal = roundToThousands(total);
+
   const [secondsLeft, setSecondsLeft] = useState(300);
+
   useEffect(() => {
     if (secondsLeft <= 0) return;
     const interval = setInterval(() => setSecondsLeft(s => s - 1), 1000);
     return () => clearInterval(interval);
   }, [secondsLeft]);
+
   const formatTime = secs => {
     const m = String(Math.floor(secs / 60)).padStart(2, '0');
     const s = String(secs % 60).padStart(2, '0');
     return `${m}:${s}`;
   };
+
+  const GradientBox = ({ children }) => {
+    if (Platform.OS === 'ios') {
+      return (
+        <View style={styles.reportBoxWrapper}>
+          <LinearGradient
+            colors={['#4774c9', '#294ea0']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 0, y: 1 }}
+            style={[StyleSheet.absoluteFillObject, { borderRadius: 24 }]}
+          />
+          <View style={styles.reportBoxContent}>{children}</View>
+        </View>
+      );
+    } else {
+      return (
+        <LinearGradient
+          colors={['#4774c9', '#294ea0']}
+          start={{ x: 0.0, y: 0.0 }}
+          end={{ x: 0.0, y: 1.0 }}
+          locations={[0, 1]}
+          style={styles.reportBox}
+        >
+          {children}
+        </LinearGradient>
+      );
+    }
+  };
+
   return (
     <View style={styles.safe}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.bg} />
@@ -68,6 +100,7 @@ const MiddleScreen = ({ route, navigation }) => {
             resizeMode="contain"
           />
         </View>
+
         <View style={styles.ribbonWrap}>
           <View style={styles.ribbon}>
             <Text style={styles.ribbonText}>
@@ -77,18 +110,18 @@ const MiddleScreen = ({ route, navigation }) => {
         </View>
 
         <Text style={styles.heading}>
-          Congratulations,{'\n'} Test Android
-          {/* {fullName}! */}
+          Congratulations,{'\n'} {fullName || 'User'}!
         </Text>
+
         <View style={styles.boxQualified}>
           <Text style={styles.boxQualifiedText}>
             We found you qualify for benefits
           </Text>
           <Text style={styles.benefitAmount}>
-            $15000+
-            {/* ${roundedTotal.toLocaleString()}+ */}
+            ${roundedTotal > 0 ? roundedTotal.toLocaleString() : '15,000'}+
           </Text>
         </View>
+
         <View style={{ alignItems: 'center' }}>
           <View style={styles.vertDashedLine} />
           <Image
@@ -98,12 +131,9 @@ const MiddleScreen = ({ route, navigation }) => {
           />
           <View style={styles.vertDashedLine} />
         </View>
-        <LinearGradient
-          colors={[COLORS.blue1, COLORS.blue2]}
-          start={{ x: 0.5, y: 0 }}
-          end={{ x: 0.5, y: 1 }}
-          style={styles.reportBox}
-        >
+
+        {/* Platform specific gradient */}
+        <GradientBox>
           <Text style={styles.reportTitle}>Your Benefit Report Is Ready!</Text>
           <View style={{ marginTop: 18 }}>
             <Text style={styles.reportDetail}>
@@ -121,11 +151,17 @@ const MiddleScreen = ({ route, navigation }) => {
           <TouchableOpacity
             style={styles.claimButton}
             activeOpacity={0.9}
-            onPress={() => navigation.navigate('Congrats')}
+            onPress={() =>
+              navigation.navigate('Congrats', {
+                fullName: fullName,
+                tags: tags,
+              })
+            }
           >
             <Text style={styles.claimText}>Start Claiming My Benefits!</Text>
           </TouchableOpacity>
-        </LinearGradient>
+        </GradientBox>
+
         <View style={styles.timerContainer}>
           <Text style={styles.timerMessage}>
             Due to high demand, your benefit report is available to claim for
@@ -135,7 +171,9 @@ const MiddleScreen = ({ route, navigation }) => {
             <Text style={styles.timerText}>{formatTime(secondsLeft)}</Text>
           </View>
         </View>
+
         <TestimonialSlider />
+
         <View style={{ ...styles.noteContainer, alignItems: 'center' }}>
           <Text style={{ textAlign: 'center' }}>
             <Text style={styles.noteStrong}>NOTE: </Text>
@@ -147,7 +185,7 @@ const MiddleScreen = ({ route, navigation }) => {
           </Text>
           <Text style={{ textAlign: 'center', ...styles.noteBody2 }}>
             Beware of other fraudulent & similar looking websites. This is the
-            only official website to claim the benefits you’re qualified for
+            only official website to claim the benefits you're qualified for
             (mybenefitsai.org).
           </Text>
         </View>
@@ -157,10 +195,13 @@ const MiddleScreen = ({ route, navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: COLORS.bg },
+  safe: {
+    flex: 1,
+    backgroundColor: COLORS.bg,
+  },
   header: {
     backgroundColor: COLORS.black,
-    paddingTop: '12%',
+    paddingTop: '10%',
   },
   logo: {
     width: 'auto',
@@ -228,6 +269,23 @@ const styles = StyleSheet.create({
     width: 65,
     height: 58,
   },
+  reportBoxWrapper: {
+    marginHorizontal: 10,
+    borderRadius: 24,
+    marginTop: 0,
+    marginBottom: 40,
+    shadowColor: '#2e2e8a',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.13,
+    shadowRadius: 14,
+    elevation: 5,
+    overflow: 'hidden',
+  },
+  reportBoxContent: {
+    paddingVertical: 30,
+    paddingHorizontal: 22,
+    zIndex: 1,
+  },
   reportBox: {
     marginHorizontal: 10,
     borderRadius: 24,
@@ -239,6 +297,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.13,
     shadowRadius: 14,
+    elevation: 5,
   },
   reportTitle: {
     fontSize: 23,

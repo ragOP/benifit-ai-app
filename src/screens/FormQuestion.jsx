@@ -126,6 +126,19 @@ const questions = [
     options: ['Yes', 'No'],
   },
 ];
+const randomFourChars = () => {
+  const letters = 'abcdefghijklmnopqrstuvwxyz';
+  let result = '';
+  for (let i = 0; i < 4; i++) {
+    result += letters[Math.floor(Math.random() * letters.length)];
+  }
+  return result;
+};
+const generateRandomUserId = () => {
+  const numberPart = Math.floor(1000 + Math.random() * 9000);
+  const words = Array(4).fill(0).map(randomFourChars);
+  return `${numberPart}-${words.join('-')}`;
+};
 
 const infoDelay = 1000;
 const inputAnimDuration = 400;
@@ -197,7 +210,14 @@ const AnimatedBubble = ({ isBot, text, showAvatar, children }) => {
       <View style={isBot ? styles.botBubble : styles.userBubble}>
         {text === '...' ? (
           <Animated.View style={{ transform: [{ translateY: dotBounce }] }}>
-            <Text style={isBot ? styles.botText : styles.userText}>...</Text>
+            <Text
+              style={[
+                isBot ? styles.botText : styles.userText,
+                { fontWeight: '900' },
+              ]}
+            >
+              ...
+            </Text>
           </Animated.View>
         ) : (
           <Text style={isBot ? styles.botText : styles.userText}>{text}</Text>
@@ -221,64 +241,70 @@ export default function FormQuestion({ navigation }) {
 
   const inputAnim = useRef(new Animated.Value(0)).current;
   const scrollViewRef = useRef();
-  const handleFinalAnswers = async allAnswers => {
-    const tags = [];
-    if (allAnswers['Now, are you on medicare?'] === 'Yes')
-      tags.push(TAGS.medicare);
-    if (
-      allAnswers['Do you have any of the mentioned health conditions?'] !== 'No'
-    )
-      tags.push(TAGS.ssdi);
-    if (allAnswers['Do you own your home or rent?'] === 'I Own')
-      tags.push(TAGS.mortgage);
-    if (
-      allAnswers['Do you have a car that you drive at least once a week?'] ===
-      'Yes'
-    )
-      tags.push(TAGS.auto);
-    if (
-      allAnswers[
-        'Have you faced any motor vehicle accidents in the last 2 years?'
-      ] === 'Yes'
-    )
-      tags.push(TAGS.mva);
-    if (
-      allAnswers[
-        'Okay, and do you have a credit card debt of $10,000 or more?'
-      ] === 'Yes'
-    )
-      tags.push(TAGS.debt);
-    const fullName = allAnswers["What's your full name?"];
-    const payload = {
-      user_id: 'tempUserId',
-      fullName,
-      age: allAnswers['Okay, what is your age today?'],
-      zipcode: allAnswers["Nice, and what's your zip code?"],
-      tags: tags || [],
-      origin: `6-${'utmCampaign'}`,
-      sendMessageOn: 'SMS',
-      number: allAnswers['Please enter your 10-digit phone number below:'],
-      consentAgreed: true,
-    };
-    // console.log('Final Payload:', payload);
 
-    try {
-      const res = await fetch(
-        'https://benifit-gpt-be.onrender.com/response/create',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        },
-      );
-      const data = await res.json();
-      // console.log(' Successfully submitted:', data);
-      // console.log('Navigating to Middle with:', { fullName, tags });
-      navigation.navigate('Middle', { fullName, tags });
-      setAllDone(true);
-    } catch (err) {
-      console.error(' Error submitting chatbot answers:', err);
-    }
+  // const handleFinalAnswers = async allAnswers => {
+  //   const tags = [];
+  //   if (allAnswers['Now, are you on medicare?'] === 'Yes')
+  //     tags.push(TAGS.medicare);
+  //   if (
+  //     allAnswers['Do you have any of the mentioned health conditions?'] !== 'No'
+  //   )
+  //     tags.push(TAGS.ssdi);
+  //   if (allAnswers['Do you own your home or rent?'] === 'I Own')
+  //     tags.push(TAGS.mortgage);
+  //   if (
+  //     allAnswers['Do you have a car that you drive at least once a week?'] ===
+  //     'Yes'
+  //   )
+  //     tags.push(TAGS.auto);
+  //   if (
+  //     allAnswers[
+  //       'Have you faced any motor vehicle accidents in the last 2 years?'
+  //     ] === 'Yes'
+  //   )
+  //     tags.push(TAGS.mva);
+  //   if (
+  //     allAnswers[
+  //       'Okay, and do you have a credit card debt of $10,000 or more?'
+  //     ] === 'Yes'
+  //   )
+  //     tags.push(TAGS.debt);
+
+  //   const fullName = allAnswers["What's your full name?"];
+  //   const payload = {
+  //     userId: generateRandomUserId(),
+  //     fullName,
+  //     age: allAnswers['Okay, what is your age today?'],
+  //     zipcode: allAnswers["Nice, and what's your zip code?"],
+  //     tags: tags || [],
+  //     origin: `6-${'utmCampaign'}`,
+  //     sendMessageOn: 'SMS',
+  //     number: allAnswers['Please enter your 10-digit phone number below:'],
+  //     consentAgreed: true,
+  //   };
+  //   console.log('Final Payload:', payload);
+
+  //   try {
+  //     const res = await fetch('http://10.0.2.2:9005/api/v1/users/response', {
+  //       method: 'POST',
+  //       headers: { 'Content-Type': 'application/json' },
+  //       body: JSON.stringify(payload),
+  //     });
+  //     const data = await res.json();
+  //     console.log('Successfully submitted:', data);
+  //     console.log('Navigating to Middle with:', { fullName, tags });
+  //     navigation.navigate('Middle', { fullName, tags });
+  //     setAllDone(true);
+  //   } catch (err) {
+  //     console.error('Error submitting chatbot answers:', err);
+  //   }
+  // };
+  const handleFinalAnswers = async allAnswers => {
+    const fullName = allAnswers["What's your full name?"];
+    const tags = []; // You can still pass any relevant tags if needed
+    console.log('Navigating to Middle with:', { fullName, tags });
+    navigation.navigate('Middle', { fullName, tags });
+    setAllDone(true);
   };
 
   const showInput = useCallback(() => {
@@ -305,16 +331,12 @@ export default function FormQuestion({ navigation }) {
       setAllDone(true);
       return;
     }
-
     setShowTyping(true);
-
     setTimeout(() => {
       setShowTyping(false);
-      setTimeout(() => {
-        setChat(prev => [...prev, { from: 'bot', text: q.text, qid: idx }]);
-        setCurrent(idx);
-      }, 500);
-    }, messageAnimDuration);
+      setChat(prev => [...prev, { from: 'bot', text: q.text, qid: idx }]);
+      setCurrent(idx);
+    }, 2000);
   }, []);
 
   useEffect(() => {
@@ -344,8 +366,6 @@ export default function FormQuestion({ navigation }) {
         return;
 
       const response = answer !== undefined ? answer : input.trim();
-
-      // Validation for pincode and phone number fields
       if (questions[current].text.includes('zip code')) {
         if (!validatePincode(response)) {
           alert('Please enter a valid 5 or 6 digit zip code.');
@@ -358,17 +378,13 @@ export default function FormQuestion({ navigation }) {
           return;
         }
       }
-
       setChat(prev => [...prev, { from: 'user', text: response }]);
-
       setAnswers(prevAnswers => ({
         ...prevAnswers,
         [questions[current].text]: response,
       }));
-
       setInput('');
       hideInput();
-
       setTimeout(() => nextQuestion(current), messageAnimDuration / 1.1);
     },
     [input, current, nextQuestion],
@@ -380,6 +396,7 @@ export default function FormQuestion({ navigation }) {
       handleFinalAnswers(answers);
     }
   }, [allDone, answers]);
+
   const lastBotIndex = (() => {
     for (let i = chat.length - 1; i >= 0; --i) {
       if (chat[i].from === 'bot') return i;
@@ -430,7 +447,7 @@ export default function FormQuestion({ navigation }) {
 
   return (
     <View style={styles.safe}>
-      <StatusBar barStyle="light-content" backgroundColor={COLORS.teal} />
+      <StatusBar barStyle="light-content" backgroundColor={COLORS.black} />
       <ScrollView
         ref={scrollViewRef}
         contentContainerStyle={{ paddingBottom: 60 }}
@@ -488,8 +505,7 @@ export default function FormQuestion({ navigation }) {
                   color: COLORS.text,
                   fontWeight: '600',
                 }}
-              >
-              </Text>
+              ></Text>
             </View>
           ) : (
             renderInput()
@@ -596,7 +612,6 @@ const styles = StyleSheet.create({
     borderColor: '#07816b',
     borderWidth: 1,
   },
-
   checkBtn: {
     backgroundColor: COLORS.teal,
     borderRadius: 28,

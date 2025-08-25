@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -14,6 +14,7 @@ import Svg, { Path } from 'react-native-svg';
 import TestimonialSlider from '../component/TestimonialSlider';
 import FaqSection from '../component/FAQSection';
 import InfinityLoader from '../component/InfinityLoader';
+
 const COLORS = {
   black: '#000000',
   dark: '#0c1a17',
@@ -64,10 +65,8 @@ export default function HomeScreen({ navigation }) {
         });
       }, 100);
     }
-
     return () => clearInterval(interval);
   }, [isAnimating]);
-
   useEffect(() => {
     const moveFinger = () => {
       Animated.sequence([
@@ -83,7 +82,6 @@ export default function HomeScreen({ navigation }) {
         }),
       ]).start(() => moveFinger());
     };
-
     moveFinger();
   }, [fingerAnimation]);
 
@@ -100,10 +98,8 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <View style={styles.safe}>
-      <StatusBar barStyle="light-content" backgroundColor={COLORS.teal} />
-
+      <StatusBar barStyle="light-content" backgroundColor={COLORS.black} />
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Header */}
         <View style={styles.header}>
           <Image
             source={require('../assets/center.png')}
@@ -136,31 +132,45 @@ export default function HomeScreen({ navigation }) {
             <CheckRow text="Takes Under 2 Minutes" />
             <CheckRow text="90% Of Users Qualify for Benefits $2500+" />
           </View>
-
-          {/* CTA */}
           <TouchableOpacity
             activeOpacity={0.9}
             style={[styles.cta, showLoader && styles.ctaDisabled]}
             onPress={handleStartNow}
             disabled={showLoader}
           >
-            {showLoader ? (
-              <View style={styles.loaderRow}>
-                <InfinityLoader />
+            <View
+              style={{
+                overflow: 'hidden',
+                flex: 1,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                {showLoader ? (
+                  <View style={styles.loaderRow}>
+                    <InfinityLoader />
+                  </View>
+                ) : (
+                  <>
+                    <Animated.View
+                      style={{ transform: [{ translateX: fingerAnimation }] }}
+                    >
+                      <Text style={styles.ctaText}>👉 </Text>
+                    </Animated.View>
+                    <Text style={styles.ctaText}>START NOW</Text>
+                    <ChevronRight size={24} color="#fff" />
+                  </>
+                )}
               </View>
-            ) : (
-              <>
-                <Animated.View
-                  style={{ transform: [{ translateX: fingerAnimation }] }}
-                >
-                  <Text style={styles.ctaText}>👉 </Text>
-                </Animated.View>
-                <Text style={styles.ctaText}>START NOW</Text>
-                <ChevronRight size={24} color="#fff" />
-              </>
-            )}
+            </View>
           </TouchableOpacity>
-
           <Text style={styles.claim}>
             <Text style={styles.claimNumber}>69</Text>
             <Text style={styles.claimBold}>
@@ -170,10 +180,12 @@ export default function HomeScreen({ navigation }) {
             </Text>
           </Text>
         </View>
+
         <TestimonialSlider />
+
         <View style={styles.faqSection}>
           <Text style={styles.faqTitle}>Frequently Asked Questions</Text>
-        </View>{' '}
+        </View>
         <FaqSection />
       </ScrollView>
     </View>
@@ -184,7 +196,7 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: COLORS.bg },
   header: {
     backgroundColor: COLORS.black,
-    paddingTop: '12%',
+    paddingTop: '10%',
   },
   logo: {
     width: 'auto',
@@ -206,6 +218,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
+  ribbonWrap: {},
   content: {
     paddingHorizontal: 30,
     paddingTop: 18,
@@ -257,9 +270,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'center',
-
     width: '76%',
     alignSelf: 'center',
+    marginBottom: 12,
   },
   ctaText: {
     color: '#ffffff',

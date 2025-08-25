@@ -131,7 +131,6 @@ const QuestionScreen = ({ navigation }) => {
       }, delays[index]);
       timers.push(t);
     });
-
     return () => timers.forEach(clearTimeout);
   }, []);
 
@@ -143,9 +142,8 @@ const QuestionScreen = ({ navigation }) => {
 
   return (
     <View style={styles.safe}>
-      <StatusBar barStyle="light-content" backgroundColor={COLORS.teal} />
+      <StatusBar barStyle="light-content" backgroundColor={COLORS.black} />
       <ScrollView showsVerticalScrollIndicator={false}>
-        \{' '}
         <View style={styles.header}>
           <Image
             source={require('../assets/center.png')}
@@ -191,9 +189,8 @@ const QuestionScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: COLORS.bg },
-  header: { backgroundColor: COLORS.black, paddingTop: '12%' },
+  header: { backgroundColor: COLORS.black, paddingTop: '10%' },
   logo: { width: 'auto', height: 60, marginRight: 10 },
-
   ribbonWrap: {},
   ribbon: {
     backgroundColor: COLORS.teal,
@@ -210,7 +207,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-
   content: { paddingHorizontal: 30, paddingTop: 18 },
   pill: {
     backgroundColor: COLORS.pill,
@@ -227,11 +223,9 @@ const styles = StyleSheet.create({
     letterSpacing: 0.4,
     fontSize: 16,
   },
-
   chatArea: { paddingHorizontal: 20, paddingTop: 12, paddingBottom: 40 },
   msgWrap: { marginTop: 14 },
   msgRow: { flexDirection: 'row', alignItems: 'flex-start' },
-
   avatarContainer: {
     width: 28,
     height: 28,
@@ -246,7 +240,6 @@ const styles = StyleSheet.create({
     height: '100%',
     resizeMode: 'cover',
   },
-
   bubble: {
     backgroundColor: COLORS.white,
     paddingVertical: 12,
@@ -256,9 +249,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 12,
     borderBottomRightRadius: 12,
   },
-
   bubbleText: { color: COLORS.text, fontSize: 15.5, lineHeight: 22 },
-
   ctaWrap: { marginTop: 18 },
   ctaBtn: {
     backgroundColor: COLORS.teal,
