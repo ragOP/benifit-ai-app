@@ -1,11 +1,5 @@
-import React, { useState } from 'react';
-import {
-  View,
-  TouchableOpacity,
-  StyleSheet,
-  Dimensions,
-  Platform,
-} from 'react-native';
+import React from 'react';
+import { View, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import {
@@ -15,22 +9,23 @@ import {
   Mic,
   HexagonIcon,
 } from 'lucide-react-native';
-import HomeScreen from '../screens/HomeScreen';
+// import DeviceScreen from '../screens/DeviceScreen';
+// import CenterScreen from '../screens/CenterScreen';
+// import SettingsScreen from '../screens/SettingsScreen';
+// import ProfileScreen from '../screens/ProfileScreen';
 
-function DeviceScreen() {
-  return <View style={{ flex: 1, backgroundColor: '#222' }} />;
-}
-function CenterScreen() {
-  return <View style={{ flex: 1, backgroundColor: 'red' }} />;
-}
-function SettingsScreen() {
-  return <View style={{ flex: 1, backgroundColor: '#444' }} />;
-}
-function ProfileScreen() {
-  return <View style={{ flex: 1, backgroundColor: '#555' }} />;
-}
+// Stack for Home + Question
+import { createStackNavigator } from '@react-navigation/stack';
+import HomeScreen from '../screens/HomeScreen';
+import QuestionScreen from '../screens/QuestionScreen';
+import FormQuestion from '../screens/FormQuestion';
+import MiddleScreen from '../screens/MiddleScreen';
+import CongratsScreen from '../screens/CongratsScreen';
+import BenefitBlogPage from '../screens/BenefitBlogPage';
 
 const Tab = createBottomTabNavigator();
+const HomeStack = createStackNavigator();
+
 const { width } = Dimensions.get('window');
 
 const OUTER_H_GAP = 18;
@@ -39,29 +34,31 @@ const CARD_RADIUS = 20;
 const TAB_HEIGHT = 72;
 const FLOAT_SIZE = 72;
 
-const TABS = [
-  { icon: Home },
-  { icon: MonitorSpeaker },
-  { icon: HexagonIcon },
-  { icon: User },
-];
+function HomeStackScreen() {
+  return (
+    <HomeStack.Navigator screenOptions={{ headerShown: false }}>
+      <HomeStack.Screen name="HomeMain" component={HomeScreen} />
+      <HomeStack.Screen name="Question" component={QuestionScreen} />
+      <HomeStack.Screen name="Form" component={FormQuestion} />
+      <HomeStack.Screen name="Middle" component={MiddleScreen} />
+      <HomeStack.Screen name="Congrats" component={CongratsScreen} />
+    </HomeStack.Navigator>
+  );
+}
 
 function CustomTabBar({ state, descriptors, navigation }) {
-  const [active, setActive] = useState(0);
-
   const cardWidth = width - OUTER_H_GAP * 2;
-  const notchWidth = 120;
-  const notchDepth = 36;
+
   const d = `
     M0 ${CARD_RADIUS}
     Q0 0 ${CARD_RADIUS} 0
-    H${cardWidth / 2 - notchWidth / 2}
-    C${cardWidth / 2 - notchWidth / 4} 0, ${
-    cardWidth / 2 - notchWidth / 4
-  } ${notchDepth}, ${cardWidth / 2} ${notchDepth}
-    C${cardWidth / 2 + notchWidth / 4} ${notchDepth}, ${
-    cardWidth / 2 + notchWidth / 4
-  } 0, ${cardWidth / 2 + notchWidth / 2} 0
+    H${cardWidth / 2 - 120 / 2}
+    C${cardWidth / 2 - 120 / 4} 0, ${cardWidth / 2 - 120 / 4} 36, ${
+    cardWidth / 2
+  } 36
+    C${cardWidth / 2 + 120 / 4} 36, ${cardWidth / 2 + 120 / 4} 0, ${
+    cardWidth / 2 + 120 / 2
+  } 0
     H${cardWidth - CARD_RADIUS}
     Q${cardWidth} 0 ${cardWidth} ${CARD_RADIUS}
     V${TAB_HEIGHT - CARD_RADIUS}
@@ -140,7 +137,20 @@ function CustomTabBar({ state, descriptors, navigation }) {
         onPress={() => navigation.navigate('Center')}
       >
         <View style={styles.fabInner}>
-          <Mic size={28} color="#0B0E12" strokeWidth={2} />
+          {(() => {
+            const centerIndex = state.routes.findIndex(
+              r => r.name === 'Center',
+            );
+            const isFocused = state.index === centerIndex;
+
+            return (
+              <Mic
+                size={28}
+                color={isFocused ? '#FFFFFF' : '#7C848D'}
+                strokeWidth={2}
+              />
+            );
+          })()}
         </View>
       </TouchableOpacity>
     </View>
@@ -153,11 +163,11 @@ export default function BottomNavigation() {
       screenOptions={{ headerShown: false }}
       tabBar={props => <CustomTabBar {...props} />}
     >
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Device" component={DeviceScreen} />
-      <Tab.Screen name="Center" component={CenterScreen} />
-      <Tab.Screen name="Settings" component={SettingsScreen} />
-      <Tab.Screen name="Profile" component={ProfileScreen} />
+      <Tab.Screen name="Home" component={HomeStackScreen} />
+      <Tab.Screen name="Device" component={BenefitBlogPage} />
+      <Tab.Screen name="Center" component={BenefitBlogPage} />
+      <Tab.Screen name="Settings" component={BenefitBlogPage} />
+      <Tab.Screen name="Profile" component={BenefitBlogPage} />
     </Tab.Navigator>
   );
 }
@@ -198,20 +208,18 @@ const styles = StyleSheet.create({
     width: FLOAT_SIZE,
     height: FLOAT_SIZE,
     borderRadius: FLOAT_SIZE / 2,
-    backgroundColor: '#9eca30',
-    alignItems: 'center',
+    backgroundColor: '#ffffff',
     justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.25,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 12,
+    alignItems: 'center',
+    elevation: 20,
   },
   fabInner: {
-    width: FLOAT_SIZE - 14,
-    height: FLOAT_SIZE - 14,
-    borderRadius: (FLOAT_SIZE - 14) / 2,
-    backgroundColor: '#9eca30',
-    alignItems: 'center',
+    backgroundColor: '#1A242F',
+    width: 52,
+    height: 52,
+    borderRadius: 26,
     justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 3,
   },
 });

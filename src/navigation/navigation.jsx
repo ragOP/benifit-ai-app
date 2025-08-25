@@ -1,12 +1,8 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
-import HomeScreen from '../screens/HomeScreen';
-import QuestionScreen from '../screens/QuestionScreen';
-import FormQuestion from '../screens/FormQuestion';
-import MiddleScreen from '../screens/MiddleScreen';
-import CongratsScreen from '../screens/CongratsScreen';
 import SplashScreen from '../screens/SplashScreen';
+import BenefitBlogPage from '../screens/BenefitBlogPage';
 import LoginScreen from '../auth/LoginScreen';
 import RegisterScreen from '../auth/RegisterScreen';
 import BottomNavigation from './BottomNavigation';
@@ -17,53 +13,33 @@ export default function Navigation() {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="Login"
-        options={{ headerShown: false }}
+        initialRouteName="BottomNavigation"
+        screenOptions={{ headerShown: false }}
       >
         <Stack.Screen
           name="Splash"
           component={SplashScreen}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="BottomNavigation"
-          component={BottomNavigation}
-          options={{ headerShown: false }}
+          screenOptions={{ headerShown: false }}
         />
         <Stack.Screen
           name="Login"
           component={LoginScreen}
-          options={{ headerShown: false }}
+          screenOptions={{ headerShown: false }}
         />
         <Stack.Screen
           name="Register"
           component={RegisterScreen}
-          options={{ headerShown: false }}
+          screenOptions={{ headerShown: false }}
         />
         <Stack.Screen
-          name="Home"
-          component={HomeScreen}
-          options={{ headerShown: false }}
+          name="BottomNavigation"
+          component={BottomNavigation}
+          screenOptions={{ headerShown: false }}
         />
         <Stack.Screen
-          name="Question"
-          component={QuestionScreen}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="Form"
-          component={FormQuestion}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="Middle"
-          component={MiddleScreen}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="Congrats"
-          component={CongratsScreen}
-          options={{ headerShown: false }}
+          name="BenefitBlogPage"
+          component={BenefitBlogPage}
+          screenOptions={{ headerShown: false }}
         />
       </Stack.Navigator>
     </NavigationContainer>
