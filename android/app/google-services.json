@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "567371967864",
+    "project_id": "testlogin-c7356",
+    "storage_bucket": "testlogin-c7356.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:567371967864:android:628c5e6e9348a4938c6c8d",
+        "android_client_info": {
+          "package_name": "com.mybenifitaiapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "567371967864-88ee6c6l20r554412p0sleuam2e6cbiq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAmmf5T0AIngxAkqPuOaXzin6yd9BwC5hM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "567371967864-88ee6c6l20r554412p0sleuam2e6cbiq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "567371967864-948qds94rebng7mn7t7ljn2jja138man.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.mybenifitaiapp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

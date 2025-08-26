@@ -62,7 +62,7 @@ const RegisterScreen = ({ navigation }) => {
   //   }
   // };
   const handleRegister = async () => {
-    navigation.navigate('Home');
+    navigation.navigate('BottomNavigation');
   };
   return (
     <SafeAreaView style={styles.container}>

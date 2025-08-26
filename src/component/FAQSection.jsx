@@ -124,7 +124,7 @@ const DEFAULT_ITEMS = [
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 45,
+    paddingHorizontal: 20,
     paddingTop: 12,
     backgroundColor: '#ffffff',
   },
