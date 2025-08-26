@@ -12,6 +12,7 @@ import {
   ScrollView,
   Keyboard,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const COLORS = {
   black: '#000000',
@@ -126,18 +127,13 @@ const questions = [
     options: ['Yes', 'No'],
   },
 ];
-const randomFourChars = () => {
-  const letters = 'abcdefghijklmnopqrstuvwxyz';
+const generateRandomUserId = () => {
+  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
   let result = '';
   for (let i = 0; i < 4; i++) {
-    result += letters[Math.floor(Math.random() * letters.length)];
+    result += chars[Math.floor(Math.random() * chars.length)];
   }
   return result;
-};
-const generateRandomUserId = () => {
-  const numberPart = Math.floor(1000 + Math.random() * 9000);
-  const words = Array(4).fill(0).map(randomFourChars);
-  return `${numberPart}-${words.join('-')}`;
 };
 
 const infoDelay = 1000;
@@ -242,69 +238,69 @@ export default function FormQuestion({ navigation }) {
   const inputAnim = useRef(new Animated.Value(0)).current;
   const scrollViewRef = useRef();
 
-  // const handleFinalAnswers = async allAnswers => {
-  //   const tags = [];
-  //   if (allAnswers['Now, are you on medicare?'] === 'Yes')
-  //     tags.push(TAGS.medicare);
-  //   if (
-  //     allAnswers['Do you have any of the mentioned health conditions?'] !== 'No'
-  //   )
-  //     tags.push(TAGS.ssdi);
-  //   if (allAnswers['Do you own your home or rent?'] === 'I Own')
-  //     tags.push(TAGS.mortgage);
-  //   if (
-  //     allAnswers['Do you have a car that you drive at least once a week?'] ===
-  //     'Yes'
-  //   )
-  //     tags.push(TAGS.auto);
-  //   if (
-  //     allAnswers[
-  //       'Have you faced any motor vehicle accidents in the last 2 years?'
-  //     ] === 'Yes'
-  //   )
-  //     tags.push(TAGS.mva);
-  //   if (
-  //     allAnswers[
-  //       'Okay, and do you have a credit card debt of $10,000 or more?'
-  //     ] === 'Yes'
-  //   )
-  //     tags.push(TAGS.debt);
-
-  //   const fullName = allAnswers["What's your full name?"];
-  //   const payload = {
-  //     userId: generateRandomUserId(),
-  //     fullName,
-  //     age: allAnswers['Okay, what is your age today?'],
-  //     zipcode: allAnswers["Nice, and what's your zip code?"],
-  //     tags: tags || [],
-  //     origin: `6-${'utmCampaign'}`,
-  //     sendMessageOn: 'SMS',
-  //     number: allAnswers['Please enter your 10-digit phone number below:'],
-  //     consentAgreed: true,
-  //   };
-  //   console.log('Final Payload:', payload);
-
-  //   try {
-  //     const res = await fetch('http://10.0.2.2:9005/api/v1/users/response', {
-  //       method: 'POST',
-  //       headers: { 'Content-Type': 'application/json' },
-  //       body: JSON.stringify(payload),
-  //     });
-  //     const data = await res.json();
-  //     console.log('Successfully submitted:', data);
-  //     console.log('Navigating to Middle with:', { fullName, tags });
-  //     navigation.navigate('Middle', { fullName, tags });
-  //     setAllDone(true);
-  //   } catch (err) {
-  //     console.error('Error submitting chatbot answers:', err);
-  //   }
-  // };
   const handleFinalAnswers = async allAnswers => {
+    const tags = [];
+    if (allAnswers['Now, are you on medicare?'] === 'Yes')
+      tags.push(TAGS.medicare);
+    if (
+      allAnswers['Do you have any of the mentioned health conditions?'] !== 'No'
+    )
+      tags.push(TAGS.ssdi);
+    if (allAnswers['Do you own your home or rent?'] === 'I Own')
+      tags.push(TAGS.mortgage);
+    if (
+      allAnswers['Do you have a car that you drive at least once a week?'] ===
+      'Yes'
+    )
+      tags.push(TAGS.auto);
+    if (
+      allAnswers[
+        'Have you faced any motor vehicle accidents in the last 2 years?'
+      ] === 'Yes'
+    )
+      tags.push(TAGS.mva);
+    if (
+      allAnswers[
+        'Okay, and do you have a credit card debt of $10,000 or more?'
+      ] === 'Yes'
+    )
+      tags.push(TAGS.debt);
+
     const fullName = allAnswers["What's your full name?"];
-    const tags = []; // You can still pass any relevant tags if needed
-    console.log('Navigating to Middle with:', { fullName, tags });
-    navigation.navigate('Middle', { fullName, tags });
-    setAllDone(true);
+    const userId = generateRandomUserId();
+
+    const payload = {
+      userId,
+      fullName,
+      age: allAnswers['Okay, what is your age today?'],
+      zipcode: allAnswers["Nice, and what's your zip code?"],
+      tags: tags || [],
+      origin: `6-${'utmCampaign'}`,
+      sendMessageOn: 'SMS',
+      number: allAnswers['Please enter your 10-digit phone number below:'],
+      consentAgreed: true,
+    };
+
+    console.log('Final Payload:', payload);
+
+    try {
+      await AsyncStorage.setItem('userId', userId);
+      console.log('Saved userId in AsyncStorage:', userId);
+
+      const res = await fetch('http://10.0.2.2:9005/api/v1/users/response', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+
+      console.log('Successfully submitted:', data);
+
+      navigation.navigate('Middle', { fullName, tags, userId });
+      setAllDone(true);
+    } catch (err) {
+      console.error('Error submitting chatbot answers:', err);
+    }
   };
 
   const showInput = useCallback(() => {
