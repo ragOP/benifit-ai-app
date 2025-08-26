@@ -60,7 +60,7 @@ const RegisterScreen = ({ navigation }) => {
           }),
         },
       );
-
+      console.log('paylod', fcmToken);
       const data = await response.json();
       console.log('Register RESPONSE:', data);
 

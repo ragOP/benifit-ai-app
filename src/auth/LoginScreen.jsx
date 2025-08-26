@@ -57,7 +57,7 @@ const LoginScreen = ({ navigation }) => {
           fcmToken,
         }),
       });
-
+      console.log('Loginpaylod', fcmToken);
       const data = await response.json();
       console.log('LOGIN RESPONSE:', data);
 
