@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
+// ✅ Color constants
 const COLORS = {
   black: '#000000',
   dark: '#0c1a17',
@@ -26,6 +27,15 @@ const COLORS = {
   checkBg: '#e7f4f1',
   checkIcon: '#0c7a6a',
   claim: '#2fbfa6',
+};
+
+const TAGS = {
+  is_md: 'Medicare',
+  is_ssdi: 'SSDI',
+  is_auto: 'Auto',
+  is_mva: 'MVA',
+  is_debt: 'Debt',
+  is_rvm: 'Reverse Mortgage',
 };
 
 const LockIcon = ({ size = 16, color = '#94a3b8' }) => (
@@ -76,7 +86,7 @@ const ALL_BENEFIT_CARDS = {
 const BenefitCard = ({ benefit, onClaim }) => {
   const handlePress = async () => {
     try {
-      if (benefit.title === 'MVA Compensation') {
+      if (benefit.title === 'MVA') {
         await Linking.openURL(benefit.phone);
       } else {
         const phoneNumber = benefit.phone.replace(/[^\d+]/g, '');
@@ -125,26 +135,54 @@ const BenefitCard = ({ benefit, onClaim }) => {
         activeOpacity={0.9}
       >
         <Text style={styles.callIcon}>
-          {benefit.title === 'MVA Compensation' ? '🌐' : '📞'}
+          {benefit.title === 'MVA ' ? '🌐' : '📞'}
         </Text>
         <Text style={styles.callButtonText}>{benefit.call}</Text>
       </TouchableOpacity>
-      {benefit.title !== 'MVA Compensation' && (
+      {benefit.title !== 'MVA' && (
         <Text style={styles.altDial}>Or dial: {benefit.phone}</Text>
       )}
     </View>
   );
 };
 
-const StepperCard = ({ benefits }) => {
+const StepperCard = ({ benefits, userId }) => {
   const benefitKeys = Object.keys(benefits);
   const [activeBenefitKey, setActiveBenefitKey] = useState(
     benefitKeys[0] || '',
   );
   const [completedBenefits, setCompletedBenefits] = useState({});
 
-  const handleBenefitClaim = key => {
+  const handleBenefitClaim = async key => {
     setCompletedBenefits(prev => ({ ...prev, [key]: true }));
+
+    const claimedOfferId = TAGS[key];
+
+    const payload = {
+      userId: userId,
+      claimedOfferIds: [claimedOfferId],
+    };
+
+    console.log('📦 API Payload:', payload);
+
+    try {
+      const response = await fetch(
+        'http://10.0.2.2:9005/api/v1/users/abandoned-claim',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        },
+      );
+
+      const data = await response.json();
+      console.log('✅ Claimed offer API response:', data);
+    } catch (error) {
+      console.error('❌ Error in claiming offer:', error);
+    }
+
     const activeIndex = benefitKeys.indexOf(key);
     if (activeIndex < benefitKeys.length - 1) {
       setActiveBenefitKey(benefitKeys[activeIndex + 1]);
@@ -160,7 +198,6 @@ const StepperCard = ({ benefits }) => {
 
         return (
           <View key={key} style={{ marginBottom: 12 }}>
-            {/* Stepper Row */}
             <TouchableOpacity
               style={[
                 isActive ? styles.stepActive : styles.stepInactive,
@@ -218,14 +255,12 @@ const StepperCard = ({ benefits }) => {
     </View>
   );
 };
-
 const CongratsScreen = ({ route }) => {
-  const { fullName, tags = [] } = route.params || {};
+  const { fullName, tags = [], userId } = route.params || {};
+
   const getFilteredBenefits = () => {
     const filteredBenefits = {};
-    if (tags.length === 0) {
-      return ALL_BENEFIT_CARDS;
-    }
+    if (tags.length === 0) return ALL_BENEFIT_CARDS;
     tags.forEach(tag => {
       if (ALL_BENEFIT_CARDS[tag]) {
         filteredBenefits[tag] = ALL_BENEFIT_CARDS[tag];
@@ -255,7 +290,7 @@ const CongratsScreen = ({ route }) => {
           <Text style={styles.description}>
             We've found that you immediately qualify for{' '}
             <Text style={styles.greenText}>these benefits</Text> worth thousands
-            of dollars combined.{' '}
+            of dollars combined.
           </Text>
           <View style={styles.claimBox}>
             <Text style={styles.claimText}>
@@ -267,7 +302,9 @@ const CongratsScreen = ({ route }) => {
             </Text>
           </View>
         </View>
-        <StepperCard benefits={filteredBenefits} />
+
+        <StepperCard benefits={filteredBenefits} userId={userId} />
+
         <View style={{ ...styles.noteContainer, alignItems: 'center' }}>
           <Text style={{ textAlign: 'center', ...styles.noteBody2 }}>
             Beware of other fraudulent & similar looking websites that might
@@ -280,22 +317,11 @@ const CongratsScreen = ({ route }) => {
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: COLORS.bg },
-  header: {
-    backgroundColor: COLORS.black,
-    paddingTop: '10%',
-  },
-  logo: {
-    width: 'auto',
-    height: 60,
-    marginRight: 10,
-  },
-  congratsCard: {
-    marginHorizontal: 20,
-    marginTop: 25,
-  },
+  header: { backgroundColor: COLORS.black, paddingTop: '10%' },
+  logo: { width: 'auto', height: 60, marginRight: 10 },
+  congratsCard: { marginHorizontal: 20, marginTop: 25 },
   congratsTitle: {
     fontSize: 29,
     fontWeight: '900',
@@ -308,24 +334,15 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     lineHeight: 24,
   },
-  greenText: {
-    fontWeight: '700',
-    color: '#00a840',
-  },
+  greenText: { fontWeight: '700', color: '#00a840' },
   claimBox: {
     backgroundColor: '#cbeed9',
     borderRadius: 20,
     paddingVertical: 20,
     paddingHorizontal: 18,
   },
-  claimText: {
-    fontSize: 14.5,
-    color: '#000',
-    lineHeight: 19,
-  },
-  boldText: {
-    fontWeight: '900',
-  },
+  claimText: { fontSize: 14.5, color: '#000', lineHeight: 19 },
+  boldText: { fontWeight: '900' },
   cardContainer: {
     backgroundColor: '#F7FFFA',
     borderRadius: 22,
@@ -356,21 +373,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  stepNumberActiveText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 19,
-  },
-  stepTitleActive: {
-    fontWeight: 'bold',
-    fontSize: 16,
-    color: '#04884D',
-  },
-  stepSubtitle: {
-    color: '#48a97e',
-    fontSize: 12,
-    fontWeight: '500',
-  },
+  stepNumberActiveText: { color: '#fff', fontWeight: 'bold', fontSize: 19 },
+  stepTitleActive: { fontWeight: 'bold', fontSize: 16, color: '#04884D' },
+  stepSubtitle: { color: '#48a97e', fontSize: 12, fontWeight: '500' },
   stepInactive: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -390,21 +395,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  stepNumberInactiveText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 19,
-  },
-  stepTitleInactive: {
-    fontWeight: 'bold',
-    fontSize: 15,
-    color: '#314158',
-  },
-  stepSubtitleInactive: {
-    color: '#314158',
-    fontSize: 12,
-    fontWeight: '500',
-  },
+  stepNumberInactiveText: { color: '#fff', fontWeight: 'bold', fontSize: 19 },
+  stepTitleInactive: { fontWeight: 'bold', fontSize: 15, color: '#314158' },
+  stepSubtitleInactive: { color: '#314158', fontSize: 12, fontWeight: '500' },
   lockIconContainer: {
     position: 'absolute',
     right: 12,
@@ -434,11 +427,7 @@ const styles = StyleSheet.create({
     marginTop: -20,
     zIndex: 9,
   },
-  pillText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 15,
-  },
+  pillText: { color: '#fff', fontWeight: 'bold', fontSize: 15 },
   foodImage: {
     height: 200,
     width: '100%',
@@ -467,10 +456,7 @@ const styles = StyleSheet.create({
     borderColor: '#24c492',
     borderWidth: 0.5,
   },
-  unlockText: {
-    fontSize: 15,
-    color: 'black',
-  },
+  unlockText: { fontSize: 15, color: 'black' },
   callButton: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -480,37 +466,15 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     marginBottom: 9,
   },
-  callIcon: {
-    fontSize: 23,
-    color: 'white',
-    marginRight: 8,
-  },
-  callButtonText: {
-    color: 'white',
-    fontSize: 18.5,
-    fontWeight: 'bold',
-  },
-  altDial: {
-    textAlign: 'center',
-    fontSize: 14.5,
-    color: '#516a5c',
-  },
-  noteContainer: {
-    marginTop: 36,
-    marginBottom: 40,
-    paddingHorizontal: 30,
-  },
+  callIcon: { fontSize: 23, color: 'white', marginRight: 8 },
+  callButtonText: { color: 'white', fontSize: 18.5, fontWeight: 'bold' },
+  altDial: { textAlign: 'center', fontSize: 14.5, color: '#516a5c' },
+  noteContainer: { marginTop: 36, marginBottom: 40, paddingHorizontal: 30 },
   noteBody2: {
     marginTop: 15,
     color: '#111827',
     fontSize: 14,
     lineHeight: 20,
-  },
-  noBenefitsText: {
-    textAlign: 'center',
-    fontSize: 16,
-    color: '#666',
-    padding: 20,
   },
 });
 

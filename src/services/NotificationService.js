@@ -7,10 +7,11 @@ export class NotificationService {
   static async initialize() {
     try {
       console.log('Initializing notification service...');
-      
+
       // Request notification permission
-      const hasPermission = await NotificationPermissions.requestPermissionWithFallback();
-      
+      const hasPermission =
+        await NotificationPermissions.requestPermissionWithFallback();
+
       if (hasPermission) {
         console.log('✅ Notification service initialized successfully');
         return true;
@@ -52,7 +53,7 @@ export class NotificationService {
     try {
       const status = await this.getPermissionStatus();
       console.log('📱 Notification Permission Status:', status);
-      
+
       if (status.granted) {
         console.log('✅ Notifications are enabled');
         return true;
@@ -73,7 +74,7 @@ export class NotificationService {
   static async showTestNotification() {
     try {
       const hasPermission = await this.areNotificationsEnabled();
-      
+
       if (!hasPermission) {
         console.log('❌ Cannot show notification: permission not granted');
         return false;
@@ -84,7 +85,7 @@ export class NotificationService {
       console.log('🔔 Test Notification Sent!');
       console.log('📱 Title: Benefits Update');
       console.log('📝 Body: You have new benefits available!');
-      
+
       return true;
     } catch (error) {
       console.error('❌ Error showing test notification:', error);
@@ -93,4 +94,4 @@ export class NotificationService {
   }
 }
 
-export default NotificationService; 
+export default NotificationService;

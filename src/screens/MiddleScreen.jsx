@@ -43,7 +43,7 @@ const PRICE_BY_TAG = {
 const roundToThousands = n => Math.floor((Number(n) || 0) / 1000) * 1000;
 
 const MiddleScreen = ({ route, navigation }) => {
-  const { fullName, tags = [] } = route.params || {};
+  const { fullName, tags = [], userId } = route.params || {};
   const total = tags.reduce((sum, tag) => sum + (PRICE_BY_TAG[tag] || 0), 0);
   const roundedTotal = roundToThousands(total);
 
@@ -131,8 +131,6 @@ const MiddleScreen = ({ route, navigation }) => {
           />
           <View style={styles.vertDashedLine} />
         </View>
-
-        {/* Platform specific gradient */}
         <GradientBox>
           <Text style={styles.reportTitle}>Your Benefit Report Is Ready!</Text>
           <View style={{ marginTop: 18 }}>
@@ -155,6 +153,7 @@ const MiddleScreen = ({ route, navigation }) => {
               navigation.navigate('Congrats', {
                 fullName: fullName,
                 tags: tags,
+                userId,
               })
             }
           >

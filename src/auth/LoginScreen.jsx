@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -17,51 +17,66 @@ const LoginScreen = ({ navigation }) => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [fcmToken, setFcmToken] = useState('');
 
-  // const handleLogin = async () => {
-  //   if (!username || !password) {
-  //     Alert.alert('Error', 'Please enter both username and password');
-  //     return;
-  //   }
+  useEffect(() => {
+    const fetchFcmToken = async () => {
+      try {
+        const token = await AsyncStorage.getItem('fcmToken');
+        if (token) {
+          setFcmToken(token);
+          console.log('Fetched FCM token from storage:', token);
+        } else {
+          console.warn('FCM token not found in storage.');
+        }
+      } catch (error) {
+        console.error('Error retrieving FCM token:', error);
+      }
+    };
 
-  //   setIsLoading(true);
-  //   // http://10.0.2.2:9005/api/v1/auth/login
-  //   try {
-  //     const response = await fetch('http://localhost:9005/api/v1/auth/login', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({
-  //         username,
-  //         password,
-  //       }),
-  //     });
+    fetchFcmToken();
+  }, []);
 
-  //     const data = await response.json();
-  //     console.log('LOGIN RESPONSE:', data);
-
-  //     if (response.ok && data.data && data.data.token) {
-  //       const token = data.data.token;
-  //       await AsyncStorage.setItem('userToken', token);
-  //       const savedToken = await AsyncStorage.getItem('userToken');
-  //       console.log('Saved Token:', savedToken);
-
-  //       navigation.navigate('Home');
-  //     } else {
-  //       Alert.alert('Login Failed', data.message || 'Something went wrong');
-  //     }
-  //   } catch (error) {
-  //     console.error('Error during login:', error);
-  //     Alert.alert('Error', 'Something went wrong. Please try again.');
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
   const handleLogin = async () => {
-    navigation.navigate('BottomNavigation');
+    if (!username || !password) {
+      Alert.alert('Error', 'Please enter both username and password');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const response = await fetch('http://10.0.2.2:9005/api/v1/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username,
+          password,
+          fcmToken,
+        }),
+      });
+
+      const data = await response.json();
+      console.log('LOGIN RESPONSE:', data);
+
+      if (response.ok && data.data && data.data.token) {
+        const token = data.data.token;
+        await AsyncStorage.setItem('userToken', token);
+        console.log('Saved Token:', token);
+        navigation.navigate('BottomNavigation');
+      } else {
+        Alert.alert('Login Failed', data.message || 'Something went wrong');
+      }
+    } catch (error) {
+      console.error('Error during login:', error);
+      Alert.alert('Error', 'Something went wrong. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
-  
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
