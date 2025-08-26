@@ -44,64 +44,57 @@ const App = () => {
       id: 'benefits',
       name: 'Benefits Notifications',
       description: 'Channel for benefits and updates',
-      importance: AndroidImportance.HIGH,
+      // importance: AndroidImportance.HIGH,
+      // importance: notifee.AndroidImportance.HIGH,
       sound: 'default',
       vibration: true,
+      lights: true,
+      lightColor: '#0F766E',
+      showBadge: true,
     });
   };
 
   // Display notification when message is received
-  const onMessageReceived = useCallback(async message => {
+  const onMessageReceived = useCallback(async (message) => {
     console.log('📱 Message received:', message);
 
     try {
-      if (!message || !message.data) {
-        console.warn('⚠️ message or message.data is undefined');
+      if (!message || !message.notification) {
+        console.log('Message or notification is undefined, skipping');
         return;
       }
 
-      const { totalUsers, successCount, failureCount, results, type } =
-        message.data;
+      const { title, body } = message.notification;
 
-      if (
-        totalUsers === undefined ||
-        successCount === undefined ||
-        failureCount === undefined
-      ) {
-        console.warn(
-          '⚠️ Missing required fields in message data:',
-          message.data,
-        );
+      if (!title || !body) {
+        console.log('Missing title or body, skipping notification');
         return;
       }
 
       await notifee.displayNotification({
-        title: getNotificationTitle(successCount, failureCount),
-        body: getNotificationBody(totalUsers, successCount, failureCount),
-        data: {
-          totalUsers: totalUsers?.toString() || '0',
-          successCount: successCount?.toString() || '0',
-          failureCount: failureCount?.toString() || '0',
-          results: results ? JSON.stringify(results) : '[]',
-          type: type || 'notification',
-        },
+        title: title,
+        body: body,
+        data: message.data || {},
         android: {
           channelId: 'benefits',
-          largeIcon: 'ic_launcher',
-          color: getNotificationColor(successCount, failureCount),
-          progress: {
-            max: parseInt(totalUsers) || 0,
-            current: parseInt(successCount) || 0,
-            indeterminate: false,
-          },
+          smallIcon: 'ic_launcher',
+          // largeIcon: 'ic_launcher',
+          color: '#0F766E',
+          sound: 'default',
+          vibrationPattern: [300, 500],
+          // priority: notifee.AndroidImportance.HIGH,
           actions: [
             {
               title: 'View Details',
-              pressAction: { id: 'view_details' },
+              pressAction: {
+                id: 'view_details',
+              },
             },
             {
               title: 'Dismiss',
-              pressAction: { id: 'dismiss' },
+              pressAction: {
+                id: 'dismiss',
+              },
             },
           ],
         },
@@ -112,31 +105,11 @@ const App = () => {
       });
 
       console.log('✅ Notification displayed successfully');
+
     } catch (error) {
       console.error('❌ Error displaying notification:', error);
-      console.error('Message that caused error:', message);
     }
   }, []);
-
-  // Helper: Notification title
-  const getNotificationTitle = (successCount, failureCount) => {
-    if (parseInt(failureCount) === 0)
-      return '✅ All Notifications Sent Successfully';
-    if (parseInt(successCount) === 0) return '❌ All Notifications Failed';
-    return '⚠️ Partial Success - Some Notifications Failed';
-  };
-
-  // Helper: Notification body
-  const getNotificationBody = (totalUsers, successCount, failureCount) => {
-    return `${successCount}/${totalUsers} successful • ${failureCount} failed`;
-  };
-
-  // Helper: Notification color
-  const getNotificationColor = (successCount, failureCount) => {
-    if (parseInt(failureCount) === 0) return '#10B981'; // Green
-    if (parseInt(successCount) === 0) return '#EF4444'; // Red
-    return '#F59E0B'; // Yellow
-  };
 
   // Register device and get FCM token
   const registerAndGetToken = async () => {

@@ -13,6 +13,7 @@ import {
   Keyboard,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { BACKEND_URL } from '../utils/backendUrl';
 
 const COLORS = {
   black: '#000000',
@@ -288,7 +289,8 @@ export default function FormQuestion({ navigation }) {
       console.log('Saved userId in AsyncStorage:', userId);
 
       const res = await fetch(
-        'https://benifit-ai-app-be.onrender.com/api/v1/users/response',
+        `${BACKEND_URL}/api/v1/users/response`,
+        // 'http://10.0.2.2:9005/api/v1/users/response',
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

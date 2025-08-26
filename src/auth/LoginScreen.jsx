@@ -11,6 +11,7 @@ import {
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { BACKEND_URL } from '../utils/backendUrl';
 
 const LoginScreen = ({ navigation }) => {
   const [username, setUsername] = useState('');
@@ -47,17 +48,12 @@ const LoginScreen = ({ navigation }) => {
 
     try {
       const response = await fetch(
-        'https://benifit-ai-app-be.onrender.com/api/v1/auth/login',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            username,
-            password,
-            fcmToken,
-          }),
+        `${BACKEND_URL}/api/v1/auth/login`,
+        // 'http://10.0.2.2:9005/api/v1/auth/login',
+         {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
       );
       console.log('Loginpaylod', fcmToken);
