@@ -5,7 +5,7 @@ import SplashScreen from '../screens/SplashScreen';
 import BenefitBlogPage from '../screens/BenefitBlogPage';
 import LoginScreen from '../auth/LoginScreen';
 import RegisterScreen from '../auth/RegisterScreen';
-import BottomNavigation from './BottomNavigation';
+import AppBottomNavigation from './BottomNavigation';
 
 const Stack = createStackNavigator();
 
@@ -13,7 +13,7 @@ export default function Navigation() {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="BottomNavigation"
+        initialRouteName="Splash"
         screenOptions={{ headerShown: false }}
       >
         <Stack.Screen
@@ -33,7 +33,7 @@ export default function Navigation() {
         />
         <Stack.Screen
           name="BottomNavigation"
-          component={BottomNavigation}
+          component={AppBottomNavigation}
           screenOptions={{ headerShown: false }}
         />
         <Stack.Screen

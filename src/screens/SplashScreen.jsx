@@ -11,7 +11,7 @@ const SplashScreen = ({ navigation }) => {
 
         setTimeout(() => {
           if (token) {
-            navigation.replace('Home');
+            navigation.replace('BottomNavigation');
           } else {
             navigation.replace('Login');
           }

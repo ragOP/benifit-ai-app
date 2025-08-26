@@ -8,12 +8,17 @@ import {
   TouchableOpacity,
   Animated,
   ScrollView,
+  Dimensions,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChevronRight } from 'lucide-react-native';
 import Svg, { Path } from 'react-native-svg';
 import TestimonialSlider from '../component/TestimonialSlider';
 import FaqSection from '../component/FAQSection';
 import InfinityLoader from '../component/InfinityLoader';
+import NotificationService from '../services/NotificationService';
+
+const { width } = Dimensions.get('window');
 
 const COLORS = {
   black: '#000000',
@@ -50,6 +55,7 @@ export default function HomeScreen({ navigation }) {
   const [isAnimating, setIsAnimating] = useState(true);
   const [showLoader, setShowLoader] = useState(false);
   const fingerAnimation = useRef(new Animated.Value(0)).current;
+  const shimmerAnimation = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     let interval;
@@ -67,6 +73,15 @@ export default function HomeScreen({ navigation }) {
     }
     return () => clearInterval(interval);
   }, [isAnimating]);
+
+  // Initialize notification service
+  useEffect(() => {
+    const initNotifications = async () => {
+      await NotificationService.initialize();
+    };
+    initNotifications();
+  }, []);
+
   useEffect(() => {
     const moveFinger = () => {
       Animated.sequence([
@@ -85,6 +100,24 @@ export default function HomeScreen({ navigation }) {
     moveFinger();
   }, [fingerAnimation]);
 
+  useEffect(() => {
+    const shimmer = () => {
+      Animated.sequence([
+        Animated.timing(shimmerAnimation, {
+          toValue: 1,
+          duration: 3000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(shimmerAnimation, {
+          toValue: 0,
+          duration: 0,
+          useNativeDriver: true,
+        }),
+      ]).start(() => shimmer());
+    };
+    shimmer();
+  }, [shimmerAnimation]);
+
   const formatNumber = number => `$${number.toFixed(0)}`;
   const handleStartNow = () => {
     if (showLoader) return;
@@ -97,7 +130,7 @@ export default function HomeScreen({ navigation }) {
   };
 
   return (
-    <View style={styles.safe}>
+    <SafeAreaView style={styles.safe} edges={['top']}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.black} />
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
@@ -123,8 +156,8 @@ export default function HomeScreen({ navigation }) {
           </View>
 
           <Text style={styles.headline}>
-            Americans, Get Your{'\n'}Benefits Eligibility{'\n'}Check in Just 60
-            {'\n'}Seconds!
+            Americans, Get Your Benefits Eligibility Check in Just 60
+            Seconds!
           </Text>
 
           <View style={styles.checkList}>
@@ -132,45 +165,65 @@ export default function HomeScreen({ navigation }) {
             <CheckRow text="Takes Under 2 Minutes" />
             <CheckRow text="90% Of Users Qualify for Benefits $2500+" />
           </View>
-          <TouchableOpacity
-            activeOpacity={0.9}
-            style={[styles.cta, showLoader && styles.ctaDisabled]}
-            onPress={handleStartNow}
-            disabled={showLoader}
-          >
-            <View
-              style={{
-                overflow: 'hidden',
-                flex: 1,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
+          
+          <View style={styles.ctaContainer}>
+            <TouchableOpacity
+              activeOpacity={0.9}
+              style={[styles.cta, showLoader && styles.ctaDisabled]}
+              onPress={handleStartNow}
+              disabled={showLoader}
             >
+              {/* Shimmer Effect */}
+              <Animated.View
+                style={[
+                  styles.shimmer,
+                  {
+                    transform: [{
+                      translateX: shimmerAnimation.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [-width, width],
+                      })
+                    }]
+                  }
+                ]}
+              />
+              
               <View
                 style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
+                  overflow: 'hidden',
+                  flex: 1,
                   justifyContent: 'center',
+                  alignItems: 'center',
+                  zIndex: 1,
                 }}
               >
-                {showLoader ? (
-                  <View style={styles.loaderRow}>
-                    <InfinityLoader />
-                  </View>
-                ) : (
-                  <>
-                    <Animated.View
-                      style={{ transform: [{ translateX: fingerAnimation }] }}
-                    >
-                      <Text style={styles.ctaText}>👉 </Text>
-                    </Animated.View>
-                    <Text style={styles.ctaText}>START NOW</Text>
-                    <ChevronRight size={24} color="#fff" />
-                  </>
-                )}
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  {showLoader ? (
+                    <View style={styles.loaderRow}>
+                      <InfinityLoader />
+                    </View>
+                  ) : (
+                    <>
+                      <Animated.View
+                        style={{ transform: [{ translateX: fingerAnimation }] }}
+                      >
+                        <Text style={styles.ctaText}>👉 </Text>
+                      </Animated.View>
+                      <Text style={styles.ctaText}>START NOW</Text>
+                      <ChevronRight size={24} color="#fff" />
+                    </>
+                  )}
+                </View>
               </View>
-            </View>
-          </TouchableOpacity>
+            </TouchableOpacity>
+          </View>
+          
           <Text style={styles.claim}>
             <Text style={styles.claimNumber}>69</Text>
             <Text style={styles.claimBold}>
@@ -188,15 +241,15 @@ export default function HomeScreen({ navigation }) {
         </View>
         <FaqSection />
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: COLORS.bg },
+  safe: { flex: 1, backgroundColor: COLORS.bg, paddingBottom: 20 },
   header: {
     backgroundColor: COLORS.black,
-    paddingTop: '10%',
+    paddingTop: 0,
   },
   logo: {
     width: 'auto',
@@ -240,7 +293,7 @@ const styles = StyleSheet.create({
   },
   headline: {
     color: COLORS.text,
-    fontSize: 32,
+    fontSize: 24,
     fontWeight: '700',
     textAlign: 'center',
     lineHeight: 34,
@@ -250,7 +303,6 @@ const styles = StyleSheet.create({
     marginTop: 6,
     marginBottom: 22,
     gap: 12,
-    paddingHorizontal: 20,
   },
   checkRow: { flexDirection: 'row', alignItems: 'center' },
   checkIconWrap: {
@@ -263,6 +315,11 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   checkText: { color: '#1b1f22', fontSize: 16, fontWeight: '700' },
+  ctaContainer: {
+    position: 'relative',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
   cta: {
     backgroundColor: '#015d54',
     paddingVertical: 18,
@@ -272,7 +329,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: '76%',
     alignSelf: 'center',
-    marginBottom: 12,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  shimmer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: '100%',
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    transform: [{ skewX: '-20deg' }],
+    zIndex: 0,
   },
   ctaText: {
     color: '#ffffff',
@@ -284,6 +353,7 @@ const styles = StyleSheet.create({
   claim: {
     textAlign: 'center',
     marginTop: 12,
+    marginBottom: 12,
     color: '#2f3a39',
     fontSize: 14,
     fontStyle: 'italic',
@@ -299,7 +369,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   faqTitle: {
-    fontSize: 30,
+    fontSize: 24,
     fontWeight: '700',
     color: COLORS.teal,
     textAlign: 'center',
@@ -312,5 +382,24 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+  },
+  testNotificationButton: {
+    backgroundColor: '#0F766E',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 25,
+    alignSelf: 'center',
+    marginTop: 20,
+    shadowColor: '#0F766E',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  testNotificationText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+    textAlign: 'center',
   },
 });

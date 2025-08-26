@@ -59,8 +59,9 @@ const LoginScreen = ({ navigation }) => {
   //   }
   // };
   const handleLogin = async () => {
-    navigation.navigate('Home');
+    navigation.navigate('BottomNavigation');
   };
+  
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
