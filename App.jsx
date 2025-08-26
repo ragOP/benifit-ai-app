@@ -14,10 +14,27 @@ const App = () => {
       authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
       authStatus === messaging.AuthorizationStatus.PROVISIONAL;
 
-    if (enabled) {
-      console.info('🔐 Authorization status:', authStatus);
-    } else {
-      console.warn('🚫 Notification permission not granted');
+    return enabled;
+  };
+
+  // Handle permissions with status check
+  const handlePermissions = async () => {
+    try {
+      const currentStatus = await messaging().hasPermission();
+
+      if (currentStatus === messaging.AuthorizationStatus.AUTHORIZED) {
+        console.log('✅ Firebase permission already granted');
+      } else {
+        const granted = await requestUserPermission();
+
+        if (granted) {
+          console.log('✅ Firebase permission granted successfully');
+        } else {
+          console.warn('🚫 Firebase permission denied');
+        }
+      }
+    } catch (error) {
+      console.error('❌ Error handling permissions:', error);
     }
   };
 
@@ -127,18 +144,9 @@ const App = () => {
       console.log('📲 Registering for remote messages...');
       await messaging().registerDeviceForRemoteMessages();
 
-      const authStatus = await messaging().requestPermission();
-      const enabled =
-        authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-        authStatus === messaging.AuthorizationStatus.PROVISIONAL;
-
-      if (enabled) {
-        const token = await messaging().getToken();
-        console.log('📩 FCM Token:', token);
-        await AsyncStorage.setItem('fcmToken', token);
-      } else {
-        console.warn('🚫 Notification permission not granted');
-      }
+      const token = await messaging().getToken();
+      console.log('📩 FCM Token:', token);
+      await AsyncStorage.setItem('fcmToken', token);
     } catch (error) {
       console.error('❌ Error getting FCM token:', error);
     }
@@ -158,7 +166,7 @@ const App = () => {
   // Initialize everything on mount
   useEffect(() => {
     console.log('🚀 App mounted');
-    requestUserPermission();
+    handlePermissions();
     createNotificationChannel();
     registerAndGetToken();
   }, []);
