@@ -72,7 +72,7 @@ const RegisterScreen = ({ navigation }) => {
         const savedToken = await AsyncStorage.getItem('userToken');
         console.log('Saved Token:', savedToken);
 
-        navigation.navigate('Home');
+        navigation.navigate('BottomNavigation');
       } else {
         Alert.alert('Register Failed', data.message || 'Something went wrong');
       }

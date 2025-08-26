@@ -50,10 +50,16 @@ const LoginScreen = ({ navigation }) => {
       const response = await fetch(
         `${BACKEND_URL}/api/v1/auth/login`,
         // 'http://10.0.2.2:9005/api/v1/auth/login',
-         {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username,
+            password,
+            fcmToken,
+          }),
         },
       );
       console.log('Loginpaylod', fcmToken);

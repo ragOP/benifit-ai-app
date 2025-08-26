@@ -1,9 +1,8 @@
 import React, { useEffect, useCallback } from 'react';
 import { StyleSheet } from 'react-native';
 import Navigation from './src/navigation/navigation';
-
 import messaging from '@react-native-firebase/messaging';
-import notifee, { AndroidImportance } from '@notifee/react-native';
+import notifee from '@notifee/react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const App = () => {
@@ -23,18 +22,20 @@ const App = () => {
       const currentStatus = await messaging().hasPermission();
 
       if (currentStatus === messaging.AuthorizationStatus.AUTHORIZED) {
-        console.log('✅ Firebase permission already granted');
+        console.log(':white_check_mark: Firebase permission already granted');
       } else {
         const granted = await requestUserPermission();
 
         if (granted) {
-          console.log('✅ Firebase permission granted successfully');
+          console.log(
+            ':white_check_mark: Firebase permission granted successfully',
+          );
         } else {
-          console.warn('🚫 Firebase permission denied');
+          console.warn(':no_entry_sign: Firebase permission denied');
         }
       }
     } catch (error) {
-      console.error('❌ Error handling permissions:', error);
+      console.error(':x: Error handling permissions:', error);
     }
   };
 
@@ -55,8 +56,8 @@ const App = () => {
   };
 
   // Display notification when message is received
-  const onMessageReceived = useCallback(async (message) => {
-    console.log('📱 Message received:', message);
+  const onMessageReceived = useCallback(async message => {
+    console.log(':iphone: Message received:', message);
 
     try {
       if (!message || !message.notification) {
@@ -83,20 +84,20 @@ const App = () => {
           sound: 'default',
           vibrationPattern: [300, 500],
           // priority: notifee.AndroidImportance.HIGH,
-          actions: [
-            {
-              title: 'View Details',
-              pressAction: {
-                id: 'view_details',
-              },
-            },
-            {
-              title: 'Dismiss',
-              pressAction: {
-                id: 'dismiss',
-              },
-            },
-          ],
+          // actions: [
+          //   {
+          //     title: 'View Details',
+          //     pressAction: {
+          //       id: 'view_details',
+          //     },
+          //   },
+          //   {
+          //     title: 'Dismiss',
+          //     pressAction: {
+          //       id: 'dismiss',
+          //     },
+          //   },
+          // ],
         },
         ios: {
           categoryId: 'benefits',
@@ -104,41 +105,37 @@ const App = () => {
         },
       });
 
-      console.log('✅ Notification displayed successfully');
-
+      console.log(':white_check_mark: Notification displayed successfully');
     } catch (error) {
-      console.error('❌ Error displaying notification:', error);
+      console.error(':x: Error displaying notification:', error);
     }
   }, []);
-
-  // Register device and get FCM token
   const registerAndGetToken = async () => {
     try {
-      console.log('📲 Registering for remote messages...');
+      console.log(':calling: Registering for remote messages...');
       await messaging().registerDeviceForRemoteMessages();
 
       const token = await messaging().getToken();
-      console.log('📩 FCM Token:', token);
+      console.log(':envelope_with_arrow: FCM Token:', token);
       await AsyncStorage.setItem('fcmToken', token);
     } catch (error) {
-      console.error('❌ Error getting FCM token:', error);
+      console.error(':x: Error getting FCM token:', error);
     }
   };
 
-  // Foreground message listener
   useEffect(() => {
     const unsubscribe = messaging().onMessage(onMessageReceived);
     return unsubscribe;
   }, [onMessageReceived]);
 
   // Background message handler
-  useEffect(() => {
-    messaging().setBackgroundMessageHandler(onMessageReceived);
-  }, [onMessageReceived]);
+  // useEffect(() => {
+  //   messaging().setBackgroundMessageHandler(onMessageReceived);
+  // }, [onMessageReceived]);
 
   // Initialize everything on mount
   useEffect(() => {
-    console.log('🚀 App mounted');
+    console.log(':rocket: App mounted');
     handlePermissions();
     createNotificationChannel();
     registerAndGetToken();

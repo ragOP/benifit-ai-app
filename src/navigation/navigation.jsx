@@ -2,6 +2,8 @@ import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import SplashScreen from '../screens/SplashScreen';
+import Logout from '../screens/Logout';
+
 import BenefitBlogPage from '../screens/BenefitBlogPage';
 import LoginScreen from '../auth/LoginScreen';
 import RegisterScreen from '../auth/RegisterScreen';
@@ -39,6 +41,11 @@ export default function Navigation() {
         <Stack.Screen
           name="BenefitBlogPage"
           component={BenefitBlogPage}
+          screenOptions={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Logout"
+          component={Logout}
           screenOptions={{ headerShown: false }}
         />
       </Stack.Navigator>

@@ -241,6 +241,7 @@ import FormQuestion from '../screens/FormQuestion';
 import MiddleScreen from '../screens/MiddleScreen';
 import CongratsScreen from '../screens/CongratsScreen';
 import BenefitBlogPage from '../screens/BenefitBlogPage';
+import Logout from '../screens/Logout';
 
 const HomeStack = createStackNavigator();
 
@@ -287,7 +288,7 @@ const CustomBottomNavigation = () => {
       title: 'Me',
       focusedIcon: 'account',
       unfocusedIcon: 'account-outline',
-      component: BenefitBlogPage,
+      component: Logout,
     },
   ];
 
@@ -303,13 +304,13 @@ const CustomBottomNavigation = () => {
 
   const renderLabel = ({ route, focused, color }) => {
     return (
-      <Text 
+      <Text
         style={[
           styles.tabLabel,
-          { 
+          {
             color: color,
-            fontWeight: focused ? '600' : '400'
-          }
+            fontWeight: focused ? '600' : '400',
+          },
         ]}
       >
         {route.title}
@@ -342,9 +343,7 @@ const CustomBottomNavigation = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.contentContainer}>
-        {renderScene()}
-      </View>
+      <View style={styles.contentContainer}>{renderScene()}</View>
       <View style={styles.bottomNavBar}>
         {routes.map((route, index) => renderTab(route, index))}
       </View>
