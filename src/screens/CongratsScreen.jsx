@@ -12,6 +12,7 @@ import {
   Alert,
 } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
+import { BACKEND_URL } from '../utils/backendUrl';
 
 // ✅ Color constants
 const COLORS = {
@@ -167,7 +168,8 @@ const StepperCard = ({ benefits, userId }) => {
 
     try {
       const response = await fetch(
-        'http://10.0.2.2:9005/api/v1/users/abandoned-claim',
+        `${BACKEND_URL}/api/v1/users/abandoned-claim`,
+        // 'http://10.0.2.2:9005/api/v1/users/abandoned-claim',
         {
           method: 'POST',
           headers: {

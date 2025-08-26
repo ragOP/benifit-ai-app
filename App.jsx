@@ -87,7 +87,8 @@ const App = () => {
         },
         android: {
           channelId: 'benefits',
-          largeIcon: 'ic_launcher',
+          smallIcon: 'benefit_icon',
+          largeIcon: 'benefit_icon',
           color: getNotificationColor(successCount, failureCount),
           progress: {
             max: parseInt(totalUsers) || 0,
