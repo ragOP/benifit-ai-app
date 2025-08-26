@@ -276,10 +276,10 @@ const CustomBottomNavigation = () => {
       component: BenefitBlogPage,
     },
     {
-      key: 'bag',
-      title: 'Bag',
-      focusedIcon: 'shopping',
-      unfocusedIcon: 'shopping-outline',
+      key: 'blog',
+      title: 'Blog',
+      focusedIcon: 'post',
+      unfocusedIcon: 'post',
       component: BenefitBlogPage,
     },
     {
