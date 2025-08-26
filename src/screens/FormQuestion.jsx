@@ -285,7 +285,7 @@ export default function FormQuestion({ navigation }) {
 
     try {
       await AsyncStorage.setItem('userId', userId);
-      console.log('✅ Saved userId in AsyncStorage:', userId);
+      console.log('Saved userId in AsyncStorage:', userId);
 
       const res = await fetch('http://10.0.2.2:9005/api/v1/users/response', {
         method: 'POST',
