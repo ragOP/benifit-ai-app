@@ -46,17 +46,20 @@ const LoginScreen = ({ navigation }) => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://10.0.2.2:9005/api/v1/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        'https://benifit-ai-app-be.onrender.com/api/v1/auth/login',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username,
+            password,
+            fcmToken,
+          }),
         },
-        body: JSON.stringify({
-          username,
-          password,
-          fcmToken,
-        }),
-      });
+      );
       console.log('Loginpaylod', fcmToken);
       const data = await response.json();
       console.log('LOGIN RESPONSE:', data);

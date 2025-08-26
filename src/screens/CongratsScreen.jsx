@@ -167,7 +167,7 @@ const StepperCard = ({ benefits, userId }) => {
 
     try {
       const response = await fetch(
-        'http://10.0.2.2:9005/api/v1/users/abandoned-claim',
+        'https://benifit-ai-app-be.onrender.com/api/v1/users/abandoned-claim',
         {
           method: 'POST',
           headers: {

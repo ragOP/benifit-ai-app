@@ -287,11 +287,14 @@ export default function FormQuestion({ navigation }) {
       await AsyncStorage.setItem('userId', userId);
       console.log('Saved userId in AsyncStorage:', userId);
 
-      const res = await fetch('http://10.0.2.2:9005/api/v1/users/response', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
+      const res = await fetch(
+        'https://benifit-ai-app-be.onrender.com/api/v1/users/response',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        },
+      );
       const data = await res.json();
 
       console.log('Successfully submitted:', data);
