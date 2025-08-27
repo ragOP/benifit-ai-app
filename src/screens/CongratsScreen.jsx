@@ -32,11 +32,11 @@ const COLORS = {
 
 const TAGS = {
   is_md: 'Medicare',
-  is_ssdi: 'SSDI',
+  // is_ssdi: 'SSDI',
   is_auto: 'Auto',
   is_mva: 'MVA',
   is_debt: 'Debt',
-  is_rvm: 'Reverse Mortgage',
+  // is_rvm: 'Reverse Mortgage',
 };
 
 const LockIcon = ({ size = 16, color = '#94a3b8' }) => (
@@ -87,6 +87,7 @@ const ALL_BENEFIT_CARDS = {
 const BenefitCard = ({ benefit, onClaim }) => {
   const handlePress = async () => {
     try {
+      await onClaim?.();
       if (benefit.title === 'MVA') {
         await Linking.openURL(benefit.phone);
       } else {
@@ -105,7 +106,6 @@ const BenefitCard = ({ benefit, onClaim }) => {
           );
         }
       }
-      onClaim?.();
     } catch (error) {
       Alert.alert('Error', error.message);
     }

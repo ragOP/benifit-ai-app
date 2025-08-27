@@ -274,7 +274,7 @@ export default function FormQuestion({ navigation }) {
       userId,
       fullName,
       age: allAnswers['Okay, what is your age today?'],
-      zipcode: allAnswers["Nice, and what's your zip code?"],
+      zipCode: allAnswers["Nice, and what's your zip code?"],
       tags: tags || [],
       origin: `6-${'utmCampaign'}`,
       sendMessageOn: 'SMS',

@@ -241,6 +241,8 @@ import FormQuestion from '../screens/FormQuestion';
 import MiddleScreen from '../screens/MiddleScreen';
 import CongratsScreen from '../screens/CongratsScreen';
 import BenefitBlogPage from '../screens/BenefitBlogPage';
+import ClaimedScreen from '../screens/ClaimedScreen';
+
 import Logout from '../screens/Logout';
 
 const HomeStack = createStackNavigator();
@@ -271,10 +273,10 @@ const CustomBottomNavigation = () => {
     },
     {
       key: 'menu',
-      title: 'Menu',
+      title: 'Unclaimed Offer',
       focusedIcon: 'menu',
       unfocusedIcon: 'menu',
-      component: BenefitBlogPage,
+      component: ClaimedScreen,
     },
     {
       key: 'blog',
@@ -367,22 +369,23 @@ const styles = StyleSheet.create({
     backgroundColor: '#F9FAFB',
     borderTopWidth: 1,
     borderTopColor: '#E5E7EB',
-    height: 60,
+    height: 70,
     elevation: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
+    paddingBottom: 10,
   },
   tabItem: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 8,
+    paddingVertical: 10,
   },
   iconContainer: {
-    width: 30,
-    height: 30,
+    width: 32,
+    height: 32,
     justifyContent: 'center',
     alignItems: 'center',
   },

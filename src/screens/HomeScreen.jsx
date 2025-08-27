@@ -73,8 +73,6 @@ export default function HomeScreen({ navigation }) {
     }
     return () => clearInterval(interval);
   }, [isAnimating]);
-
-  // Initialize notification service
   useEffect(() => {
     const initNotifications = async () => {
       await NotificationService.initialize();
@@ -140,7 +138,6 @@ export default function HomeScreen({ navigation }) {
             resizeMode="contain"
           />
         </View>
-        {/* Ribbon */}
         <View style={styles.ribbonWrap}>
           <View style={styles.ribbon}>
             <Text style={styles.ribbonText}>
@@ -156,8 +153,7 @@ export default function HomeScreen({ navigation }) {
           </View>
 
           <Text style={styles.headline}>
-            Americans, Get Your Benefits Eligibility Check in Just 60
-            Seconds!
+            Americans, Get Your Benefits Eligibility Check in Just 60 Seconds!
           </Text>
 
           <View style={styles.checkList}>
@@ -165,7 +161,7 @@ export default function HomeScreen({ navigation }) {
             <CheckRow text="Takes Under 2 Minutes" />
             <CheckRow text="90% Of Users Qualify for Benefits $2500+" />
           </View>
-          
+
           <View style={styles.ctaContainer}>
             <TouchableOpacity
               activeOpacity={0.9}
@@ -178,16 +174,18 @@ export default function HomeScreen({ navigation }) {
                 style={[
                   styles.shimmer,
                   {
-                    transform: [{
-                      translateX: shimmerAnimation.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: [-width, width],
-                      })
-                    }]
-                  }
+                    transform: [
+                      {
+                        translateX: shimmerAnimation.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [-width, width],
+                        }),
+                      },
+                    ],
+                  },
                 ]}
               />
-              
+
               <View
                 style={{
                   overflow: 'hidden',
@@ -223,7 +221,7 @@ export default function HomeScreen({ navigation }) {
               </View>
             </TouchableOpacity>
           </View>
-          
+
           <Text style={styles.claim}>
             <Text style={styles.claimNumber}>69</Text>
             <Text style={styles.claimBold}>

@@ -69,7 +69,9 @@ const LoginScreen = ({ navigation }) => {
       if (response.ok && data.data && data.data.token) {
         const token = data.data.token;
         await AsyncStorage.setItem('userToken', token);
+        await AsyncStorage.setItem('userName', username);
         console.log('Saved Token:', token);
+        console.log('Saved Username:', username);
         navigation.navigate('BottomNavigation');
       } else {
         Alert.alert('Login Failed', data.message || 'Something went wrong');

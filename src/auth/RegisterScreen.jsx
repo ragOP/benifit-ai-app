@@ -69,6 +69,8 @@ const RegisterScreen = ({ navigation }) => {
       if (response.ok && data.data && data.data.token) {
         const token = data.data.token;
         await AsyncStorage.setItem('userToken', token);
+        await AsyncStorage.setItem('userName', username);
+        console.log('Saved Username:', username);
         const savedToken = await AsyncStorage.getItem('userToken');
         console.log('Saved Token:', savedToken);
 
