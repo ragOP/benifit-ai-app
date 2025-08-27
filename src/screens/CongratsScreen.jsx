@@ -14,7 +14,6 @@ import {
 import Svg, { Path } from 'react-native-svg';
 import { BACKEND_URL } from '../utils/backendUrl';
 
-// ✅ Color constants
 const COLORS = {
   black: '#000000',
   dark: '#0c1a17',

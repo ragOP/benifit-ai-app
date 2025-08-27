@@ -102,7 +102,7 @@ export default function ProfileScreen() {
 
             navigation.reset({
               index: 0,
-              routes: [{ name: 'Login' }], // Apne navigator ka Login screen ka exact name yahan dena
+              routes: [{ name: 'Login' }],
             });
           } catch (error) {
             console.error('Logout error:', error);

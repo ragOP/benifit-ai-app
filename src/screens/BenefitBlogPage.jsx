@@ -10,10 +10,8 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-// 👇👇 ADD THIS LINE
 import { useNavigation } from '@react-navigation/native';
 
-// Mock data
 const DATA = [
   {
     id: '1',
@@ -45,7 +43,6 @@ const DATA = [
   },
 ];
 
-// CardItem remains a presentational child
 const CardItem = ({ item, onPress }) => (
   <TouchableOpacity onPress={onPress} activeOpacity={0.9}>
     <View style={styles.card}>
@@ -64,9 +61,8 @@ const CardItem = ({ item, onPress }) => (
   </TouchableOpacity>
 );
 
-// Always use useNavigation at the top of your component
 export default function BenefitBlogPage() {
-  const navigation = useNavigation(); // 👈 FIX: Use hook, never undefined
+  const navigation = useNavigation(); 
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#f5f5f5' }}>
