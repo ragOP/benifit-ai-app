@@ -1,11 +1,36 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import Navigation from './src/navigation/navigation';
 import messaging from '@react-native-firebase/messaging';
 import notifee from '@notifee/react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getAuth, onAuthStateChanged } from '@react-native-firebase/auth';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 const App = () => {
+  // Authentication state
+  const [initializing, setInitializing] = useState(true);
+  const [user, setUser] = useState(null);
+
+  // Handle user state changes
+  const handleAuthStateChanged = useCallback((user) => {
+    setUser(user);
+    if (initializing) setInitializing(false);
+  }, [initializing]);
+
+  // Initialize Google Sign-In
+  useEffect(() => {
+    GoogleSignin.configure({
+      webClientId: 'YOUR_WEB_CLIENT_ID.apps.googleusercontent.com', // Get this from Firebase Console
+    });
+  }, []);
+
+  // Listen for auth state changes
+  useEffect(() => {
+    const subscriber = onAuthStateChanged(getAuth(), handleAuthStateChanged);
+    return subscriber;
+  }, [handleAuthStateChanged]);
+
   // Request user permission for notifications
   const requestUserPermission = async () => {
     const authStatus = await messaging().requestPermission();
@@ -140,6 +165,8 @@ const App = () => {
     createNotificationChannel();
     registerAndGetToken();
   }, []);
+
+  if (initializing) return null;
 
   return <Navigation />;
 };
