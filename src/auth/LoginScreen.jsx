@@ -13,8 +13,8 @@ import { Eye, EyeOff, Mail, Lock } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BACKEND_URL } from '../utils/backendUrl';
-import { getAuth, signInWithCredential, GoogleAuthProvider } from '@react-native-firebase/auth';
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
+// import { getAuth, signInWithCredential, GoogleAuthProvider } from '@react-native-firebase/auth';
+// import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 const LoginScreen = ({ navigation }) => {
   const [username, setUsername] = useState('');
@@ -87,34 +87,34 @@ const LoginScreen = ({ navigation }) => {
     }
   };
 
-  const signInWithGoogle = async () => {
-    try {
-      setGoogleLoading(true);
+  // const signInWithGoogle = async () => {
+  //   try {
+  //     setGoogleLoading(true);
       
-      // Check if your device supports Google Play
-      await GoogleSignin.hasPlayServices();
+  //     // Check if your device supports Google Play
+  //     await GoogleSignin.hasPlayServices();
       
-      // Get the users ID token
-      const { idToken } = await GoogleSignin.signIn();
+  //     // Get the users ID token
+  //     const { idToken } = await GoogleSignin.signIn();
       
-      // Create a Google credential with the token
-      const googleCredential = GoogleAuthProvider.credential(idToken);
+  //     // Create a Google credential with the token
+  //     const googleCredential = GoogleAuthProvider.credential(idToken);
       
-      // Sign-in the user with the credential
-      const auth = getAuth();
-      await signInWithCredential(auth, googleCredential);
+  //     // Sign-in the user with the credential
+  //     const auth = getAuth();
+  //     await signInWithCredential(auth, googleCredential);
       
-      console.log('Google sign-in successful');
-      // Navigate to main app after successful Google sign-in
-      navigation.navigate('BottomNavigation');
+  //     console.log('Google sign-in successful');
+  //     // Navigate to main app after successful Google sign-in
+  //     navigation.navigate('BottomNavigation');
       
-    } catch (error) {
-      console.error('Google sign-in error:', error);
-      Alert.alert('Error', 'Google sign-in failed. Please try again.');
-    } finally {
-      setGoogleLoading(false);
-    }
-  };
+  //   } catch (error) {
+  //     console.error('Google sign-in error:', error);
+  //     Alert.alert('Error', 'Google sign-in failed. Please try again.');
+  //   } finally {
+  //     setGoogleLoading(false);
+  //   }
+  // };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -184,7 +184,7 @@ const LoginScreen = ({ navigation }) => {
           )}
 
           {/* Google Sign-In Button */}
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={styles.googleButton}
             activeOpacity={0.9}
             onPress={signInWithGoogle}
@@ -195,7 +195,7 @@ const LoginScreen = ({ navigation }) => {
             ) : (
               <Text style={styles.googleButtonText}>Continue with Google</Text>
             )}
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
 
         <View style={styles.registerContainer}>

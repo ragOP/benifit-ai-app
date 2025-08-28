@@ -4,8 +4,8 @@ import Navigation from './src/navigation/navigation';
 import messaging from '@react-native-firebase/messaging';
 import notifee from '@notifee/react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getAuth, onAuthStateChanged } from '@react-native-firebase/auth';
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
+// import { getAuth, onAuthStateChanged } from '@react-native-firebase/auth';
+// import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 const App = () => {
   // Authentication state
@@ -19,17 +19,17 @@ const App = () => {
   }, [initializing]);
 
   // Initialize Google Sign-In
-  useEffect(() => {
-    GoogleSignin.configure({
-      webClientId: 'YOUR_WEB_CLIENT_ID.apps.googleusercontent.com', // Get this from Firebase Console
-    });
-  }, []);
+  // useEffect(() => {
+  //   GoogleSignin.configure({
+  //     webClientId: 'YOUR_WEB_CLIENT_ID.apps.googleusercontent.com', // Get this from Firebase Console
+  //   });
+  // }, []);
 
   // Listen for auth state changes
-  useEffect(() => {
-    const subscriber = onAuthStateChanged(getAuth(), handleAuthStateChanged);
-    return subscriber;
-  }, [handleAuthStateChanged]);
+  // useEffect(() => {
+  //   const subscriber = onAuthStateChanged(getAuth(), handleAuthStateChanged);
+  //   return subscriber;
+  // }, [handleAuthStateChanged]);
 
   // Request user permission for notifications
   const requestUserPermission = async () => {
@@ -104,7 +104,7 @@ const App = () => {
         android: {
           channelId: 'benefits',
           smallIcon: 'ic_launcher',
-          // largeIcon: 'ic_launcher',
+          largeIcon: 'ic_launcher',
           color: '#0F766E',
           sound: 'default',
           vibrationPattern: [300, 500],
@@ -166,7 +166,7 @@ const App = () => {
     registerAndGetToken();
   }, []);
 
-  if (initializing) return null;
+  // if (initializing) return null;
 
   return <Navigation />;
 };
