@@ -23,6 +23,7 @@ import { useNavigation } from '@react-navigation/native';
 const COLORS = {
   bg: '#16391A',
   bg2: '#1F4720',
+  black: '#000000',
   white: '#FFF',
   cardBg: '#F9F9F9',
   title: '#21382B',
@@ -114,7 +115,7 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <StatusBar barStyle="light-content" backgroundColor={COLORS.bg} />
+      <StatusBar barStyle="light-content" backgroundColor={COLORS.black} />
 
       <View style={styles.header}>
         <Text style={styles.profileTitle}>Profile</Text>

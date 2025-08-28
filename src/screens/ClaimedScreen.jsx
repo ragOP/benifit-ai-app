@@ -208,13 +208,17 @@ const ClaimedScreen = () => {
     );
   };
 
-  if (loading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color={COLORS.teal} />
+  const renderSkeletonCard = () => (
+    <View style={styles.skeletonCard}>
+      <View style={styles.skeletonImage} />
+      <View style={styles.skeletonContent}>
+        <View style={styles.skeletonTitle} />
+        <View style={styles.skeletonBadge} />
+        <View style={styles.skeletonDescription} />
+        <View style={styles.skeletonButton} />
       </View>
-    );
-  }
+    </View>
+  );
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
@@ -235,8 +239,15 @@ const ClaimedScreen = () => {
           </View>
         </View> */}
         <View style={styles.content}>
-          <Text style={styles.sectionHeader}>Claimed Offers</Text>
-          {claimedOffers.length > 0 ? (
+          <Text style={styles.sectionHeader}>
+            Claimed Offers {claimedOffers.length > 0 ? `(${claimedOffers.length})` : ''}
+          </Text>
+          {loading ? (
+            <>
+              {renderSkeletonCard()}
+              {renderSkeletonCard()}
+            </>
+          ) : claimedOffers.length > 0 ? (
             claimedOffers.map((item, index) => (
               <View key={index} style={styles.cardWrapper}>
                 <Text style={styles.userIdText}>User ID: {userId}</Text>
@@ -255,14 +266,35 @@ const ClaimedScreen = () => {
             </View>
           )}
 
-          <Text style={styles.sectionHeader}>Unclaimed Offers</Text>
-          {unclaimedOffers.length > 0 ? (
+          <Text style={styles.sectionHeader}>
+            Unclaimed Offers {unclaimedOffers.length > 0 ? `(${unclaimedOffers.length})` : ''}
+          </Text>
+          {loading ? (
+            <>
+              {renderSkeletonCard()}
+              {renderSkeletonCard()}
+              {renderSkeletonCard()}
+            </>
+          ) : unclaimedOffers.length > 0 ? (
             unclaimedOffers.map((item, index) => (
               <View key={index} style={styles.cardWrapper}>
                 <Text style={styles.userIdText}>User ID: {userId}</Text>
                 {renderCard(item, false)}
               </View>
             ))
+          ) : claimedOffers?.length > 0 ? (
+            <View style={styles.emptyStateContainer}>
+              <View style={styles.emptyStateIcon}>
+                <Text style={styles.emptyStateEmoji}>🎉</Text>
+              </View>
+              <Text style={styles.emptyStateTitle}>Congratulations!</Text>
+              <Text style={styles.emptyStateSubtitle}>
+                You've claimed all available offers! Check back later for new benefits.
+              </Text>
+              <View style={styles.successBadge}>
+                <Text style={styles.successBadgeText}>All Offers Claimed! 🎯</Text>
+              </View>
+            </View>
           ) : (
             <View style={styles.emptyStateContainer}>
               <View style={styles.emptyStateIcon}>
@@ -272,7 +304,6 @@ const ClaimedScreen = () => {
               <Text style={styles.emptyStateSubtitle}>
                 Complete your registration to discover and claim amazing benefits you're eligible for!
               </Text>
-
             </View>
           )}
         </View>
@@ -281,7 +312,7 @@ const ClaimedScreen = () => {
   );
 };
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: COLORS.bg, paddingBottom: 20 },
+  safe: { flex: 1, backgroundColor: COLORS.bg, },
   header: {
     backgroundColor: COLORS.black,
     paddingTop: 0,
@@ -308,8 +339,7 @@ const styles = StyleSheet.create({
   },
   ribbonWrap: {},
   content: {
-    paddingHorizontal: 30,
-    paddingTop: 18,
+    paddingHorizontal: 20,
   },
   center: {
     flex: 1,
@@ -468,6 +498,54 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
     letterSpacing: 0.3,
+  },
+  skeletonCard: {
+    backgroundColor: COLORS.white,
+    marginHorizontal: 20,
+    marginBottom: 20,
+    padding: 20,
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  skeletonImage: {
+    width: '100%',
+    height: 180,
+    backgroundColor: '#E5E7EB',
+    borderRadius: 12,
+    marginBottom: 16,
+  },
+  skeletonContent: {
+    gap: 12,
+  },
+  skeletonTitle: {
+    height: 24,
+    backgroundColor: '#E5E7EB',
+    borderRadius: 6,
+    width: '80%',
+  },
+  skeletonBadge: {
+    height: 20,
+    backgroundColor: '#E5E7EB',
+    borderRadius: 10,
+    width: '40%',
+  },
+  skeletonDescription: {
+    height: 16,
+    backgroundColor: '#E5E7EB',
+    borderRadius: 4,
+    width: '100%',
+    marginBottom: 8,
+  },
+  skeletonButton: {
+    height: 40,
+    backgroundColor: '#E5E7EB',
+    borderRadius: 8,
+    width: '60%',
+    alignSelf: 'center',
   },
 });
 

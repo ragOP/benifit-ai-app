@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { BACKEND_URL } from '../utils/backendUrl';
 import {
   View,
   Text,
@@ -54,6 +56,10 @@ export default function HomeScreen({ navigation }) {
   const [counter, setCounter] = useState(1200);
   const [isAnimating, setIsAnimating] = useState(true);
   const [showLoader, setShowLoader] = useState(false);
+  const [showCongratulations, setShowCongratulations] = useState(false);
+  const [redirectTimer, setRedirectTimer] = useState(5);
+  const [isCheckingUser, setIsCheckingUser] = useState(false);
+  const [hasCompletedFlow, setHasCompletedFlow] = useState(false);
   const fingerAnimation = useRef(new Animated.Value(0)).current;
   const shimmerAnimation = useRef(new Animated.Value(0)).current;
 
@@ -78,6 +84,24 @@ export default function HomeScreen({ navigation }) {
       await NotificationService.initialize();
     };
     initNotifications();
+  }, []);
+
+  useEffect(() => {
+    const checkStoredUserFlow = async () => {
+      try {
+        const storedUserFlow = await AsyncStorage.getItem('userFlowCompleted');
+        if (storedUserFlow) {
+          const userData = JSON.parse(storedUserFlow);
+          if (userData.success && userData.data && userData.data.userId) {
+            setHasCompletedFlow(true);
+          }
+        }
+      } catch (error) {
+        console.error('Error checking stored user flow:', error);
+      }
+    };
+
+    checkStoredUserFlow();
   }, []);
 
   useEffect(() => {
@@ -117,14 +141,94 @@ export default function HomeScreen({ navigation }) {
   }, [shimmerAnimation]);
 
   const formatNumber = number => `$${number.toFixed(0)}`;
+  const checkUserFlow = async () => {
+    try {
+      const userId = await AsyncStorage.getItem('userId');
+      if (!userId) {
+        // No userId, start new flow
+        setShowLoader(true);
+        setIsAnimating(false);
+        setTimeout(() => {
+          setShowLoader(false);
+          navigation.navigate('Question');
+        }, 1500);
+        return;
+      }
+
+      // User has userId, check if they've completed the flow
+      setIsCheckingUser(true);
+      const response = await fetch(
+        `${BACKEND_URL}/api/v1/users/qualified-user?userId=${userId}`,
+        {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.success && data.data && data.data.userId) {
+        // User has completed the flow - store in AsyncStorage
+        await AsyncStorage.setItem('userFlowCompleted', JSON.stringify(data));
+        setHasCompletedFlow(true);
+        setShowCongratulations(true);
+        setIsCheckingUser(false);
+
+        // Start countdown timer - 5 seconds
+        let timer = 5;
+        setRedirectTimer(timer);
+
+        const countdown = setInterval(() => {
+          timer -= 1;
+          setRedirectTimer(timer);
+
+          if (timer <= 0) {
+            clearInterval(countdown);
+            // Reset navigation stack to ensure fresh state
+            navigation.reset({
+              index: 0,
+              routes: [
+                { name: 'BottomNavigation', params: { initialTab: 1 } }
+              ],
+            });
+          }
+        }, 1000);
+      } else {
+        // User doesn't exist or hasn't completed flow, start new flow
+        setShowLoader(true);
+        setIsAnimating(false);
+        setTimeout(() => {
+          setShowLoader(false);
+          navigation.navigate('Question');
+        }, 1500);
+      }
+    } catch (error) {
+      console.error('Error checking user flow:', error);
+      // On error, start new flow
+      setShowLoader(true);
+      setIsAnimating(false);
+      setTimeout(() => {
+        setShowLoader(false);
+        navigation.navigate('Question');
+      }, 1500);
+    } finally {
+      setIsCheckingUser(false);
+    }
+  };
+
   const handleStartNow = () => {
-    if (showLoader) return;
-    setShowLoader(true);
-    setIsAnimating(false);
-    setTimeout(() => {
-      setShowLoader(false);
-      navigation.navigate('Question');
-    }, 1500);
+    if (showLoader || isCheckingUser) return;
+    checkUserFlow();
+  };
+
+  const handleGoToOffers = () => {
+    // Reset navigation stack to ensure fresh state
+    navigation.reset({
+      index: 0,
+      routes: [
+        { name: 'BottomNavigation', params: { initialTab: 1 } }
+      ],
+    });
   };
 
   return (
@@ -163,63 +267,80 @@ export default function HomeScreen({ navigation }) {
           </View>
 
           <View style={styles.ctaContainer}>
-            <TouchableOpacity
-              activeOpacity={0.9}
-              style={[styles.cta, showLoader && styles.ctaDisabled]}
-              onPress={handleStartNow}
-              disabled={showLoader}
-            >
-              {/* Shimmer Effect */}
-              <Animated.View
-                style={[
-                  styles.shimmer,
-                  {
-                    transform: [
-                      {
-                        translateX: shimmerAnimation.interpolate({
-                          inputRange: [0, 1],
-                          outputRange: [-width, width],
-                        }),
-                      },
-                    ],
-                  },
-                ]}
-              />
-
-              <View
-                style={{
-                  overflow: 'hidden',
-                  flex: 1,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  zIndex: 1,
-                }}
+            {hasCompletedFlow ? (
+              <>
+                <Text style={styles.alreadyCompletedText}>
+                  You have already filled out the form! 🎉
+                </Text>
+                <TouchableOpacity
+                  activeOpacity={0.9}
+                  style={[styles.cta, styles.ctaOffers]}
+                  onPress={handleGoToOffers}
+                >
+                  <Text style={styles.ctaText}>GO TO OFFERS</Text>
+                  <ChevronRight size={24} color="#fff" />
+                </TouchableOpacity>
+              
+              </>
+            ) : (
+              <TouchableOpacity
+                activeOpacity={0.9}
+                style={[styles.cta, showLoader && styles.ctaDisabled]}
+                onPress={handleStartNow}
+                disabled={showLoader}
               >
+                {/* Shimmer Effect */}
+                <Animated.View
+                  style={[
+                    styles.shimmer,
+                    {
+                      transform: [
+                        {
+                          translateX: shimmerAnimation.interpolate({
+                            inputRange: [0, 1],
+                            outputRange: [-width, width],
+                          }),
+                        },
+                      ],
+                    },
+                  ]}
+                />
+
                 <View
                   style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
+                    overflow: 'hidden',
+                    flex: 1,
                     justifyContent: 'center',
+                    alignItems: 'center',
+                    zIndex: 1,
                   }}
                 >
-                  {showLoader ? (
-                    <View style={styles.loaderRow}>
-                      <InfinityLoader />
-                    </View>
-                  ) : (
-                    <>
-                      <Animated.View
-                        style={{ transform: [{ translateX: fingerAnimation }] }}
-                      >
-                        <Text style={styles.ctaText}>👉 </Text>
-                      </Animated.View>
-                      <Text style={styles.ctaText}>START NOW</Text>
-                      <ChevronRight size={24} color="#fff" />
-                    </>
-                  )}
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    {showLoader ? (
+                      <View style={styles.loaderRow}>
+                        <InfinityLoader />
+                      </View>
+                    ) : (
+                      <>
+                        <Animated.View
+                          style={{ transform: [{ translateX: fingerAnimation }] }}
+                        >
+                          <Text style={styles.ctaText}>👉 </Text>
+                        </Animated.View>
+                        <Text style={styles.ctaText}>START NOW</Text>
+                        <ChevronRight size={24} color="#fff" />
+                      </>
+                    )}
+                  </View>
                 </View>
-              </View>
-            </TouchableOpacity>
+              </TouchableOpacity>
+            )}
           </View>
 
           <Text style={styles.claim}>
@@ -239,12 +360,36 @@ export default function HomeScreen({ navigation }) {
         </View>
         <FaqSection />
       </ScrollView>
+
+      {/* Congratulations Overlay */}
+      {showCongratulations && (
+        <View style={styles.congratulationsOverlay}>
+          <View style={styles.congratulationsCard}>
+            <Text style={styles.congratulationsEmoji}>🎉</Text>
+            <Text style={styles.congratulationsTitle}>Congratulations!</Text>
+            <Text style={styles.congratulationsSubtitle}>
+              You have already submitted your information!
+            </Text>
+            <Text style={styles.redirectText}>
+              Redirecting to offers section in {redirectTimer} seconds...
+            </Text>
+            <View style={styles.progressBar}>
+              <View
+                style={[
+                  styles.progressFill,
+                  { width: `${((5 - redirectTimer) / 5) * 100}%` }
+                ]}
+              />
+            </View>
+          </View>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: COLORS.bg, paddingBottom: 20 },
+  safe: { flex: 1, backgroundColor: COLORS.bg },
   header: {
     backgroundColor: COLORS.black,
     paddingTop: 0,
@@ -399,5 +544,77 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     textAlign: 'center',
+  },
+  congratulationsOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1000,
+  },
+  congratulationsCard: {
+    backgroundColor: COLORS.white,
+    padding: 32,
+    borderRadius: 24,
+    alignItems: 'center',
+    maxWidth: '85%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  congratulationsEmoji: {
+    fontSize: 48,
+    marginBottom: 16,
+  },
+  congratulationsTitle: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: COLORS.teal,
+    textAlign: 'center',
+    marginBottom: 12,
+  },
+  congratulationsSubtitle: {
+    fontSize: 18,
+    color: COLORS.text,
+    textAlign: 'center',
+    marginBottom: 20,
+    lineHeight: 24,
+  },
+  redirectText: {
+    fontSize: 16,
+    color: COLORS.sub,
+    textAlign: 'center',
+    marginBottom: 20,
+    fontWeight: '500',
+  },
+  progressBar: {
+    width: '100%',
+    height: 8,
+    backgroundColor: '#E5E7EB',
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: COLORS.teal,
+    borderRadius: 4,
+  },
+  alreadyCompletedText: {
+    fontSize: 16,
+    fontStyle: 'italic',
+    fontWeight: '600',
+    color: COLORS.teal,
+    textAlign: 'center',
+    marginBottom: 16,
+    paddingHorizontal: 20,
+  },
+  ctaOffers: {
+    backgroundColor: COLORS.tealDark,
   },
 });

@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { BACKEND_URL } from '../utils/backendUrl';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const COLORS = {
   black: '#000000',
@@ -273,7 +274,7 @@ const CongratsScreen = ({ route }) => {
   const filteredBenefits = getFilteredBenefits();
 
   return (
-    <View style={styles.safe}>
+    <SafeAreaView style={styles.safe}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.black} />
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
@@ -315,16 +316,16 @@ const CongratsScreen = ({ route }) => {
           </Text>
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: COLORS.bg },
-  header: { backgroundColor: COLORS.black, paddingTop: '10%' },
+  header: { backgroundColor: COLORS.black },
   logo: { width: 'auto', height: 60, marginRight: 10 },
   congratsCard: { marginHorizontal: 20, marginTop: 25 },
   congratsTitle: {
-    fontSize: 29,
+    fontSize: 24,
     fontWeight: '900',
     color: COLORS.text,
     marginBottom: 7,

@@ -9,6 +9,7 @@ import {
   Animated,
   ScrollView,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 
 const COLORS = {
@@ -141,7 +142,7 @@ const QuestionScreen = ({ navigation }) => {
   const thirdShown = chat.some(m => m.id === 3);
 
   return (
-    <View style={styles.safe}>
+    <SafeAreaView style={styles.safe}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.black} />
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
@@ -183,13 +184,13 @@ const QuestionScreen = ({ navigation }) => {
           )}
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: COLORS.bg },
-  header: { backgroundColor: COLORS.black, paddingTop: '10%' },
+  header: { backgroundColor: COLORS.black },
   logo: { width: 'auto', height: 60, marginRight: 10 },
   ribbonWrap: {},
   ribbon: {

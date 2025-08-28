@@ -68,6 +68,7 @@ const benefitExplanations = {
     'This benefit is especially valuable for those recovering from injuries or facing long-term recovery.',
   ],
 };
+
 const COLORS = {
   black: '#000',
   lightText: '#666',
@@ -114,16 +115,12 @@ export default function BlogDetailScreen({ route, navigation }) {
           >
             <ChevronLeft size={24} color="#FFF" strokeWidth={2.5} />
           </TouchableOpacity>
-          <Image
-            source={require('../assets/center.png')}
-            style={styles.logo}
-            resizeMode="contain"
-          />
+          <Text style={styles.headerTitle}>{card.title}</Text>
         </View>
       </SafeAreaView>
       <ScrollView
         style={{ flex: 1 }}
-        contentContainerStyle={{ paddingBottom: 40 }}
+        contentContainerStyle={{ paddingBottom: 40, paddingTop: 20 }}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.imageContainer}>
@@ -139,16 +136,37 @@ export default function BlogDetailScreen({ route, navigation }) {
           )}
         </View>
 
-        <Text style={styles.subtitle}>What is this benefit?</Text>
-        <Text style={styles.description}>{card.description}</Text>
-
-        <View style={styles.bulletList}>
-          {benefitsList.map((item, idx) => (
-            <View key={idx} style={styles.bulletRow}>
-              <Text style={styles.bullet}>•</Text>
-              <Text style={styles.bulletText}>{item}</Text>
+        <View style={styles.contentSection}>
+          <View style={styles.sectionHeader}>
+            <View style={styles.sectionIcon}>
+              <Text style={styles.sectionIconText}>💡</Text>
             </View>
-          ))}
+            <Text style={styles.subtitle}>What is this benefit?</Text>
+          </View>
+          
+          <View style={styles.descriptionCard}>
+            <Text style={styles.description}>{card.description}</Text>
+          </View>
+        </View>
+
+        <View style={styles.benefitsSection}>
+          <View style={styles.sectionHeader}>
+            <View style={styles.sectionIcon}>
+              <Text style={styles.sectionIconText}>✨</Text>
+            </View>
+            <Text style={styles.subtitle}>Key Benefits</Text>
+          </View>
+          
+          <View style={styles.benefitsCard}>
+            {benefitsList.map((item, idx) => (
+              <View key={idx} style={styles.benefitItem}>
+                <View style={styles.benefitIcon}>
+                  <Text style={styles.benefitIconText}>✓</Text>
+                </View>
+                <Text style={styles.benefitText}>{item}</Text>
+              </View>
+            ))}
+          </View>
         </View>
       </ScrollView>
     </View>
@@ -161,34 +179,30 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.cardBG,
   },
   safe: {
-    backgroundColor: COLORS.headerBG,
+    backgroundColor: COLORS.black,
   },
   header: {
     backgroundColor: 'black',
-    paddingVertical: 8,
-    paddingHorizontal: 24,
+    paddingVertical: 16,
+    paddingHorizontal: 10,
+    gap: 14,
+    flexDirection: 'row',
     alignItems: 'center',
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: '#eee',
-    position: 'relative',
   },
-  logo: {
-    width: '100%',
-    height: 60,
-    marginRight: 10,
+  headerTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    flex: 1,
   },
   backButton: {
-    position: 'absolute',
-    left: 16,
-    top: 30,
-    zIndex: 1,
+    paddingVertical: 8,
+    paddingHorizontal: 8,
   },
   imageContainer: {
-    marginTop: 16,
-    marginHorizontal: 24,
-
-    borderRadius: 12,
-    overflow: 'hidden',
+    padding: 10,
   },
   bigImage: {
     width: '100%',
@@ -197,7 +211,7 @@ const styles = StyleSheet.create({
   },
   titleContainer: {
     marginHorizontal: 24,
-    marginTop: 32,
+    paddingTop: 10,
     gap: 12,
   },
   bigTitle: {
@@ -221,43 +235,95 @@ const styles = StyleSheet.create({
     color: '#0a6e0a',
     fontWeight: '600',
   },
+  contentSection: {
+    marginHorizontal: 24,
+    marginTop: 32,
+    marginBottom: 24,
+  },
+  benefitsSection: {
+    marginHorizontal: 24,
+    marginBottom: 40,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  sectionIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#f0f9ff',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 16,
+  },
+  sectionIconText: {
+    fontSize: 20,
+  },
   subtitle: {
     fontSize: 22,
-    fontWeight: '600',
+    fontWeight: '700',
     color: COLORS.subtitleText,
-    marginTop: 32,
-    marginBottom: 12,
-    marginHorizontal: 24,
+    flex: 1,
+  },
+  descriptionCard: {
+    backgroundColor: '#f8fafc',
+    padding: 20,
+    borderRadius: 16,
+    borderLeftWidth: 4,
+    borderLeftColor: '#3b82f6',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
   description: {
     fontSize: 17,
     color: COLORS.descriptionText,
-    lineHeight: 26,
+    lineHeight: 28,
     letterSpacing: -0.2,
-    marginBottom: 24,
-    marginHorizontal: 24,
+    textAlign: 'left',
   },
-  bulletList: {
-    marginHorizontal: 24,
-    marginTop: 8,
+  benefitsCard: {
+    backgroundColor: '#ffffff',
+    padding: 20,
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
   },
-  bulletRow: {
+  benefitItem: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: 12,
+    marginBottom: 16,
+    paddingHorizontal: 4,
   },
-  bullet: {
-    color: COLORS.bulletTextColor,
-    fontSize: 18,
-    paddingRight: 10,
+  benefitIcon: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#10b981',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 16,
     marginTop: 2,
   },
-  bulletText: {
+  benefitIconText: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  benefitText: {
     flex: 1,
     fontSize: 16,
     color: COLORS.bulletTextColor,
     lineHeight: 24,
     letterSpacing: -0.2,
+    fontWeight: '500',
   },
   errorText: {
     color: COLORS.errorRed,

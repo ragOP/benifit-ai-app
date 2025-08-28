@@ -55,6 +55,11 @@ export default function Navigation() {
           component={MyProfileScreen}
           screenOptions={{ headerShown: false }}
         />
+        <Stack.Screen
+          name="ClaimedScreen"
+          component={ClaimedScreen}
+          screenOptions={{ headerShown: false }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

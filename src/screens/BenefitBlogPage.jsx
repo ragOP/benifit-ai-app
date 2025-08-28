@@ -12,6 +12,21 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 
+const COLORS = {
+  black: '#000000',
+  dark: '#0c1a17',
+  bg: '#f6f7f2',
+  white: '#ffffff',
+  teal: '#015d54',
+  tealDark: '#0a6a5c',
+  text: '#121517',
+  sub: '#6b7a78',
+  pill: '#0f0f10',
+  checkBg: '#e7f4f1',
+  checkIcon: '#0c7a6a',
+  claim: '#2fbfa6',
+};
+
 const DATA = [
   {
     id: '1',
@@ -62,11 +77,11 @@ const CardItem = ({ item, onPress }) => (
 );
 
 export default function BenefitBlogPage() {
-  const navigation = useNavigation(); 
+  const navigation = useNavigation();
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#f5f5f5' }}>
-      <StatusBar barStyle="dark-content" backgroundColor="#042677" />
+    <SafeAreaView style={styles.safe}>
+      <StatusBar barStyle="light-content" backgroundColor={COLORS.black} />
       <View style={styles.header}>
         <View style={styles.headerContent}>
           <Text style={styles.pageTitle}>Your Benefits Guide</Text>
@@ -117,6 +132,7 @@ export default function BenefitBlogPage() {
 
 // Styles
 const styles = StyleSheet.create({
+  safe: { flex: 1, backgroundColor: COLORS.bg, paddingBottom: 20 },
   header: {
     height: 200,
     backgroundColor: '#0a2003',

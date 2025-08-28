@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
 */
 
 // NEW BOTTOM NAVIGATION USING REACT NATIVE PAPER & VECTOR ICONS
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
 import MaterialIcon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -259,9 +259,16 @@ function HomeStackScreen() {
   );
 }
 
-const CustomBottomNavigation = () => {
-  const [index, setIndex] = useState(0);
+const CustomBottomNavigation = ({ route }) => {
+  const [index, setIndex] = useState(route?.params?.initialTab || 0);
   const PRIMARY_COLOR = '#0F766E';
+  
+  // Update index when route params change
+  useEffect(() => {
+    if (route?.params?.initialTab !== undefined) {
+      setIndex(route.params.initialTab);
+    }
+  }, [route?.params?.initialTab]);
 
   const routes = [
     {
@@ -273,7 +280,8 @@ const CustomBottomNavigation = () => {
     },
     {
       key: 'menu',
-      title: 'Unclaimed Offer',
+      // title: 'Unclaimed Offer',
+      title: 'Offer',
       focusedIcon: 'menu',
       unfocusedIcon: 'menu',
       component: ClaimedScreen,
@@ -353,8 +361,8 @@ const CustomBottomNavigation = () => {
   );
 };
 
-export default function AppBottomNavigation() {
-  return <CustomBottomNavigation />;
+export default function AppBottomNavigation({ route }) {
+  return <CustomBottomNavigation route={route} />;
 }
 
 const styles = StyleSheet.create({

@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import TestimonialSlider from '../component/TestimonialSlider';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const COLORS = {
   black: '#000000',
@@ -90,7 +91,7 @@ const MiddleScreen = ({ route, navigation }) => {
   };
 
   return (
-    <View style={styles.safe}>
+    <SafeAreaView style={styles.safe}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.bg} />
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
@@ -189,7 +190,7 @@ const MiddleScreen = ({ route, navigation }) => {
           </Text>
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -200,7 +201,6 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: COLORS.black,
-    paddingTop: '10%',
   },
   logo: {
     width: 'auto',

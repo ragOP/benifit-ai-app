@@ -80,7 +80,7 @@ export default function MyProfileScreen() {
           onPress={() => navigation.goBack()}
           activeOpacity={0.7}
         >
-          <ChevronLeft size={24} color={COLORS.teal} strokeWidth={2.5} />
+          <ChevronLeft size={24} color={COLORS.white} strokeWidth={2.5} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>My Profile</Text>
         <View style={styles.headerSpacer} />
@@ -120,7 +120,7 @@ export default function MyProfileScreen() {
             </View>
           </View>
 
-          <View style={styles.infoRow}>
+          {/* <View style={styles.infoRow}>
             <View style={[styles.iconContainer, { backgroundColor: COLORS.iconBg }]}>
               <Phone size={18} color={COLORS.teal} />
             </View>
@@ -128,9 +128,9 @@ export default function MyProfileScreen() {
               <Text style={styles.infoLabel}>Phone</Text>
               <Text style={styles.infoValue}>{userData.phone}</Text>
             </View>
-          </View>
+          </View> */}
 
-          <View style={styles.infoRow}>
+          {/* <View style={styles.infoRow}>
             <View style={[styles.iconContainer, { backgroundColor: COLORS.iconBg }]}>
               <MapPin size={18} color={COLORS.teal} />
             </View>
@@ -138,17 +138,17 @@ export default function MyProfileScreen() {
               <Text style={styles.infoLabel}>Location</Text>
               <Text style={styles.infoValue}>{userData.location}</Text>
             </View>
-          </View>
+          </View> */}
         </View>
 
         {/* Edit Profile Button */}
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={styles.editProfileButton}
           activeOpacity={0.7}
         >
           <Edit3 size={20} color={COLORS.white} />
           <Text style={styles.editProfileButtonText}>Edit Profile</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         <View style={styles.bottomSpacer} />
       </ScrollView>
@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.black,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.border,
   },
@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.white,
   },
   headerSpacer: {
     width: 60,

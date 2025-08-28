@@ -11,9 +11,11 @@ import {
   TextInput,
   ScrollView,
   Keyboard,
+  ActivityIndicator,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BACKEND_URL } from '../utils/backendUrl';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const COLORS = {
   black: '#000000',
@@ -235,11 +237,14 @@ export default function FormQuestion({ navigation }) {
   const [allDone, setAllDone] = useState(false);
   const [showTyping, setShowTyping] = useState(false);
   const [answers, setAnswers] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const inputAnim = useRef(new Animated.Value(0)).current;
   const scrollViewRef = useRef();
 
   const handleFinalAnswers = async allAnswers => {
+    setIsSubmitting(true);
+
     const tags = [];
     if (allAnswers['Now, are you on medicare?'] === 'Yes')
       tags.push(TAGS.medicare);
@@ -256,13 +261,13 @@ export default function FormQuestion({ navigation }) {
       tags.push(TAGS.auto);
     if (
       allAnswers[
-        'Have you faced any motor vehicle accidents in the last 2 years?'
+      'Have you faced any motor vehicle accidents in the last 2 years?'
       ] === 'Yes'
     )
       tags.push(TAGS.mva);
     if (
       allAnswers[
-        'Okay, and do you have a credit card debt of $10,000 or more?'
+      'Okay, and do you have a credit card debt of $10,000 or more?'
       ] === 'Yes'
     )
       tags.push(TAGS.debt);
@@ -305,6 +310,8 @@ export default function FormQuestion({ navigation }) {
       setAllDone(true);
     } catch (err) {
       console.error('Error submitting chatbot answers:', err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -447,8 +454,22 @@ export default function FormQuestion({ navigation }) {
   };
 
   return (
-    <View style={styles.safe}>
+    <SafeAreaView style={styles.safe}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.black} />
+
+      {/* Loading Overlay */}
+      {isSubmitting && (
+        <View style={styles.loadingOverlay}>
+          <View style={styles.loadingContent}>
+            <View style={styles.loadingSpinner}>
+              <ActivityIndicator size="large" color={COLORS.white} />
+            </View>
+            <Text style={styles.loadingText}>Submitting your information...</Text>
+            <Text style={styles.loadingSubtext}>Please wait while we process your benefits</Text>
+          </View>
+        </View>
+      )}
+
       <ScrollView
         ref={scrollViewRef}
         contentContainerStyle={{ paddingBottom: 60 }}
@@ -513,13 +534,13 @@ export default function FormQuestion({ navigation }) {
           )}
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: COLORS.bg },
-  header: { backgroundColor: COLORS.black, paddingTop: '12%' },
+  header: { backgroundColor: COLORS.black },
   logo: { width: 'auto', height: 60, marginRight: 10 },
   ribbonWrap: {},
   ribbon: {
@@ -648,5 +669,44 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
+  },
+  loadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1000,
+  },
+  loadingContent: {
+    backgroundColor: COLORS.teal,
+    padding: 30,
+    borderRadius: 20,
+    alignItems: 'center',
+    maxWidth: '80%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  loadingSpinner: {
+    marginBottom: 20,
+  },
+  loadingText: {
+    color: COLORS.white,
+    fontSize: 18,
+    fontWeight: '700',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  loadingSubtext: {
+    color: COLORS.white,
+    fontSize: 14,
+    textAlign: 'center',
+    opacity: 0.9,
   },
 });
