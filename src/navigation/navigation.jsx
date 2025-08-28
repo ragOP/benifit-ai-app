@@ -9,6 +9,7 @@ import ClaimedScreen from '../screens/ClaimedScreen';
 import LoginScreen from '../auth/LoginScreen';
 import RegisterScreen from '../auth/RegisterScreen';
 import AppBottomNavigation from './BottomNavigation';
+import MyProfileScreen from '../screens/MyProfileScreen';
 
 const Stack = createStackNavigator();
 
@@ -47,6 +48,11 @@ export default function Navigation() {
         <Stack.Screen
           name="BlogDetailScreen"
           component={BlogDetailScreen}
+          screenOptions={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="MyProfileScreen"
+          component={MyProfileScreen}
           screenOptions={{ headerShown: false }}
         />
       </Stack.Navigator>

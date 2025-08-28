@@ -6,8 +6,10 @@ import {
   StyleSheet,
   ScrollView,
   StatusBar,
+  TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { ChevronLeft } from 'lucide-react-native';
 
 const ALL_BENEFIT_CARDS = {
   is_md: {
@@ -105,6 +107,13 @@ export default function BlogDetailScreen({ route, navigation }) {
       <SafeAreaView style={styles.safe} edges={['top']}>
         <StatusBar barStyle="light-content" backgroundColor={COLORS.black} />
         <View style={styles.header}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+            activeOpacity={0.7}
+          >
+            <ChevronLeft size={24} color="#FFF" strokeWidth={2.5} />
+          </TouchableOpacity>
           <Image
             source={require('../assets/center.png')}
             style={styles.logo}
@@ -161,11 +170,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: '#eee',
+    position: 'relative',
   },
   logo: {
     width: '100%',
     height: 60,
     marginRight: 10,
+  },
+  backButton: {
+    position: 'absolute',
+    left: 16,
+    top: 30,
+    zIndex: 1,
   },
   imageContainer: {
     marginTop: 16,

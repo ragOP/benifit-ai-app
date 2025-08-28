@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -90,7 +90,7 @@ const ClaimedScreen = () => {
       .filter((value, index, self) => value && self.indexOf(value) === index); // Remove duplicates
   };
 
-  const fetchClaimedOffers = async () => {
+  const fetchClaimedOffers = useCallback(async () => {
     try {
       const id = await AsyncStorage.getItem('userId');
       setUserId(id);
@@ -122,11 +122,11 @@ const ClaimedScreen = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchClaimedOffers();
-  }, []);
+  }, [fetchClaimedOffers]);
 
   const handleActionPress = async offerKey => {
     if (!userId || !offerKey) return;
@@ -217,40 +217,65 @@ const ClaimedScreen = () => {
   }
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe} edges={['top']}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.black} />
-      <View style={styles.header}>
-        <Image
-          source={require('../assets/center.png')}
-          style={styles.logo}
-          resizeMode="contain"
-        />
-      </View>
-
-      <ScrollView contentContainerStyle={{ padding: 16 }}>
-        <Text style={styles.sectionHeader}>Claimed Offers</Text>
-        {claimedOffers.length > 0 ? (
-          claimedOffers.map((item, index) => (
-            <View key={index} style={styles.cardWrapper}>
-              <Text style={styles.userIdText}>User ID: {userId}</Text>
-              {renderCard(item, true)}
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={styles.header}>
+          <Image
+            source={require('../assets/center.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+        </View>
+        {/* <View style={styles.ribbonWrap}>
+          <View style={styles.ribbon}>
+            <Text style={styles.ribbonText}>
+              Unclaimed Offers - Get Your Benefits Today!
+            </Text>
+          </View>
+        </View> */}
+        <View style={styles.content}>
+          <Text style={styles.sectionHeader}>Claimed Offers</Text>
+          {claimedOffers.length > 0 ? (
+            claimedOffers.map((item, index) => (
+              <View key={index} style={styles.cardWrapper}>
+                <Text style={styles.userIdText}>User ID: {userId}</Text>
+                {renderCard(item, true)}
+              </View>
+            ))
+          ) : (
+            <View style={styles.emptyStateContainer}>
+              <View style={styles.emptyStateIcon}>
+                <Text style={styles.emptyStateEmoji}>📋</Text>
+              </View>
+              <Text style={styles.emptyStateTitle}>No Claimed Offers Yet</Text>
+              <Text style={styles.emptyStateSubtitle}>
+                You haven't claimed any offers yet. Complete your registration to start claiming benefits!
+              </Text>
             </View>
-          ))
-        ) : (
-          <Text style={styles.emptyMessage}>No claimed offers found.</Text>
-        )}
+          )}
 
-        <Text style={styles.sectionHeader}>Unclaimed Offers</Text>
-        {unclaimedOffers.length > 0 ? (
-          unclaimedOffers.map((item, index) => (
-            <View key={index} style={styles.cardWrapper}>
-              <Text style={styles.userIdText}>User ID: {userId}</Text>
-              {renderCard(item, false)}
+          <Text style={styles.sectionHeader}>Unclaimed Offers</Text>
+          {unclaimedOffers.length > 0 ? (
+            unclaimedOffers.map((item, index) => (
+              <View key={index} style={styles.cardWrapper}>
+                <Text style={styles.userIdText}>User ID: {userId}</Text>
+                {renderCard(item, false)}
+              </View>
+            ))
+          ) : (
+            <View style={styles.emptyStateContainer}>
+              <View style={styles.emptyStateIcon}>
+                <Text style={styles.emptyStateEmoji}>🚀</Text>
+              </View>
+              <Text style={styles.emptyStateTitle}>Start Your Benefits Journey</Text>
+              <Text style={styles.emptyStateSubtitle}>
+                Complete your registration to discover and claim amazing benefits you're eligible for!
+              </Text>
+
             </View>
-          ))
-        ) : (
-          <Text style={styles.emptyMessage}>No unclaimed offers found.</Text>
-        )}
+          )}
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -262,9 +287,29 @@ const styles = StyleSheet.create({
     paddingTop: 0,
   },
   logo: {
-    width: 120,
+    width: 'auto',
     height: 60,
-    alignSelf: 'center',
+    marginRight: 10,
+  },
+  ribbon: {
+    backgroundColor: COLORS.teal,
+    paddingVertical: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderBottomLeftRadius: 40,
+    borderBottomRightRadius: 40,
+  },
+  ribbonText: {
+    color: COLORS.white,
+    letterSpacing: 0.3,
+    fontStyle: 'italic',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  ribbonWrap: {},
+  content: {
+    paddingHorizontal: 30,
+    paddingTop: 18,
   },
   center: {
     flex: 1,
@@ -277,6 +322,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginVertical: 16,
     color: COLORS.teal,
+    marginHorizontal: 0,
   },
   cardWrapper: {
     marginBottom: 20,
@@ -349,6 +395,79 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginLeft: 4,
     marginBottom: 16,
+  },
+  emptyStateContainer: {
+    backgroundColor: COLORS.white,
+    marginHorizontal: 20,
+    marginVertical: 20,
+    padding: 32,
+    borderRadius: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  emptyStateIcon: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: COLORS.iconBg,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+  },
+  emptyStateEmoji: {
+    fontSize: 40,
+  },
+  emptyStateTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: COLORS.text,
+    textAlign: 'center',
+    marginBottom: 12,
+    letterSpacing: -0.5,
+  },
+  emptyStateSubtitle: {
+    fontSize: 16,
+    color: COLORS.sub,
+    textAlign: 'center',
+    lineHeight: 24,
+    marginBottom: 24,
+    paddingHorizontal: 10,
+  },
+  exploreButton: {
+    backgroundColor: COLORS.teal,
+    paddingVertical: 14,
+    paddingHorizontal: 28,
+    borderRadius: 25,
+    shadowColor: COLORS.teal,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  exploreButtonText: {
+    color: COLORS.white,
+    fontSize: 16,
+    fontWeight: '600',
+    letterSpacing: 0.3,
+  },
+  successBadge: {
+    backgroundColor: COLORS.checkBg,
+    borderWidth: 2,
+    borderColor: COLORS.checkIcon,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    marginTop: 8,
+  },
+  successBadgeText: {
+    color: COLORS.checkIcon,
+    fontSize: 14,
+    fontWeight: '700',
+    letterSpacing: 0.3,
   },
 });
 

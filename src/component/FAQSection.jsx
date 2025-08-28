@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#005e54',
     marginRight: 10,
-    lineHeight: 'auto',
+    lineHeight: 22,
   },
   answerWrap: {
     backgroundColor: '#f9faf5',

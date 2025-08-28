@@ -166,6 +166,26 @@ export default function ProfileScreen() {
                 </TouchableOpacity>
               );
             }
+            if (item.label === 'My Profile') {
+              return (
+                <TouchableOpacity
+                  key={item.label}
+                  style={styles.row}
+                  activeOpacity={0.7}
+                  onPress={() => navigation.navigate('MyProfileScreen')}
+                >
+                  <View style={[styles.chip, { backgroundColor: item.chipBg }]}>
+                    {item.icon}
+                  </View>
+                  <Text style={styles.rowText}>{item.label}</Text>
+                  <ChevronRight
+                    size={22}
+                    color="#BBC3BA"
+                    style={{ marginLeft: 'auto' }}
+                  />
+                </TouchableOpacity>
+              );
+            }
             return (
               <TouchableOpacity
                 key={item.label}
