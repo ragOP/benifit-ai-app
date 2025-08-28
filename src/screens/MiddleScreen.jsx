@@ -336,6 +336,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textAlign: 'center',
     marginBottom: 12,
+    paddingHorizontal: 20,
   },
   timerBox: {
     borderWidth: 2,

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Snackbar } from 'react-native-paper';
+import { Platform } from 'react-native';
 
 export const Toast = ({ 
   visible, 
@@ -17,7 +18,7 @@ export const Toast = ({
         backgroundColor: type === 'success' ? '#4CAF50' : '#F44336',
       }}
       wrapperStyle={{
-        top: 0,
+        top: Platform.OS === 'ios' ? 40 : 20,
         position: 'absolute',
       }}
       action={{

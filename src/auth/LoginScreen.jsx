@@ -28,7 +28,7 @@ const LoginScreen = ({ navigation }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [fcmToken, setFcmToken] = useState('');
   const [googleLoading, setGoogleLoading] = useState(false);
-  
+
   // Use the custom toast hook
   const { toastVisible, toastMessage, toastType, showSuccessToast, showErrorToast, hideToast } = useToast();
 
@@ -73,7 +73,11 @@ const LoginScreen = ({ navigation }) => {
           }),
         },
       );
-      console.log('Loginpaylod', fcmToken);
+      console.log("PAYLOAD", {
+        loginId: emailOrUsername,
+        password,
+        fcmToken,
+      })
       const data = await response.json();
       console.log('LOGIN RESPONSE:', data);
 
@@ -101,24 +105,24 @@ const LoginScreen = ({ navigation }) => {
   // const signInWithGoogle = async () => {
   //   try {
   //     setGoogleLoading(true);
-      
+
   //     // Check if your device supports Google Play
   //     await GoogleSignin.hasPlayServices();
-      
+
   //     // Get the users ID token
   //     const { idToken } = await GoogleSignin.signIn();
-      
+
   //     // Create a Google credential with the token
   //     const googleCredential = GoogleAuthProvider.credential(idToken);
-      
+
   //     // Sign-in the user with the credential
   //     const auth = getAuth();
   //     await signInWithCredential(auth, googleCredential);
-      
+
   //     console.log('Google sign-in successful');
   //     // Navigate to main app after successful Google sign-in
   //     navigation.navigate('BottomNavigation');
-      
+
   //   } catch (error) {
   //     console.error('Google sign-in error:', error);
   //     Alert.alert('Error', 'Google sign-in failed. Please try again.');
@@ -129,12 +133,12 @@ const LoginScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView 
+      <KeyboardAvoidingView
         style={styles.keyboardAvoidingView}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
       >
-        <ScrollView 
+        <ScrollView
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
@@ -222,7 +226,7 @@ const LoginScreen = ({ navigation }) => {
 
             <View style={styles.registerContainer}>
               <Text style={styles.registerText}>Don't have an account? </Text>
-              <TouchableOpacity 
+              <TouchableOpacity
                 onPress={() => {
                   console.log('Register button pressed');
                   console.log('Navigation object:', navigation);
@@ -241,7 +245,7 @@ const LoginScreen = ({ navigation }) => {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-      
+
       {/* Toast Notification */}
       <Toast
         visible={toastVisible}

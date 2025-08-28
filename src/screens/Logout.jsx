@@ -98,8 +98,14 @@ export default function ProfileScreen() {
         style: 'destructive',
         onPress: async () => {
           try {
+            // Clear all user-related data from AsyncStorage
             await AsyncStorage.removeItem('userToken');
             await AsyncStorage.removeItem('userName');
+            await AsyncStorage.removeItem('userEmail');
+            await AsyncStorage.removeItem('userId');
+            await AsyncStorage.removeItem('userPhone');
+            await AsyncStorage.removeItem('fcmToken');
+            await AsyncStorage.removeItem('userFlowCompleted');
 
             navigation.reset({
               index: 0,

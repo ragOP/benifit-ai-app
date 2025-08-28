@@ -57,9 +57,9 @@ export default function HomeScreen({ navigation }) {
   const [isAnimating, setIsAnimating] = useState(true);
   const [showLoader, setShowLoader] = useState(false);
   const [showCongratulations, setShowCongratulations] = useState(false);
-  const [redirectTimer, setRedirectTimer] = useState(5);
-  const [isCheckingUser, setIsCheckingUser] = useState(false);
-  const [hasCompletedFlow, setHasCompletedFlow] = useState(false);
+  // const [redirectTimer, setRedirectTimer] = useState(5);
+  // const [isCheckingUser, setIsCheckingUser] = useState(false);
+  // const [hasCompletedFlow, setHasCompletedFlow] = useState(false);
   const fingerAnimation = useRef(new Animated.Value(0)).current;
   const shimmerAnimation = useRef(new Animated.Value(0)).current;
 
@@ -79,6 +79,7 @@ export default function HomeScreen({ navigation }) {
     }
     return () => clearInterval(interval);
   }, [isAnimating]);
+
   useEffect(() => {
     const initNotifications = async () => {
       await NotificationService.initialize();
@@ -86,23 +87,24 @@ export default function HomeScreen({ navigation }) {
     initNotifications();
   }, []);
 
-  useEffect(() => {
-    const checkStoredUserFlow = async () => {
-      try {
-        const storedUserFlow = await AsyncStorage.getItem('userFlowCompleted');
-        if (storedUserFlow) {
-          const userData = JSON.parse(storedUserFlow);
-          if (userData.success && userData.data && userData.data.userId) {
-            setHasCompletedFlow(true);
-          }
-        }
-      } catch (error) {
-        console.error('Error checking stored user flow:', error);
-      }
-    };
+  // useEffect(() => {
+  //   const checkStoredUserFlow = async () => {
+  //     try {
+  //       const storedUserFlow = await AsyncStorage.getItem('userFlowCompleted');
+  //       console.log("storedUserFlow >>>", storedUserFlow)
+  //       if (storedUserFlow) {
+  //         const userData = JSON.parse(storedUserFlow);
+  //         if (userData.success && userData.data && userData.data.userId) {
+  //           setHasCompletedFlow(true);
+  //         }
+  //       }
+  //     } catch (error) {
+  //       console.error('Error checking stored user flow:', error);
+  //     }
+  //   };
 
-    checkStoredUserFlow();
-  }, []);
+  //   checkStoredUserFlow();
+  // }, []);
 
   useEffect(() => {
     const moveFinger = () => {
@@ -144,80 +146,89 @@ export default function HomeScreen({ navigation }) {
   const checkUserFlow = async () => {
     try {
       const userId = await AsyncStorage.getItem('userId');
-      if (!userId) {
-        // No userId, start new flow
-        setShowLoader(true);
-        setIsAnimating(false);
-        setTimeout(() => {
-          setShowLoader(false);
-          navigation.navigate('Question');
-        }, 1500);
-        return;
-      }
+      // if (!userId) {
+      //   // No userId, start new flow
+      //   setShowLoader(true);
+      //   setIsAnimating(false);
+      //   setTimeout(() => {
+      //     setShowLoader(false);
+      //     navigation.navigate('Question');
+      //   }, 1500);
+      //   return;
+      // }
 
-      // User has userId, check if they've completed the flow
-      setIsCheckingUser(true);
-      const response = await fetch(
-        `${BACKEND_URL}/api/v1/users/qualified-user?userId=${userId}`,
-        {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
-        }
-      );
-
-      const data = await response.json();
-
-      if (data.success && data.data && data.data.userId) {
-        // User has completed the flow - store in AsyncStorage
-        await AsyncStorage.setItem('userFlowCompleted', JSON.stringify(data));
-        setHasCompletedFlow(true);
-        setShowCongratulations(true);
-        setIsCheckingUser(false);
-
-        // Start countdown timer - 5 seconds
-        let timer = 5;
-        setRedirectTimer(timer);
-
-        const countdown = setInterval(() => {
-          timer -= 1;
-          setRedirectTimer(timer);
-
-          if (timer <= 0) {
-            clearInterval(countdown);
-            // Reset navigation stack to ensure fresh state
-            navigation.reset({
-              index: 0,
-              routes: [
-                { name: 'BottomNavigation', params: { initialTab: 1 } }
-              ],
-            });
-          }
-        }, 1000);
-      } else {
-        // User doesn't exist or hasn't completed flow, start new flow
-        setShowLoader(true);
-        setIsAnimating(false);
-        setTimeout(() => {
-          setShowLoader(false);
-          navigation.navigate('Question');
-        }, 1500);
-      }
-    } catch (error) {
-      console.error('Error checking user flow:', error);
-      // On error, start new flow
       setShowLoader(true);
       setIsAnimating(false);
       setTimeout(() => {
         setShowLoader(false);
         navigation.navigate('Question');
       }, 1500);
+
+      // User has userId, check if they've completed the flow
+      // setIsCheckingUser(true);
+      // const response = await fetch(
+      //   `${BACKEND_URL}/api/v1/users/qualified-user?userId=${userId}`,
+      //   {
+      //     method: 'GET',
+      //     headers: { 'Content-Type': 'application/json' },
+      //   }
+      // );
+
+      // const data = await response.json();
+
+
+      // // if (data.success && data.data && data.data.userId) {
+      //   if (data.success && data.data && data.data.userId) {
+      //   // User has completed the flow - store in AsyncStorage
+      //   await AsyncStorage.setItem('userFlowCompleted', JSON.stringify(data));
+      //   // setHasCompletedFlow(true);
+      //   setShowCongratulations(true);
+      //   // setIsCheckingUser(false);
+
+      //   // Start countdown timer - 5 seconds
+      //   let timer = 5;
+      //   // setRedirectTimer(timer);
+
+      //   const countdown = setInterval(() => {
+      //     timer -= 1;
+      //     // setRedirectTimer(timer);
+
+      //     if (timer <= 0) {
+      //       clearInterval(countdown);
+      //       // Reset navigation stack to ensure fresh state
+      //       navigation.reset({
+      //         index: 0,
+      //         routes: [
+      //           { name: 'BottomNavigation', params: { initialTab: 1 } }
+      //         ],
+      //       });
+      //     }
+      //   }, 1000);
+      // } else {
+      //   // User doesn't exist or hasn't completed flow, start new flow
+      //   setShowLoader(true);
+      //   setIsAnimating(false);
+      //   setTimeout(() => {
+      //     setShowLoader(false);
+      //     navigation.navigate('Question');
+      //   }, 1500);
+      // }
+    } catch (error) {
+      console.error('Error checking user flow:', error);
+      // On error, start new flow
+      // setShowLoader(true);
+      // setIsAnimating(false);
+      // setTimeout(() => {
+      //   setShowLoader(false);
+      //   navigation.navigate('Question');
+      // }, 1500);
     } finally {
-      setIsCheckingUser(false);
+      // setIsCheckingUser(false);
     }
   };
 
   const handleStartNow = () => {
-    if (showLoader || isCheckingUser) return;
+    // if (showLoader || isCheckingUser) return;
     checkUserFlow();
   };
 
@@ -267,7 +278,63 @@ export default function HomeScreen({ navigation }) {
           </View>
 
           <View style={styles.ctaContainer}>
-            {hasCompletedFlow ? (
+            <TouchableOpacity
+              activeOpacity={0.9}
+              style={[styles.cta, showLoader && styles.ctaDisabled]}
+              onPress={handleStartNow}
+              disabled={showLoader}
+            >
+              <Animated.View
+                style={[
+                  styles.shimmer,
+                  {
+                    transform: [
+                      {
+                        translateX: shimmerAnimation.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [-width, width],
+                        }),
+                      },
+                    ],
+                  },
+                ]}
+              />
+
+              <View
+                style={{
+                  overflow: 'hidden',
+                  flex: 1,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  zIndex: 1,
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  {showLoader ? (
+                    <View style={styles.loaderRow}>
+                      <InfinityLoader />
+                    </View>
+                  ) : (
+                    <>
+                      <Animated.View
+                        style={{ transform: [{ translateX: fingerAnimation }] }}
+                      >
+                        <Text style={styles.ctaText}>👉 </Text>
+                      </Animated.View>
+                      <Text style={styles.ctaText}>START NOW</Text>
+                      <ChevronRight size={24} color="#fff" />
+                    </>
+                  )}
+                </View>
+              </View>
+            </TouchableOpacity>
+            {/* {hasCompletedFlow ? (
               <>
                 <Text style={styles.alreadyCompletedText}>
                   You have already filled out the form! 🎉
@@ -280,7 +347,7 @@ export default function HomeScreen({ navigation }) {
                   <Text style={styles.ctaText}>GO TO OFFERS</Text>
                   <ChevronRight size={24} color="#fff" />
                 </TouchableOpacity>
-              
+
               </>
             ) : (
               <TouchableOpacity
@@ -289,7 +356,6 @@ export default function HomeScreen({ navigation }) {
                 onPress={handleStartNow}
                 disabled={showLoader}
               >
-                {/* Shimmer Effect */}
                 <Animated.View
                   style={[
                     styles.shimmer,
@@ -340,7 +406,7 @@ export default function HomeScreen({ navigation }) {
                   </View>
                 </View>
               </TouchableOpacity>
-            )}
+            )} */}
           </View>
 
           <Text style={styles.claim}>
