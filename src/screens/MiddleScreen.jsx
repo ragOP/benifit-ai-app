@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Image,
   ScrollView,
@@ -8,10 +8,14 @@ import {
   TouchableOpacity,
   View,
   Platform,
+  Animated,
+  Dimensions,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import TestimonialSlider from '../component/TestimonialSlider';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+const { width } = Dimensions.get('window');
 
 const COLORS = {
   black: '#000000',
@@ -30,6 +34,7 @@ const COLORS = {
   green: '#10b981',
   blue1: '#4774c9',
   blue2: '#294ea0',
+  ribbon: '#015d54',
 };
 
 const PRICE_BY_TAG = {
@@ -49,12 +54,32 @@ const MiddleScreen = ({ route, navigation }) => {
   const roundedTotal = roundToThousands(total);
 
   const [secondsLeft, setSecondsLeft] = useState(300);
+  const shimmerAnimation = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     if (secondsLeft <= 0) return;
     const interval = setInterval(() => setSecondsLeft(s => s - 1), 1000);
     return () => clearInterval(interval);
   }, [secondsLeft]);
+
+  // Shimmer animation effect
+  useEffect(() => {
+    const shimmer = () => {
+      Animated.sequence([
+        Animated.timing(shimmerAnimation, {
+          toValue: 1,
+          duration: 3000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(shimmerAnimation, {
+          toValue: 0,
+          duration: 0,
+          useNativeDriver: true,
+        }),
+      ]).start(() => shimmer());
+    };
+    shimmer();
+  }, [shimmerAnimation]);
 
   const formatTime = secs => {
     const m = String(Math.floor(secs / 60)).padStart(2, '0');
@@ -158,7 +183,24 @@ const MiddleScreen = ({ route, navigation }) => {
               })
             }
           >
-            <Text style={styles.claimText}>Start Claiming My Benefits!</Text>
+            <Animated.View
+              style={[
+                styles.shimmer,
+                {
+                  transform: [
+                    {
+                      translateX: shimmerAnimation.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [-width, width],
+                      }),
+                    },
+                  ],
+                },
+              ]}
+            />
+            <View style={styles.claimButtonContent}>
+              <Text style={styles.claimText}>Start Claiming My Benefits!</Text>
+            </View>
           </TouchableOpacity>
         </GradientBox>
 
@@ -167,9 +209,9 @@ const MiddleScreen = ({ route, navigation }) => {
             Due to high demand, your benefit report is available to claim for
             only 5 minutes.
           </Text>
-          <View style={styles.timerBox}>
+          {/* <View style={styles.timerBox}>
             <Text style={styles.timerText}>{formatTime(secondsLeft)}</Text>
-          </View>
+          </View> */}
         </View>
 
         <TestimonialSlider />
@@ -183,11 +225,11 @@ const MiddleScreen = ({ route, navigation }) => {
               Organisation.
             </Text>
           </Text>
-          <Text style={{ textAlign: 'center', ...styles.noteBody2 }}>
+          {/* <Text style={{ textAlign: 'center', ...styles.noteBody2 }}>
             Beware of other fraudulent & similar looking websites. This is the
             only official website to claim the benefits you're qualified for
             (mybenefitsai.org).
-          </Text>
+          </Text> */}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -209,7 +251,7 @@ const styles = StyleSheet.create({
   },
   ribbonWrap: {},
   ribbon: {
-    backgroundColor: 'transparent',
+    backgroundColor: COLORS.ribbon,
     paddingVertical: 14,
     alignItems: 'center',
     justifyContent: 'center',
@@ -217,25 +259,28 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 40,
   },
   ribbonText: {
-    color: 'black',
+    color: COLORS.white,
     letterSpacing: 0.3,
     fontStyle: 'italic',
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: 12,
+    fontWeight: '600',
   },
   heading: {
-    fontSize: 34,
+    fontSize: 32,
+    marginTop: 10,
     fontWeight: '700',
     color: COLORS.black,
     lineHeight: 41,
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
     paddingBottom: 20,
+    paddingTop: 10,
   },
   boxQualified: {
     backgroundColor: COLORS.greenLight,
     borderRadius: 20,
-    marginHorizontal: 15,
-    paddingVertical: 10,
+    marginHorizontal: 24,
+    paddingVertical: 20,
+    paddingHorizontal: 10,
     marginBottom: 0,
     alignItems: 'center',
     borderWidth: 1,
@@ -308,8 +353,10 @@ const styles = StyleSheet.create({
   reportDetail: {
     fontSize: 16,
     color: COLORS.white,
-    marginVertical: 6,
+    marginVertical: 8,
     fontWeight: '400',
+    paddingHorizontal: 4,
+    lineHeight: 22,
   },
   claimButton: {
     marginTop: 22,
@@ -318,6 +365,8 @@ const styles = StyleSheet.create({
     borderRadius: 32,
     paddingVertical: 16,
     alignItems: 'center',
+    overflow: 'hidden',
+    position: 'relative',
   },
   claimText: {
     color: COLORS.white,
@@ -325,10 +374,26 @@ const styles = StyleSheet.create({
     fontSize: 19,
     letterSpacing: 0.2,
   },
+  shimmer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: '100%',
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    transform: [{ skewX: '-20deg' }],
+    zIndex: 0,
+  },
+  claimButtonContent: {
+    zIndex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   timerContainer: {
     alignItems: 'center',
-    marginTop: 14,
-    marginBottom: 32,
+    marginTop: 8,
+    marginBottom: 12,
   },
   timerMessage: {
     fontSize: 16,
@@ -336,7 +401,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textAlign: 'center',
     marginBottom: 12,
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
+    lineHeight: 22,
   },
   timerBox: {
     borderWidth: 2,
@@ -362,7 +428,7 @@ const styles = StyleSheet.create({
   noteContainer: {
     marginTop: 36,
     marginBottom: 40,
-    paddingHorizontal: 30,
+    paddingHorizontal: 24,
   },
   noteStrong: {
     color: '#EF4444',
@@ -374,12 +440,14 @@ const styles = StyleSheet.create({
     color: '#111827',
     fontSize: 13,
     lineHeight: 23,
+    paddingHorizontal: 4,
   },
   noteBody2: {
     marginTop: 15,
     color: '#111827',
     fontSize: 13,
     lineHeight: 20,
+    paddingHorizontal: 4,
   },
 });
 

@@ -555,7 +555,7 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     letterSpacing: 0.3,
     fontStyle: 'italic',
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: '600',
   },
   content: { paddingHorizontal: 30, paddingTop: 18 },
@@ -572,7 +572,7 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     fontWeight: '800',
     letterSpacing: 0.4,
-    fontSize: 16,
+    fontSize: 13,
   },
   chatWrap: { paddingTop: 10, paddingHorizontal: 25 },
   botBubbleWrap: {

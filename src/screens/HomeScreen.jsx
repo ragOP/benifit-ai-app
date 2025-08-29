@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChevronRight } from 'lucide-react-native';
-import Svg, { Path } from 'react-native-svg';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import TestimonialSlider from '../component/TestimonialSlider';
 import FaqSection from '../component/FAQSection';
 import InfinityLoader from '../component/InfinityLoader';
@@ -40,13 +40,7 @@ const COLORS = {
 const CheckRow = ({ text }) => (
   <View style={styles.checkRow}>
     <View style={styles.checkIconWrap}>
-      <Svg fill="white" viewBox="0 0 20 20" width={22} height={22}>
-        <Path
-          fillRule="evenodd"
-          d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 6.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l7-7a1 1 0 000-1.414z"
-          clipRule="evenodd"
-        />
-      </Svg>
+      <Icon name="check" size={18} color="white" />
     </View>
     <Text style={styles.checkText}>{text}</Text>
   </View>
@@ -54,6 +48,7 @@ const CheckRow = ({ text }) => (
 
 export default function HomeScreen({ navigation }) {
   const [counter, setCounter] = useState(1200);
+  const [claimingCounter, setClaimingCounter] = useState(69);
   const [isAnimating, setIsAnimating] = useState(true);
   const [showLoader, setShowLoader] = useState(false);
   const [showCongratulations, setShowCongratulations] = useState(false);
@@ -79,6 +74,64 @@ export default function HomeScreen({ navigation }) {
     }
     return () => clearInterval(interval);
   }, [isAnimating]);
+
+  // Load claiming counter from async storage on mount
+  useEffect(() => {
+    const loadClaimingCounter = async () => {
+      try {
+        const stored = await AsyncStorage.getItem('claimingCounter');
+        if (stored) {
+          const count = parseInt(stored, 10);
+          // Ensure the stored value is within 69-90 range
+          const validCount = Math.max(69, Math.min(90, count));
+          setClaimingCounter(validCount);
+          if (validCount !== count) {
+            await AsyncStorage.setItem('claimingCounter', validCount.toString());
+          }
+        } else {
+          // Start with 80 if no stored value (middle of 69-90 range)
+          setClaimingCounter(80);
+          await AsyncStorage.setItem('claimingCounter', '80');
+        }
+      } catch (error) {
+        console.error('Error loading claiming counter:', error);
+        setClaimingCounter(80);
+      }
+    };
+    
+    loadClaimingCounter();
+  }, []);
+
+
+
+  // Dynamic claiming counter that increases slowly and randomly
+  useEffect(() => {
+    if (claimingCounter === 0) return; // Don't start until loaded
+    
+    const claimingInterval = setInterval(() => {
+      setClaimingCounter(prev => {
+        let newCount;
+        
+        // If we're at the upper limit, gradually decrease instead of random jump
+        if (prev >= 87) {
+          // Decrease by 1-2 to bring it back down naturally
+          const decrement = Math.floor(Math.random() * 2) + 1;
+          newCount = Math.max(69, prev - decrement);
+        } else {
+          // Normal increment between 1-3
+          const increment = Math.floor(Math.random() * 3) + 1;
+          newCount = Math.min(90, prev + increment);
+        }
+        
+        // Save to async storage
+        AsyncStorage.setItem('claimingCounter', newCount.toString()).catch(console.error);
+        
+        return newCount;
+      });
+    }, 3000 + Math.random() * 2000); // Random interval between 3-5 seconds
+
+    return () => clearInterval(claimingInterval);
+  }, [claimingCounter]);
 
   useEffect(() => {
     const initNotifications = async () => {
@@ -260,6 +313,7 @@ export default function HomeScreen({ navigation }) {
             </Text>
           </View>
         </View>
+        
         <View style={styles.content}>
           <View style={styles.pill}>
             <Text style={styles.pillText}>AVERAGE BENEFITS: </Text>
@@ -322,11 +376,11 @@ export default function HomeScreen({ navigation }) {
                     </View>
                   ) : (
                     <>
-                      <Animated.View
+                      {/* <Animated.View
                         style={{ transform: [{ translateX: fingerAnimation }] }}
                       >
                         <Text style={styles.ctaText}>👉 </Text>
-                      </Animated.View>
+                      </Animated.View> */}
                       <Text style={styles.ctaText}>START NOW</Text>
                       <ChevronRight size={24} color="#fff" />
                     </>
@@ -410,7 +464,7 @@ export default function HomeScreen({ navigation }) {
           </View>
 
           <Text style={styles.claim}>
-            <Text style={styles.claimNumber}>69</Text>
+            <Text style={styles.claimNumber}>{claimingCounter}</Text>
             <Text style={styles.claimBold}>
               {' '}
               People Are <Text style={styles.claimNumber}>Claiming</Text> Right
@@ -437,13 +491,13 @@ export default function HomeScreen({ navigation }) {
               You have already submitted your information!
             </Text>
             <Text style={styles.redirectText}>
-              Redirecting to offers section in {redirectTimer} seconds...
+              Redirecting to offers section in 5 seconds...
             </Text>
             <View style={styles.progressBar}>
               <View
                 style={[
                   styles.progressFill,
-                  { width: `${((5 - redirectTimer) / 5) * 100}%` }
+                  { width: '100%' }
                 ]}
               />
             </View>
@@ -477,12 +531,12 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     letterSpacing: 0.3,
     fontStyle: 'italic',
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: '600',
   },
   ribbonWrap: {},
   content: {
-    paddingHorizontal: 30,
+    paddingHorizontal: 24,
     paddingTop: 18,
   },
   pill: {
@@ -498,7 +552,7 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     fontWeight: '800',
     letterSpacing: 0.4,
-    fontSize: 16,
+    fontSize: 13, 
   },
   headline: {
     color: COLORS.text,
@@ -512,8 +566,13 @@ const styles = StyleSheet.create({
     marginTop: 6,
     marginBottom: 22,
     gap: 12,
+    // paddingHorizontal: 4,
   },
-  checkRow: { flexDirection: 'row', alignItems: 'center' },
+  checkRow: { 
+    flexDirection: 'row', 
+    alignItems: 'flex-start',
+    flexWrap: 'wrap'
+  },
   checkIconWrap: {
     width: 25,
     height: 25,
@@ -523,7 +582,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginRight: 10,
   },
-  checkText: { color: '#1b1f22', fontSize: 16, fontWeight: '700' },
+  checkText: { 
+    color: '#1b1f22', 
+    fontSize: 16, 
+    fontWeight: '700',
+    flex: 1,
+    flexWrap: 'wrap'
+  },
   ctaContainer: {
     position: 'relative',
     alignItems: 'center',

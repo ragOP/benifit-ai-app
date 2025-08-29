@@ -1,5 +1,6 @@
 import React, { useEffect, useCallback, useState } from 'react';
 import { StyleSheet } from 'react-native';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Navigation from './src/navigation/navigation';
 import messaging from '@react-native-firebase/messaging';
 import notifee from '@notifee/react-native';
@@ -8,6 +9,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 const App = () => {
+  // Create a client
+  const queryClient = new QueryClient();
+  
   // Authentication state
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState(null);
@@ -168,7 +172,11 @@ const App = () => {
 
   // if (initializing) return null;
 
-  return <Navigation />;
+  return (
+    <QueryClientProvider client={queryClient}>
+      <Navigation />
+    </QueryClientProvider>
+  );
 };
 
 export default App;

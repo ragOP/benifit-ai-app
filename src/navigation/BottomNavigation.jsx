@@ -242,6 +242,7 @@ import MiddleScreen from '../screens/MiddleScreen';
 import CongratsScreen from '../screens/CongratsScreen';
 import BenefitBlogPage from '../screens/BenefitBlogPage';
 import ClaimedScreen from '../screens/ClaimedScreen';
+import ChatScreen from '../screens/ChatScreen';
 
 import Logout from '../screens/Logout';
 
@@ -273,7 +274,7 @@ const CustomBottomNavigation = ({ route }) => {
   const routes = [
     {
       key: 'home',
-      title: 'Home',
+      title: 'Start',
       focusedIcon: 'home',
       unfocusedIcon: 'home-outline',
       component: HomeStackScreen,
@@ -281,10 +282,17 @@ const CustomBottomNavigation = ({ route }) => {
     {
       key: 'menu',
       // title: 'Unclaimed Offer',
-      title: 'Offer',
+      title: 'Your Offer',
       focusedIcon: 'menu',
       unfocusedIcon: 'menu',
       component: ClaimedScreen,
+    },
+    {
+      key: 'chat',
+      title: 'Chat',
+      focusedIcon: 'chat',
+      unfocusedIcon: 'chat-outline',
+      component: ChatScreen,
     },
     {
       key: 'blog',
