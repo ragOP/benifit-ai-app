@@ -259,7 +259,7 @@ const StepperCard = ({ benefits, userId }) => {
 };
 const CongratsScreen = ({ route }) => {
   const { fullName, tags = [], userId } = route.params || {};
-
+console.log('tags')
   const getFilteredBenefits = () => {
     const filteredBenefits = {};
     if (tags.length === 0) return ALL_BENEFIT_CARDS;

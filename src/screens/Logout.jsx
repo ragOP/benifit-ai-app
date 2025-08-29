@@ -17,6 +17,7 @@ import {
   Lock,
   LogOut,
   Menu,
+  Gift,
 } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 
@@ -34,11 +35,13 @@ const COLORS = {
   chip3: '#EFEAFF',
   chip4: '#FFF2EB',
   chip5: '#FFF0F6',
+  chip6: '#FFE8E8',
   icon1: '#59A6F3',
   icon2: '#58C584',
   icon3: '#7C5CFF',
   icon4: '#F8755D',
   icon5: '#FF54AC',
+  icon6: '#FF6B6B',
   orange: '#FFA559',
 };
 
@@ -49,24 +52,29 @@ const menuData = [
     chipBg: COLORS.chip1,
   },
   {
-    label: 'Claimed Offer',
-    icon: <Menu size={22} color={COLORS.icon2} />,
+    label: 'Refer & Earn',
+    icon: <Gift size={22} color={COLORS.icon2} />,
     chipBg: COLORS.chip2,
   },
   {
-    label: 'Refund',
-    icon: <Undo2 size={22} color={COLORS.icon3} />,
+    label: 'Claimed Offer',
+    icon: <Menu size={22} color={COLORS.icon3} />,
     chipBg: COLORS.chip3,
   },
   {
-    label: 'Change Password',
-    icon: <Lock size={22} color={COLORS.icon4} />,
+    label: 'Refund',
+    icon: <Undo2 size={22} color={COLORS.icon4} />,
     chipBg: COLORS.chip4,
   },
   {
-    label: 'Logout',
-    icon: <LogOut size={22} color={COLORS.icon5} />,
+    label: 'Change Password',
+    icon: <Lock size={22} color={COLORS.icon5} />,
     chipBg: COLORS.chip5,
+  },
+  {
+    label: 'Logout',
+    icon: <LogOut size={22} color={COLORS.icon6} />,
+    chipBg: COLORS.chip6,
   },
 ];
 
@@ -99,12 +107,13 @@ export default function ProfileScreen() {
         onPress: async () => {
           try {
             // Clear all user-related data from AsyncStorage
+            // Keep FCM token for device - it's device-specific, not user-specific
             await AsyncStorage.removeItem('userToken');
             await AsyncStorage.removeItem('userName');
             await AsyncStorage.removeItem('userEmail');
             await AsyncStorage.removeItem('userId');
             await AsyncStorage.removeItem('userPhone');
-            await AsyncStorage.removeItem('fcmToken');
+            // await AsyncStorage.removeItem('fcmToken'); // Keep FCM token - device specific
             await AsyncStorage.removeItem('userFlowCompleted');
 
             navigation.reset({
@@ -180,6 +189,26 @@ export default function ProfileScreen() {
                   style={styles.row}
                   activeOpacity={0.7}
                   onPress={() => navigation.navigate('MyProfileScreen')}
+                >
+                  <View style={[styles.chip, { backgroundColor: item.chipBg }]}>
+                    {item.icon}
+                  </View>
+                  <Text style={styles.rowText}>{item.label}</Text>
+                  <ChevronRight
+                    size={22}
+                    color="#BBC3BA"
+                    style={{ marginLeft: 'auto' }}
+                  />
+                </TouchableOpacity>
+              );
+            }
+            if (item.label === 'Refer & Earn') {
+              return (
+                <TouchableOpacity
+                  key={item.label}
+                  style={styles.row}
+                  activeOpacity={0.7}
+                  onPress={() => navigation.navigate('ReferralScreen')}
                 >
                   <View style={[styles.chip, { backgroundColor: item.chipBg }]}>
                     {item.icon}

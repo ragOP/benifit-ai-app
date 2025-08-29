@@ -18,6 +18,7 @@ import {
   Edit3,
   Camera,
   ChevronLeft,
+  Gift,
 } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 
@@ -139,6 +140,28 @@ export default function MyProfileScreen() {
               <Text style={styles.infoValue}>{userData.location}</Text>
             </View>
           </View> */}
+        </View>
+
+        {/* Referral Section */}
+        <View style={styles.infoCard}>
+          <Text style={styles.sectionTitle}>Referral Program</Text>
+          
+          <TouchableOpacity
+            style={styles.referralRow}
+            onPress={() => navigation.navigate('ReferralScreen')}
+            activeOpacity={0.7}
+          >
+            <View style={[styles.iconContainer, { backgroundColor: COLORS.iconBg }]}>
+              <Gift size={18} color={COLORS.teal} />
+            </View>
+            <View style={styles.infoContent}>
+              <Text style={styles.infoLabel}>Refer & Earn</Text>
+              <Text style={styles.infoValue}>Share your code and earn rewards</Text>
+            </View>
+            <View style={styles.chevronContainer}>
+              <ChevronLeft size={20} color={COLORS.sub} style={styles.chevron} />
+            </View>
+          </TouchableOpacity>
         </View>
 
         {/* Edit Profile Button */}
@@ -283,6 +306,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: COLORS.text,
     fontWeight: '600',
+  },
+  referralRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  chevronContainer: {
+    marginLeft: 'auto',
+  },
+  chevron: {
+    transform: [{ rotate: '180deg' }],
   },
   editProfileButton: {
     flexDirection: 'row',

@@ -10,6 +10,7 @@ import LoginScreen from '../auth/LoginScreen';
 import RegisterScreen from '../auth/RegisterScreen';
 import AppBottomNavigation from './BottomNavigation';
 import MyProfileScreen from '../screens/MyProfileScreen';
+import ReferralScreen from '../screens/ReferralScreen';
 
 const Stack = createStackNavigator();
 
@@ -53,6 +54,11 @@ export default function Navigation() {
         <Stack.Screen
           name="MyProfileScreen"
           component={MyProfileScreen}
+          screenOptions={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="ReferralScreen"
+          component={ReferralScreen}
           screenOptions={{ headerShown: false }}
         />
         <Stack.Screen
