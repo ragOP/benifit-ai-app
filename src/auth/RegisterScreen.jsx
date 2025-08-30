@@ -28,7 +28,14 @@ const RegisterScreen = ({ navigation }) => {
   const [fcmToken, setFcmToken] = useState('');
 
   // Use the custom toast hook
-  const { toastVisible, toastMessage, toastType, showSuccessToast, showErrorToast, hideToast } = useToast();
+  const {
+    toastVisible,
+    toastMessage,
+    toastType,
+    showSuccessToast,
+    showErrorToast,
+    hideToast,
+  } = useToast();
 
   useEffect(() => {
     const fetchFcmToken = async () => {
@@ -79,20 +86,31 @@ const RegisterScreen = ({ navigation }) => {
 
       if (response.ok && data.data && data.data.token) {
         const token = data.data.token;
+        const userId = data.data._id;
+        const conversationId = data.data.conversationId;
         await AsyncStorage.setItem('userToken', token);
         await AsyncStorage.setItem('userName', username);
         await AsyncStorage.setItem('userEmail', email);
+        await AsyncStorage.setItem('userId', userId);
+        if (conversationId !== null) {
+          console.log('Saved ConversationId:', conversationId);
+          await AsyncStorage.setItem('conversationId', conversationId);
+        }
         console.log('Saved Username:', username);
         console.log('Saved Email:', email);
         const savedToken = await AsyncStorage.getItem('userToken');
         console.log('Saved Token:', savedToken);
+        console.log('Saved UserId', userId);
+        console.log('Saved ConversationId', conversationId);
 
         showSuccessToast('Account created successfully! Welcome!');
         setTimeout(() => {
           navigation.navigate('BottomNavigation');
         }, 1500);
       } else {
-        showErrorToast(data.message || 'Registration failed. Please try again.');
+        showErrorToast(
+          data.message || 'Registration failed. Please try again.',
+        );
       }
     } catch (error) {
       console.error('Error during Register:', error);

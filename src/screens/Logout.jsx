@@ -115,6 +115,7 @@ export default function ProfileScreen() {
             await AsyncStorage.removeItem('userPhone');
             // await AsyncStorage.removeItem('fcmToken'); // Keep FCM token - device specific
             await AsyncStorage.removeItem('userFlowCompleted');
+            await AsyncStorage.removeItem('conversationId');
 
             navigation.reset({
               index: 0,

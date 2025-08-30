@@ -2,20 +2,25 @@
 import { BACKEND_URL } from '../utils/backendUrl';
 
 // GET: Fetch chat messages
-export const getMessages = async () => {
+export const getMessages = async conversationId => {
   try {
-    const response = await fetch(`${BACKEND_URL}/api/v1/chat/get-chat`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
+    console.log('conversationId >>>', conversationId);
+    const response = await fetch(
+      `${BACKEND_URL}/api/v1/chat-history?conversationId=${conversationId}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       },
-    });
+    );
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     const data = await response.json();
+    console.log('data >>>', data);
 
     return data;
   } catch (error) {
@@ -30,8 +35,9 @@ export const getMessages = async () => {
 
 // POST: Send a new message
 export const sendMessage = async ({ payload }) => {
+  console.log('payload >>>', payload);
   try {
-    const response = await fetch(`${BACKEND_URL}/api/v1/chat/message`, {
+    const response = await fetch(`${BACKEND_URL}/api/v1/send-message`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -44,6 +50,7 @@ export const sendMessage = async ({ payload }) => {
     }
 
     const data = await response.json();
+    console.log('data >>>', data);
 
     return data;
   } catch (error) {

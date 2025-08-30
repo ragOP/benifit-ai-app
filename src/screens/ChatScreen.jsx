@@ -32,14 +32,15 @@ const COLORS = {
   adminText: '#121517',
 };
 
-const MessageBubble = ({ message, isAdmin }) => {
-  const isUser = message.sender === 'user';
+const MessageBubble = ({ message }) => {
+  const isUser = message?.role?.toLowerCase() === 'user';
   const bubbleStyle = isUser ? styles.userBubble : styles.adminBubble;
   const textStyle = isUser ? styles.userText : styles.adminText;
 
-  const formatTime = (timestamp) => {
+  const formatTime = timestamp => {
     const now = new Date();
-    const diff = now - timestamp;
+    const past = new Date(timestamp);
+    const diff = now - past;
     const minutes = Math.floor(diff / (1000 * 60));
     const hours = Math.floor(diff / (1000 * 60 * 60));
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
@@ -51,17 +52,24 @@ const MessageBubble = ({ message, isAdmin }) => {
   };
 
   return (
-    <View style={[styles.messageContainer, isUser ? styles.userContainer : styles.adminContainer]}>
+    <View
+      style={[
+        styles.messageContainer,
+        isUser ? styles.userContainer : styles.adminContainer,
+      ]}
+    >
       {!isUser && (
         <View style={styles.adminAvatar}>
           <MaterialIcon name="headset" size={20} color={COLORS.primary} />
         </View>
       )}
-      <View style={[styles.messageContent, isUser && styles.userMessageContent]}>
+      <View
+        style={[styles.messageContent, isUser && styles.userMessageContent]}
+      >
         <View style={[styles.bubble, bubbleStyle]}>
-          <Text style={[styles.messageText, textStyle]}>{message.text}</Text>
+          <Text style={[styles.messageText, textStyle]}>{message?.text}</Text>
         </View>
-        <Text style={styles.timestamp}>{formatTime(message.timestamp)}</Text>
+        <Text style={styles.timestamp}>{formatTime(message?.createdAt)}</Text>
       </View>
       {isUser && (
         <View style={styles.userAvatar}>
@@ -75,6 +83,7 @@ const MessageBubble = ({ message, isAdmin }) => {
 const ChatScreen = () => {
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
+  const [isFirstMsg, setIsFirstMsg] = useState(true);
   const flatListRef = useRef(null);
   const queryClient = useQueryClient();
 
@@ -82,27 +91,60 @@ const ChatScreen = () => {
   const { data: chatMessages = [], isLoading } = useQuery({
     queryKey: ['chatMessages'],
     queryFn: async () => {
-      const response = await getMessages();
-      return response.ok ? response.data : [];
+      const conversationId = await AsyncStorage.getItem('conversationId');
+      const response = conversationId && (await getMessages(conversationId));
+      // return response.success ? response.data : [];
+      if (response?.success) {
+        setIsFirstMsg(!response?.data?.length > 0);
+        return response.data;
+      }
+      return [];
     },
+    // refetch after 2 secondds
+    refetchInterval: 2000,
     initialData: [],
   });
+  console.log('chatMessages >>>', chatMessages);
+  console.log('isFirstMsg >>>', isFirstMsg);
 
   // TanStack Query mutation for sending messages
   const sendMessageMutation = useMutation({
-    mutationFn: async (messageText) => {
-      const payload = {
-        userId: AsyncStorage.getItem('userId'),
-        text: messageText,
+    mutationFn: async messageText => {
+      let payload = {};
+      const userId = await AsyncStorage.getItem('userId');
+      console.log('userId >>>', userId);
+      const adminId = '68b2e2f6254442f9db4ae935';
+      if (!isFirstMsg) {
+        const conversationId = await AsyncStorage.getItem('conversationId');
+        payload = {
+          userId,
+          adminId,
+          conversationId,
+          text: messageText,
+          role: 'User',
+        };
+      } else {
+        payload = {
+          userId,
+          adminId,
+          text: messageText,
+          role: 'User',
+        };
       }
       const response = await sendMessage({ payload });
-      return response.ok ? response.data : null;
+      return response.success ? response.data : null;
     },
-    onSuccess: (newMessage) => {
-      if (newMessage) {
+    onSuccess: async data => {
+      if (data?.result) {
+        const newMessage = data.result;
+        const conversationId = newMessage?.conversationId;
+        await AsyncStorage.setItem('conversationId', conversationId);
         setMessages(prev => [...prev, newMessage]);
         queryClient.invalidateQueries({ queryKey: ['chatMessages'] });
       }
+    },
+    onError: error => {
+      console.error('Error sending message:', error);
     },
   });
 
@@ -130,6 +172,13 @@ const ChatScreen = () => {
     }
   }, [chatMessages]);
 
+  // clean message when component unmounts
+  useEffect(() => {
+    return () => {
+      setMessages([]);
+    };
+  }, []);
+
   const renderMessage = ({ item }) => (
     <MessageBubble message={item} isAdmin={false} />
   );
@@ -137,9 +186,16 @@ const ChatScreen = () => {
   if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
-        <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
+        <StatusBar
+          barStyle="dark-content"
+          backgroundColor={COLORS.background}
+        />
         <View style={styles.loadingContainer}>
-          <MaterialIcon name="chat-processing" size={48} color={COLORS.primary} />
+          <MaterialIcon
+            name="chat-processing"
+            size={48}
+            color={COLORS.primary}
+          />
           <Text style={styles.loadingText}>Loading chat...</Text>
         </View>
       </SafeAreaView>
@@ -161,7 +217,9 @@ const ChatScreen = () => {
           <View style={styles.headerActions}>
             <TouchableOpacity
               style={styles.refreshButton}
-              onPress={() => queryClient.invalidateQueries({ queryKey: ['chatMessages'] })}
+              onPress={() =>
+                queryClient.invalidateQueries({ queryKey: ['chatMessages'] })
+              }
             >
               <MaterialIcon name="refresh" size={20} color={COLORS.white} />
             </TouchableOpacity>
@@ -178,7 +236,7 @@ const ChatScreen = () => {
         ref={flatListRef}
         data={messages}
         renderItem={renderMessage}
-        keyExtractor={(item) => item.id}
+        keyExtractor={item => item.id}
         style={styles.messagesList}
         contentContainerStyle={styles.messagesContainer}
         showsVerticalScrollIndicator={false}
@@ -202,7 +260,7 @@ const ChatScreen = () => {
           <TouchableOpacity
             style={[
               styles.sendButton,
-              !message.trim() && styles.sendButtonDisabled
+              !message.trim() && styles.sendButtonDisabled,
             ]}
             onPress={handleSendMessage}
             disabled={!message.trim() || sendMessageMutation.isPending}
@@ -336,7 +394,7 @@ const styles = StyleSheet.create({
     color: COLORS.textLight,
     marginTop: 4,
     marginLeft: 10,
-    marginRight: 10
+    marginRight: 10,
   },
   userAvatar: {
     width: 32,
@@ -394,4 +452,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ChatScreen; 
+export default ChatScreen;

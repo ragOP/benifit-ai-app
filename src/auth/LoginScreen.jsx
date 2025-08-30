@@ -30,7 +30,14 @@ const LoginScreen = ({ navigation }) => {
   const [googleLoading, setGoogleLoading] = useState(false);
 
   // Use the custom toast hook
-  const { toastVisible, toastMessage, toastType, showSuccessToast, showErrorToast, hideToast } = useToast();
+  const {
+    toastVisible,
+    toastMessage,
+    toastType,
+    showSuccessToast,
+    showErrorToast,
+    hideToast,
+  } = useToast();
 
   useEffect(() => {
     const fetchFcmToken = async () => {
@@ -59,34 +66,41 @@ const LoginScreen = ({ navigation }) => {
     setIsLoading(true);
 
     try {
-      const response = await fetch(
-        `${BACKEND_URL}/api/v1/auth/login`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            loginId: emailOrUsername,
-            password,
-            fcmToken,
-          }),
+      const response = await fetch(`${BACKEND_URL}/api/v1/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      );
-      console.log("PAYLOAD", {
+        body: JSON.stringify({
+          loginId: emailOrUsername,
+          password,
+          fcmToken,
+        }),
+      });
+      console.log('PAYLOAD', {
         loginId: emailOrUsername,
         password,
         fcmToken,
-      })
+      });
       const data = await response.json();
       console.log('LOGIN RESPONSE:', data);
 
       if (response.ok && data.data && data.data.token) {
-        const token = data.data.token;
+        console.log('Login successful! Welcome back!');
+        const token = data?.data?.token;
+        const userId = data?.data?._id;
+        const conversationId = data?.data?.conversationId;
         await AsyncStorage.setItem('userToken', token);
         await AsyncStorage.setItem('userName', emailOrUsername);
+        await AsyncStorage.setItem('userId', userId);
+        if (conversationId !== null) {
+          console.log('Saved ConversationId:', conversationId);
+          await AsyncStorage.setItem('conversationId', conversationId);
+        }
         console.log('Saved Token:', token);
         console.log('Saved Username:', emailOrUsername);
+        console.log('Saved UserId:', userId);
+        console.log('Saved ConversationId:', conversationId);
         showSuccessToast('Login successful! Welcome back!');
         setTimeout(() => {
           navigation.navigate('BottomNavigation');
@@ -147,7 +161,9 @@ const LoginScreen = ({ navigation }) => {
           <View style={styles.content}>
             <View style={styles.headerSection}>
               <Text style={styles.mainHeading}>Let's Sign you in.</Text>
-              <Text style={styles.welcomeText}>Welcome back You've been missed!</Text>
+              <Text style={styles.welcomeText}>
+                Welcome back You've been missed!
+              </Text>
               {/* <Text style={styles.subText}>You've been missed!</Text> */}
             </View>
 
@@ -234,7 +250,10 @@ const LoginScreen = ({ navigation }) => {
                     navigation.navigate('Register');
                   } catch (error) {
                     console.error('Navigation error:', error);
-                    Alert.alert('Error', 'Navigation failed. Please try again.');
+                    Alert.alert(
+                      'Error',
+                      'Navigation failed. Please try again.',
+                    );
                   }
                 }}
                 activeOpacity={0.7}
