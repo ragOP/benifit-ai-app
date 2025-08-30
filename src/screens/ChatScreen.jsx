@@ -15,6 +15,7 @@ import MaterialIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { LinearGradient } from 'react-native-linear-gradient';
 import { getMessages, sendMessage } from '../services/ChatService';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const COLORS = {
   primary: '#0F766E',
@@ -78,11 +79,11 @@ const ChatScreen = () => {
   const queryClient = useQueryClient();
 
   // TanStack Query for fetching messages
-  const { data: chatMessages, isLoading } = useQuery({
+  const { data: chatMessages = [], isLoading } = useQuery({
     queryKey: ['chatMessages'],
     queryFn: async () => {
       const response = await getMessages();
-      return response.success ? response.data : [];
+      return response.ok ? response.data : [];
     },
     initialData: [],
   });
@@ -90,8 +91,12 @@ const ChatScreen = () => {
   // TanStack Query mutation for sending messages
   const sendMessageMutation = useMutation({
     mutationFn: async (messageText) => {
-      const response = await sendMessage({ text: messageText });
-      return response.success ? response.data : null;
+      const payload = {
+        userId: AsyncStorage.getItem('userId'),
+        text: messageText,
+      }
+      const response = await sendMessage({ payload });
+      return response.ok ? response.data : null;
     },
     onSuccess: (newMessage) => {
       if (newMessage) {
@@ -144,7 +149,7 @@ const ChatScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
-      
+
       {/* Header */}
       <LinearGradient
         colors={[COLORS.primary, COLORS.primaryDark]}
@@ -154,7 +159,7 @@ const ChatScreen = () => {
           <MaterialIcon name="chat" size={28} color={COLORS.white} />
           <Text style={styles.headerTitle}>Support Chat</Text>
           <View style={styles.headerActions}>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.refreshButton}
               onPress={() => queryClient.invalidateQueries({ queryKey: ['chatMessages'] })}
             >
