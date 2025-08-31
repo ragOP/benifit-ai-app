@@ -52,7 +52,7 @@ const menuData = [
     chipBg: COLORS.chip1,
   },
   {
-    label: 'Refer & Earn',
+    label: 'Refer Your Friends',
     icon: <Gift size={22} color={COLORS.icon2} />,
     chipBg: COLORS.chip2,
   },
@@ -60,11 +60,6 @@ const menuData = [
     label: 'Claimed Offer',
     icon: <Menu size={22} color={COLORS.icon3} />,
     chipBg: COLORS.chip3,
-  },
-  {
-    label: 'Refund',
-    icon: <Undo2 size={22} color={COLORS.icon4} />,
-    chipBg: COLORS.chip4,
   },
   {
     label: 'Change Password',

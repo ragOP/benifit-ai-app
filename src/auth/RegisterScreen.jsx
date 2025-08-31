@@ -18,6 +18,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BACKEND_URL } from '../utils/backendUrl';
 import { useToast } from '../hooks/useToast';
 import { Toast } from '../component/Toast';
+import { Image } from 'react-native';
 
 const RegisterScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -134,8 +135,15 @@ const RegisterScreen = ({ navigation }) => {
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.content}>
+            <Image
+              source={require('../assets/center.png')}
+              style={styles.logo}
+              resizeMode="contain"
+            />
             <Text style={styles.mainHeading}>Create Account</Text>
-            <Text style={styles.welcomeText}>Join us create your account!</Text>
+            <Text style={styles.welcomeText}>
+              Join us create your account!www
+            </Text>
             <View style={styles.inputContainer}>
               <Text style={styles.label}>Email</Text>
               <View style={styles.inputBox}>
@@ -208,6 +216,10 @@ const RegisterScreen = ({ navigation }) => {
               </TouchableOpacity>
             )}
 
+            <Text style={styles.subText2}>
+              free fast secure at signup register
+            </Text>
+
             <View style={styles.registerContainer}>
               <Text style={styles.registerText}>Already have an account? </Text>
               <TouchableOpacity onPress={() => navigation.navigate('Login')}>
@@ -276,6 +288,13 @@ const styles = StyleSheet.create({
     width: '100%',
     marginBottom: 25,
   },
+  subText2: {
+    fontSize: 16,
+    color: '#999',
+    marginBottom: 20,
+    textAlign: 'center',
+    marginTop: 10,
+  },
   label: {
     fontSize: 16,
     color: 'white',
@@ -336,6 +355,11 @@ const styles = StyleSheet.create({
     color: 'black',
     fontSize: 18,
     fontWeight: '600',
+  },
+  logo: {
+    width: Dimensions.get('window').width * 0.5,
+    height: 80,
+    marginBottom: 20,
   },
 });
 

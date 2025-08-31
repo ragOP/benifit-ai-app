@@ -11,6 +11,9 @@ import RegisterScreen from '../auth/RegisterScreen';
 import AppBottomNavigation from './BottomNavigation';
 import MyProfileScreen from '../screens/MyProfileScreen';
 import ReferralScreen from '../screens/ReferralScreen';
+import LoaderScreen from '../screens/LoadingPage';
+import CongratsScreen from '../screens/CongratsScreen';
+import AfterQuizScreen from '../screens/AfterQuizScreen';
 
 const Stack = createStackNavigator();
 
@@ -64,6 +67,21 @@ export default function Navigation() {
         <Stack.Screen
           name="ClaimedScreen"
           component={ClaimedScreen}
+          screenOptions={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="LoadingPage"
+          component={LoaderScreen}
+          screenOptions={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Congrats"
+          component={CongratsScreen}
+          screenOptions={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="AfterQuizScreen"
+          component={AfterQuizScreen}
           screenOptions={{ headerShown: false }}
         />
       </Stack.Navigator>

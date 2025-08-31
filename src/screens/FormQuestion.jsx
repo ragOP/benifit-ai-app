@@ -17,6 +17,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BACKEND_URL } from '../utils/backendUrl';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+const localAvatar = require('../assets/bot.png');
+
 const COLORS = {
   black: '#000000',
   dark: '#0c1a17',
@@ -141,11 +143,12 @@ const generateRandomUserId = () => {
 
 const infoDelay = 1000;
 const inputAnimDuration = 400;
-const messageAnimDuration = 900;
+const messageAnimDuration = 750;
 
 const AnimatedBubble = ({ isBot, text, showAvatar, children }) => {
   const fade = useRef(new Animated.Value(0)).current;
   const scale = useRef(new Animated.Value(0.8)).current;
+  const translateY = useRef(new Animated.Value(30)).current;
   const dotBounce = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -155,10 +158,16 @@ const AnimatedBubble = ({ isBot, text, showAvatar, children }) => {
         Animated.spring(scale, {
           toValue: 1,
           friction: 12,
+          tension: 80,
           useNativeDriver: true,
         }),
         Animated.timing(fade, {
           toValue: 1,
+          duration: messageAnimDuration,
+          useNativeDriver: true,
+        }),
+        Animated.timing(translateY, {
+          toValue: 0,
           duration: messageAnimDuration,
           useNativeDriver: true,
         }),
@@ -180,7 +189,7 @@ const AnimatedBubble = ({ isBot, text, showAvatar, children }) => {
             duration: 250,
             useNativeDriver: true,
           }),
-        ]),
+        ])
       ).start();
     } else {
       dotBounce.setValue(0);
@@ -191,18 +200,16 @@ const AnimatedBubble = ({ isBot, text, showAvatar, children }) => {
     <Animated.View
       style={[
         isBot ? styles.botBubbleWrap : styles.userBubbleWrap,
-        { opacity: fade, transform: [{ scale }] },
+        { 
+          opacity: fade, 
+          transform: [{ scale }, { translateY }],
+        },
       ]}
     >
       {isBot && (
         <View style={styles.botAvatar}>
           {showAvatar && (
-            <Image
-              source={{
-                uri: 'https://randomuser.me/api/portraits/women/44.jpg',
-              }}
-              style={styles.avatar}
-            />
+            <Image source={localAvatar} style={styles.avatar} />
           )}
         </View>
       )}
@@ -275,6 +282,10 @@ export default function FormQuestion({ navigation }) {
     const fullName = allAnswers["What's your full name?"];
     const userId = generateRandomUserId();
 
+    const userUniqueId = await AsyncStorage.getItem('userId');
+
+    console.log(userUniqueId, "<<<<<<");
+
     const payload = {
       userId,
       fullName,
@@ -285,13 +296,15 @@ export default function FormQuestion({ navigation }) {
       sendMessageOn: 'SMS',
       number: allAnswers['Please enter your 10-digit phone number below:'],
       consentAgreed: true,
+      user: userUniqueId
     };
 
     console.log('Final Payload:', payload);
 
     try {
-      await AsyncStorage.setItem('userId', userId);
+      await AsyncStorage.setItem('userUnique', userId);
       console.log('Saved userId in AsyncStorage:', userId);
+
 
       const res = await fetch(
         `${BACKEND_URL}/api/v1/users/response`,
@@ -625,7 +638,6 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    borderWidth: 0,
     borderRadius: 25,
     paddingHorizontal: 20,
     backgroundColor: 'transparent',
@@ -633,6 +645,7 @@ const styles = StyleSheet.create({
     height: 45,
     borderColor: '#07816b',
     borderWidth: 1,
+    color: COLORS.text,
   },
   checkBtn: {
     backgroundColor: COLORS.teal,

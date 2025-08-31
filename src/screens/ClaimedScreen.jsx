@@ -93,6 +93,7 @@ const ClaimedScreen = () => {
   const fetchClaimedOffers = useCallback(async () => {
     try {
       const id = await AsyncStorage.getItem('userId');
+      console.log("userid>>>", id);
       setUserId(id);
 
       if (!id) {

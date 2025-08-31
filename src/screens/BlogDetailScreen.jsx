@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -7,9 +7,13 @@ import {
   ScrollView,
   StatusBar,
   TouchableOpacity,
+  Animated,
+  Dimensions,
+  Linking
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChevronLeft } from 'lucide-react-native';
+const { width } = Dimensions.get('window');
 
 const ALL_BENEFIT_CARDS = {
   is_md: {
@@ -80,12 +84,33 @@ const COLORS = {
   subtitleText: '#1a1a1a',
   descriptionText: '#444',
   bulletTextColor: '#4b4b4b',
+  green: '#10b981',
+  white: '#fff',
 };
 
 export default function BlogDetailScreen({ route, navigation }) {
   const { benefit } = route.params || {};
   const card = ALL_BENEFIT_CARDS[benefit];
   const benefitsList = benefitExplanations[benefit] || [];
+
+  const shimmerAnimation = useRef(new Animated.Value(0)).current;
+    useEffect(() => {
+    const shimmer = () => {
+      Animated.sequence([
+        Animated.timing(shimmerAnimation, {
+          toValue: 1,
+          duration: 4000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(shimmerAnimation, {
+          toValue: 0,
+          duration: 0,
+          useNativeDriver: true,
+        }),
+      ]).start(() => shimmer());
+    };
+    shimmer();
+  }, [shimmerAnimation]);
 
   if (!card) {
     return (
@@ -143,7 +168,7 @@ export default function BlogDetailScreen({ route, navigation }) {
             </View>
             <Text style={styles.subtitle}>What is this benefit?</Text>
           </View>
-          
+
           <View style={styles.descriptionCard}>
             <Text style={styles.description}>{card.description}</Text>
           </View>
@@ -156,7 +181,7 @@ export default function BlogDetailScreen({ route, navigation }) {
             </View>
             <Text style={styles.subtitle}>Key Benefits</Text>
           </View>
-          
+
           <View style={styles.benefitsCard}>
             {benefitsList.map((item, idx) => (
               <View key={idx} style={styles.benefitItem}>
@@ -167,6 +192,31 @@ export default function BlogDetailScreen({ route, navigation }) {
               </View>
             ))}
           </View>
+          <TouchableOpacity
+            style={styles.claimButton}
+            activeOpacity={0.9}
+            onPress={() => Linking.openURL('tel:+1234567890')}
+          >
+            <Animated.View
+              style={[
+                styles.shimmer,
+                {
+                  transform: [
+                    {
+                      translateX: shimmerAnimation.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [-width, width],
+                      }),
+                    },
+                    { rotate: '13deg' },
+                  ],
+                },
+              ]}
+            />
+            <View style={styles.claimButtonContent}>
+              <Text style={styles.claimText}>Call Now</Text>
+            </View>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </View>
@@ -334,5 +384,33 @@ const styles = StyleSheet.create({
   errorSubText: {
     color: '#555',
     fontSize: 15,
+  },
+  claimButton: {
+    marginTop: 22,
+    width: '100%',
+    backgroundColor: COLORS.green,
+    borderRadius: 32,
+    paddingVertical: 16,
+    alignItems: 'center',
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  claimText: {
+    color: COLORS.white,
+    fontWeight: '700',
+    fontSize: 19,
+    letterSpacing: 0.2,
+  },
+  shimmer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: '5%',
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    boxShadow: '0 0 15px rgba(255, 255, 255, 0.3)',
+    transform: [{ skewX: '-20deg' }],
+    zIndex: 0,
   },
 });

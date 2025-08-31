@@ -8,9 +8,12 @@ import {
   TouchableOpacity,
   Animated,
   ScrollView,
+  Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
+
+const { width } = Dimensions.get('window');
 
 const COLORS = {
   black: '#000000',
@@ -67,25 +70,47 @@ const BubbleSVG = () => (
   </Svg>
 );
 
-const MessageBubble = ({ text, showAvatar }) => {
+const MessageBubble = ({ text, showAvatar, index }) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
-  const scaleAnim = useRef(new Animated.Value(0.5)).current;
+  const scaleAnim = useRef(new Animated.Value(0.95)).current;
+  const translateYAnim = useRef(new Animated.Value(50)).current;
+  const avatarScale = useRef(new Animated.Value(0.5)).current;
+  const avatarOpacity = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Animated.parallel([
-      Animated.spring(scaleAnim, {
+      Animated.timing(translateYAnim, {
+        toValue: 0,
+        duration: 620,
+        delay: index * 38,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scaleAnim, {
         toValue: 1,
-        friction: 14,
-        tension: 22,
+        duration: 620,
+        delay: index * 38,
         useNativeDriver: true,
       }),
       Animated.timing(fadeAnim, {
         toValue: 1,
-        duration: 1200,
+        duration: 620,
+        delay: index * 38,
+        useNativeDriver: true,
+      }),
+      Animated.timing(avatarScale, {
+        toValue: 1,
+        duration: 495,
+        delay: index * 38 + 133,
+        useNativeDriver: true,
+      }),
+      Animated.timing(avatarOpacity, {
+        toValue: 1,
+        duration: 495,
+        delay: index * 38 + 133,
         useNativeDriver: true,
       }),
     ]).start();
-  }, [fadeAnim, scaleAnim]);
+  }, []);
 
   return (
     <Animated.View
@@ -93,15 +118,20 @@ const MessageBubble = ({ text, showAvatar }) => {
         styles.msgWrap,
         {
           opacity: fadeAnim,
-          transform: [{ scale: scaleAnim }],
+          transform: [{ translateY: translateYAnim }, { scale: scaleAnim }],
         },
       ]}
     >
       <View style={styles.msgRow}>
         {showAvatar ? (
-          <View style={styles.avatarContainer}>
+          <Animated.View
+            style={[
+              styles.avatarContainer,
+              { transform: [{ scale: avatarScale }], opacity: avatarOpacity },
+            ]}
+          >
             <Image source={localAvatar} style={styles.avatar} />
-          </View>
+          </Animated.View>
         ) : (
           <View
             style={[
@@ -110,6 +140,7 @@ const MessageBubble = ({ text, showAvatar }) => {
             ]}
           />
         )}
+
         <View style={{ position: 'relative' }}>
           <BubbleSVG />
           <View style={styles.bubble}>
@@ -123,6 +154,7 @@ const MessageBubble = ({ text, showAvatar }) => {
 
 const QuestionScreen = ({ navigation }) => {
   const [chat, setChat] = useState([]);
+  const shimmerAnimation = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     const timers = [];
@@ -134,6 +166,24 @@ const QuestionScreen = ({ navigation }) => {
     });
     return () => timers.forEach(clearTimeout);
   }, []);
+
+  useEffect(() => {
+    const shimmer = () => {
+      Animated.sequence([
+        Animated.timing(shimmerAnimation, {
+          toValue: 1,
+          duration: 4000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(shimmerAnimation, {
+          toValue: 0,
+          duration: 0,
+          useNativeDriver: true,
+        }),
+      ]).start(() => shimmer());
+    };
+    shimmer();
+  }, [shimmerAnimation]);
 
   const onStart = () => {
     navigation.navigate('Form');
@@ -178,6 +228,22 @@ const QuestionScreen = ({ navigation }) => {
                 style={[styles.ctaBtn, styles.ctaBtnLeft]}
                 onPress={onStart}
               >
+                <Animated.View
+                  style={[
+                    styles.shimmer,
+                    {
+                      transform: [
+                        {
+                          translateX: shimmerAnimation.interpolate({
+                            inputRange: [0, 1],
+                            outputRange: [-width, width],
+                          }),
+                        },
+                        { rotate: '13deg' },
+                      ],
+                    },
+                  ]}
+                />
                 <Text style={styles.ctaText}>Lets Start</Text>
               </TouchableOpacity>
             </View>
@@ -235,6 +301,18 @@ const styles = StyleSheet.create({
     marginTop: 6,
     overflow: 'hidden',
     marginTop: 'auto',
+  },
+  shimmer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: '5%',
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    boxShadow: '0 0 15px rgba(255, 255, 255, 0.3)',
+    transform: [{ skewX: '-20deg' }],
+    zIndex: 0,
   },
   avatar: {
     width: '100%',

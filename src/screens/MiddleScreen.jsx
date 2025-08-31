@@ -14,6 +14,7 @@ import {
 import LinearGradient from 'react-native-linear-gradient';
 import TestimonialSlider from '../component/TestimonialSlider';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Timer from '../component/Timer';
 
 const { width } = Dimensions.get('window');
 
@@ -68,7 +69,7 @@ const MiddleScreen = ({ route, navigation }) => {
       Animated.sequence([
         Animated.timing(shimmerAnimation, {
           toValue: 1,
-          duration: 3000,
+          duration: 4000,
           useNativeDriver: true,
         }),
         Animated.timing(shimmerAnimation, {
@@ -141,10 +142,10 @@ const MiddleScreen = ({ route, navigation }) => {
 
         <View style={styles.boxQualified}>
           <Text style={styles.boxQualifiedText}>
-            We found you qualify for benefits
-          </Text>
-          <Text style={styles.benefitAmount}>
-            ${roundedTotal > 0 ? roundedTotal.toLocaleString() : '15,000'}+
+            We found you qualify for benefits worth{' '}
+            <Text style={styles.benefitAmount}>
+              ${roundedTotal > 0 ? roundedTotal.toLocaleString() : '15,000'}+
+            </Text>
           </Text>
         </View>
 
@@ -161,7 +162,8 @@ const MiddleScreen = ({ route, navigation }) => {
           <Text style={styles.reportTitle}>Your Benefit Report Is Ready!</Text>
           <View style={{ marginTop: 18 }}>
             <Text style={styles.reportDetail}>
-              • You're approved for 4 exclusive benefits, worth over $9,000 if
+              • You're approved for {tags.length} exclusive benefits, worth over{' '}
+              {roundedTotal > 0 ? roundedTotal.toLocaleString() : '15,000'}+ if
               claimed on time.
             </Text>
             <Text style={styles.reportDetail}>
@@ -176,7 +178,7 @@ const MiddleScreen = ({ route, navigation }) => {
             style={styles.claimButton}
             activeOpacity={0.9}
             onPress={() =>
-              navigation.navigate('Congrats', {
+              navigation.navigate('LoadingPage', {
                 fullName: fullName,
                 tags: tags,
                 userId,
@@ -184,20 +186,21 @@ const MiddleScreen = ({ route, navigation }) => {
             }
           >
             <Animated.View
-              style={[
-                styles.shimmer,
-                {
-                  transform: [
+                  style={[
+                    styles.shimmer,
                     {
-                      translateX: shimmerAnimation.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: [-width, width],
-                      }),
+                      transform: [
+                        {
+                          translateX: shimmerAnimation.interpolate({
+                            inputRange: [0, 1],
+                            outputRange: [-width, width],
+                          }),
+                        },
+                        { rotate: '13deg' },
+                      ],
                     },
-                  ],
-                },
-              ]}
-            />
+                  ]}
+                />
             <View style={styles.claimButtonContent}>
               <Text style={styles.claimText}>Start Claiming My Benefits!</Text>
             </View>
@@ -209,9 +212,7 @@ const MiddleScreen = ({ route, navigation }) => {
             Due to high demand, your benefit report is available to claim for
             only 5 minutes.
           </Text>
-          {/* <View style={styles.timerBox}>
-            <Text style={styles.timerText}>{formatTime(secondsLeft)}</Text>
-          </View> */}
+          <Timer />
         </View>
 
         <TestimonialSlider />
@@ -225,11 +226,11 @@ const MiddleScreen = ({ route, navigation }) => {
               Organisation.
             </Text>
           </Text>
-          {/* <Text style={{ textAlign: 'center', ...styles.noteBody2 }}>
+          <Text style={{ textAlign: 'center', ...styles.noteBody2 }}>
             Beware of other fraudulent & similar looking websites. This is the
             only official website to claim the benefits you're qualified for
             (mybenefitsai.org).
-          </Text> */}
+          </Text>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -292,12 +293,14 @@ const styles = StyleSheet.create({
     fontSize: 22,
     textAlign: 'center',
     marginBottom: 3,
+    marginRight: 6,
   },
   benefitAmount: {
     color: '#44aa5f',
     fontWeight: '700',
-    fontSize: 28,
+    fontSize: 20,
     marginTop: 4,
+    paddingLeft: 6,
   },
   vertDashedLine: {
     width: 1.5,
@@ -344,7 +347,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   reportTitle: {
-    fontSize: 23,
+    fontSize: 28,
     color: COLORS.white,
     fontWeight: '700',
     textAlign: 'center',
@@ -380,8 +383,9 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    width: '100%',
+    width: '5%',
     backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    boxShadow: '0 0 15px rgba(255, 255, 255, 0.3)',
     transform: [{ skewX: '-20deg' }],
     zIndex: 0,
   },
@@ -396,7 +400,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   timerMessage: {
-    fontSize: 16,
+    fontSize: 18,
     color: COLORS.black,
     fontWeight: '600',
     textAlign: 'center',
@@ -443,9 +447,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   noteBody2: {
-    marginTop: 15,
+    marginTop: 25,
     color: '#111827',
-    fontSize: 13,
+    fontSize: 11,
     lineHeight: 20,
     paddingHorizontal: 4,
   },

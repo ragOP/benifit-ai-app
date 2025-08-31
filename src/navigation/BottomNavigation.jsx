@@ -263,6 +263,8 @@ function HomeStackScreen() {
 const CustomBottomNavigation = ({ route }) => {
   const [index, setIndex] = useState(route?.params?.initialTab || 0);
   const PRIMARY_COLOR = '#0F766E';
+
+  console.log('Initial Tab from route params:', route?.params?.initialTab);
   
   // Update index when route params change
   useEffect(() => {

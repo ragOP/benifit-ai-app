@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Image,
   ScrollView,
@@ -10,10 +10,13 @@ import {
   Linking,
   Platform,
   Alert,
+  Animated,
+  Dimensions,
 } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { BACKEND_URL } from '../utils/backendUrl';
 import { SafeAreaView } from 'react-native-safe-area-context';
+const { width } = Dimensions.get('window');
 
 const COLORS = {
   black: '#000000',
@@ -85,6 +88,24 @@ const ALL_BENEFIT_CARDS = {
 };
 
 const BenefitCard = ({ benefit, onClaim }) => {
+  const shimmerAnimation = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    const shimmer = () => {
+      Animated.sequence([
+        Animated.timing(shimmerAnimation, {
+          toValue: 1,
+          duration: 4000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(shimmerAnimation, {
+          toValue: 0,
+          duration: 0,
+          useNativeDriver: true,
+        }),
+      ]).start(() => shimmer());
+    };
+    shimmer();
+  }, [shimmerAnimation]);
   const handlePress = async () => {
     try {
       await onClaim?.();
@@ -125,24 +146,40 @@ const BenefitCard = ({ benefit, onClaim }) => {
       </View>
       <Text style={styles.foodCardTitle}>{benefit.title}</Text>
       <Text style={styles.foodCardDesc}>{benefit.description}</Text>
-      <View style={styles.unlockBox}>
-        <Text style={styles.unlockText}>
-          Complete this step to unlock the next benefit.
-        </Text>
-      </View>
       <TouchableOpacity
         style={styles.callButton}
         onPress={handlePress}
         activeOpacity={0.9}
       >
+        <Animated.View
+          style={[
+            styles.shimmer,
+            {
+              transform: [
+                {
+                  translateX: shimmerAnimation.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [-width, width],
+                  }),
+                },
+                { rotate: '13deg' },
+              ],
+            },
+          ]}
+        />
         <Text style={styles.callIcon}>
           {benefit.title === 'MVA ' ? '🌐' : '📞'}
         </Text>
         <Text style={styles.callButtonText}>{benefit.call}</Text>
       </TouchableOpacity>
-      {benefit.title !== 'MVA' && (
+      {/* {benefit.title !== 'MVA' && (
         <Text style={styles.altDial}>Or dial: {benefit.phone}</Text>
-      )}
+      )} */}
+      <View style={styles.unlockBox}>
+        <Text style={styles.unlockText}>
+          Complete this step to unlock the next benefit.
+        </Text>
+      </View>
     </View>
   );
 };
@@ -259,7 +296,7 @@ const StepperCard = ({ benefits, userId }) => {
 };
 const CongratsScreen = ({ route }) => {
   const { fullName, tags = [], userId } = route.params || {};
-console.log('tags')
+  console.log('tags');
   const getFilteredBenefits = () => {
     const filteredBenefits = {};
     if (tags.length === 0) return ALL_BENEFIT_CARDS;
@@ -291,8 +328,8 @@ console.log('tags')
           </Text>
           <Text style={styles.description}>
             We've found that you immediately qualify for{' '}
-            <Text style={styles.greenText}>these benefits</Text> worth thousands
-            of dollars combined.
+            <Text style={styles.greenText}>{Object.keys(filteredBenefits).length} benefits</Text> worth
+            thousands of dollars combined.
           </Text>
           <View style={styles.claimBox}>
             <Text style={styles.claimText}>
@@ -418,6 +455,18 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.06,
     shadowRadius: 4,
     elevation: 2,
+  },
+  shimmer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: '5%',
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    boxShadow: '0 0 15px rgba(255, 255, 255, 0.3)',
+    transform: [{ skewX: '-20deg' }],
+    zIndex: 0,
   },
   pill: {
     alignSelf: 'flex-start',

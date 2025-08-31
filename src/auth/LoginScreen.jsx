@@ -57,6 +57,42 @@ const LoginScreen = ({ navigation }) => {
     fetchFcmToken();
   }, []);
 
+  const checkIfUserExist = async userId => {
+    try {
+      if (!userId) {
+        console.warn('User ID not found in storage.');
+        return;
+      }
+
+      console.log(userId, ">>>>>>>");
+
+      const response = await fetch(
+        `https://benifit-ai-app-be.onrender.com/api/v1/users/claimed-offer?userId=${userId}`,
+        {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        },
+      );
+
+      const data = await response.json();
+
+      console.log(">>>>>>222", data);
+
+      if (data.success && data.data) {
+        await AsyncStorage.setItem('userFlowCompleted', JSON.stringify(data));
+        setTimeout(() => {
+          navigation.navigate('AfterQuizScreen');
+        }, 1500);
+      } else {
+        setTimeout(() => {
+          navigation.navigate('BottomNavigation');
+        }, 1500);
+      }
+    } catch (error) {
+      console.error('Error checking user existence:', error);
+    }
+  };
+
   const handleLogin = async () => {
     if (!emailOrUsername || !password) {
       showErrorToast('Please enter both email/username and password');
@@ -102,9 +138,7 @@ const LoginScreen = ({ navigation }) => {
         console.log('Saved UserId:', userId);
         console.log('Saved ConversationId:', conversationId);
         showSuccessToast('Login successful! Welcome back!');
-        setTimeout(() => {
-          navigation.navigate('BottomNavigation');
-        }, 1500);
+        await checkIfUserExist(userId);
       } else {
         showErrorToast(data.message || 'Login failed. Please try again.');
       }

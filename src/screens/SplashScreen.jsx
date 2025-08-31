@@ -13,12 +13,12 @@ const SplashScreen = ({ navigation }) => {
           if (token) {
             navigation.replace('BottomNavigation');
           } else {
-            navigation.replace('Login');
+            navigation.replace('Register');
           }
         }, 2000);
       } catch (error) {
         console.error('Error checking token:', error);
-        navigation.replace('Login');
+        navigation.replace('Register');
       }
     };
 

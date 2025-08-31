@@ -182,7 +182,7 @@ export default function HomeScreen({ navigation }) {
       Animated.sequence([
         Animated.timing(shimmerAnimation, {
           toValue: 1,
-          duration: 3000,
+          duration: 4000,
           useNativeDriver: true,
         }),
         Animated.timing(shimmerAnimation, {
@@ -349,6 +349,7 @@ export default function HomeScreen({ navigation }) {
                           outputRange: [-width, width],
                         }),
                       },
+                      { rotate: '13deg' },
                     ],
                   },
                 ]}
@@ -612,8 +613,9 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    width: '100%',
+    width: '5%',
     backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    boxShadow: '0 0 15px rgba(255, 255, 255, 0.3)',
     transform: [{ skewX: '-20deg' }],
     zIndex: 0,
   },
