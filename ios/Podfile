@@ -27,7 +27,7 @@ target 'MyBenifitAiApp' do
   # pod 'FirebaseAppCheckInterop', :modular_headers => true
   # pod 'FirebaseCoreExtension', :modular_headers => true
   # pod 'RecaptchaInterop', :modular_headers => true
-  # pod 'FirebaseMessaging', :modular_headers => true
+  pod 'FirebaseMessaging', :modular_headers => true
   # pod 'FirebaseAnalytics', :modular_headers => true
 
   # pod 'FirebaseAuth', :modular_headers => true

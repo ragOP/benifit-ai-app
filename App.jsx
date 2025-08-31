@@ -1,176 +1,166 @@
 import React, { useEffect, useCallback, useState } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Platform, Alert } from 'react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Navigation from './src/navigation/navigation';
+
 import messaging from '@react-native-firebase/messaging';
-import notifee from '@notifee/react-native';
+import notifee, { AndroidImportance, EventType } from '@notifee/react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-// import { getAuth, onAuthStateChanged } from '@react-native-firebase/auth';
-// import { GoogleSignin } from '@react-native-google-signin/google-signin';
+
+const queryClient = new QueryClient();
 
 const App = () => {
-  // Create a client
-  const queryClient = new QueryClient();
-  
-  // Authentication state
-  const [initializing, setInitializing] = useState(true);
-  const [user, setUser] = useState(null);
+  const [initializing, setInitializing] = useState(false);
 
-  // Handle user state changes
-  const handleAuthStateChanged = useCallback((user) => {
-    setUser(user);
-    if (initializing) setInitializing(false);
-  }, [initializing]);
-
-  // Initialize Google Sign-In
-  // useEffect(() => {
-  //   GoogleSignin.configure({
-  //     webClientId: 'YOUR_WEB_CLIENT_ID.apps.googleusercontent.com', // Get this from Firebase Console
-  //   });
-  // }, []);
-
-  // Listen for auth state changes
-  // useEffect(() => {
-  //   const subscriber = onAuthStateChanged(getAuth(), handleAuthStateChanged);
-  //   return subscriber;
-  // }, [handleAuthStateChanged]);
-
-  // Request user permission for notifications
-  const requestUserPermission = async () => {
+  // ---- Permissions (Firebase + Notifee) ----
+  const requestUserPermission = useCallback(async () => {
+    // Firebase (prompts on iOS)
     const authStatus = await messaging().requestPermission();
     const enabled =
       authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
       authStatus === messaging.AuthorizationStatus.PROVISIONAL;
 
-    return enabled;
-  };
-
-  // Handle permissions with status check
-  const handlePermissions = async () => {
-    try {
-      const currentStatus = await messaging().hasPermission();
-
-      if (currentStatus === messaging.AuthorizationStatus.AUTHORIZED) {
-        console.log(':white_check_mark: Firebase permission already granted');
-      } else {
-        const granted = await requestUserPermission();
-
-        if (granted) {
-          console.log(
-            ':white_check_mark: Firebase permission granted successfully',
-          );
-        } else {
-          console.warn(':no_entry_sign: Firebase permission denied');
-        }
-      }
-    } catch (error) {
-      console.error(':x: Error handling permissions:', error);
-    }
-  };
-
-  // Create Android notification channel
-  const createNotificationChannel = async () => {
-    await notifee.createChannel({
-      id: 'benefits',
-      name: 'Benefits Notifications',
-      description: 'Channel for benefits and updates',
-      // importance: AndroidImportance.HIGH,
-      // importance: notifee.AndroidImportance.HIGH,
-      sound: 'default',
-      vibration: true,
-      lights: true,
-      lightColor: '#0F766E',
-      showBadge: true,
-    });
-  };
-
-  // Display notification when message is received
-  const onMessageReceived = useCallback(async message => {
-    console.log(':iphone: Message received:', message);
-
-    try {
-      if (!message || !message.notification) {
-        console.log('Message or notification is undefined, skipping');
-        return;
-      }
-
-      const { title, body } = message.notification;
-
-      if (!title || !body) {
-        console.log('Missing title or body, skipping notification');
-        return;
-      }
-
-      await notifee.displayNotification({
-        title: title,
-        body: body,
-        data: message.data || {},
-        android: {
-          channelId: 'benefits',
-          smallIcon: 'ic_launcher',
-          largeIcon: 'ic_launcher',
-          color: '#0F766E',
-          sound: 'default',
-          vibrationPattern: [300, 500],
-          // priority: notifee.AndroidImportance.HIGH,
-          // actions: [
-          //   {
-          //     title: 'View Details',
-          //     pressAction: {
-          //       id: 'view_details',
-          //     },
-          //   },
-          //   {
-          //     title: 'Dismiss',
-          //     pressAction: {
-          //       id: 'dismiss',
-          //     },
-          //   },
-          // ],
-        },
-        ios: {
-          categoryId: 'benefits',
-          threadId: 'benefits_thread',
-        },
+    if (Platform.OS === 'ios') {
+      // Notifee iOS permission (banner/sound/badge presentation)
+      await notifee.requestPermission({
+        alert: true,
+        sound: true,
+        badge: true,
+        announcement: false,
+        criticalAlert: false,
+        carPlay: false,
+        provisional: authStatus === messaging.AuthorizationStatus.PROVISIONAL,
       });
+    }
+    return enabled;
+  }, []);
 
-      console.log(':white_check_mark: Notification displayed successfully');
-    } catch (error) {
-      console.error(':x: Error displaying notification:', error);
+  // ---- Android channel; iOS categories ----
+  const configureNotificationRouting = useCallback(async () => {
+    if (Platform.OS === 'android') {
+      await notifee.createChannel({
+        id: 'benefits',
+        name: 'Benefits Notifications',
+        description: 'Channel for benefits and updates',
+        importance: AndroidImportance.HIGH,
+        sound: 'default',
+        vibration: true,
+        lights: true,
+        lightColor: '#0F766E',
+        badge: true,
+      });
+    } else {
+      // Optional: action buttons/categories on iOS
+      await notifee.setNotificationCategories([
+        {
+          id: 'benefits',
+          actions: [
+            { id: 'view_details', title: 'View' },
+            { id: 'dismiss', title: 'Dismiss', destructive: true },
+          ],
+        },
+      ]);
     }
   }, []);
-  const registerAndGetToken = async () => {
-    try {
-      console.log(':calling: Registering for remote messages...');
-      await messaging().registerDeviceForRemoteMessages();
 
-      const token = await messaging().getToken();
-      console.log(':envelope_with_arrow: FCM Token:', token);
-      await AsyncStorage.setItem('fcmToken', token);
-    } catch (error) {
-      console.error(':x: Error getting FCM token:', error);
+  // ---- Display helper ----
+  const displayNotification = useCallback(async (title: string, body: string, data: Record<string, string> = {}) => {
+    await notifee.displayNotification({
+      title,
+      body,
+      data,
+      android: Platform.OS === 'android' ? {
+        channelId: 'benefits',
+        smallIcon: 'ic_launcher',   // ensure present
+        largeIcon: 'ic_launcher',   // optional
+        color: '#0F766E',
+        sound: 'default',
+        vibrationPattern: [300, 500],
+        pressAction: { id: 'default' },
+      } : undefined,
+      ios: Platform.OS === 'ios' ? {
+        categoryId: 'benefits',
+        threadId: 'benefits_thread',
+        sound: 'default',
+      } : undefined,
+    });
+  }, []);
+
+  // ---- Foreground FCM handler ----
+  const onMessageReceived = useCallback(async (message) => {
+    console.log('📨 FG message:', message);
+    const title = message?.notification?.title ?? 'New message';
+    const body  = message?.notification?.body ?? (message?.data ? JSON.stringify(message.data) : '');
+    await displayNotification(title, body, message?.data || {});
+  }, [displayNotification]);
+
+  // ---- Register, get tokens (FCM + APNs) ----
+  const registerAndGetTokens = useCallback(async () => {
+    console.log('📲 Registering for remote messages…');
+    await messaging().registerDeviceForRemoteMessages();
+
+    const fcm = await messaging().getToken();
+    console.log('🔥 FCM Token:', fcm);
+    await AsyncStorage.setItem('fcmToken', fcm);
+
+    if (Platform.OS === 'ios') {
+      // Get APNs token (string) so you can test from Xcode Push panel
+      const apns = await messaging().getAPNSToken();
+      if (apns) {
+        console.log('🍏 APNs Token (hex):', apns);
+      } else {
+        console.log('⚠️ APNs token not yet available (will be provided after registration).');
+      }
     }
-  };
+  }, []);
 
+  // ---- Notification events (taps, actions) ----
   useEffect(() => {
-    const unsubscribe = messaging().onMessage(onMessageReceived);
-    return unsubscribe;
+    // Foreground messages
+    const unsubOnMsg = messaging().onMessage(onMessageReceived);
+
+    // App opened from background by tapping a notification
+    const unsubOpened = messaging().onNotificationOpenedApp(remoteMessage => {
+      console.log('🔁 Opened from BG:', remoteMessage?.data);
+    });
+
+    // App launched from quit state by tapping a notification
+    messaging().getInitialNotification().then(remoteMessage => {
+      if (remoteMessage) {
+        console.log('🚀 Opened from quit:', remoteMessage?.data);
+      }
+    });
+
+    // Notifee events (actions, taps)
+    const unsubNotifee = notifee.onForegroundEvent(async ({ type, detail }) => {
+      if (type === EventType.ACTION_PRESS) {
+        console.log('🖱️ Action pressed:', detail.pressAction?.id, detail.notification?.data);
+      }
+      if (type === EventType.PRESS) {
+        console.log('👆 Notification pressed:', detail.notification?.data);
+      }
+    });
+
+    return () => {
+      unsubOnMsg();
+      unsubOpened();
+      unsubNotifee();
+    };
   }, [onMessageReceived]);
 
-  // Background message handler
-  // useEffect(() => {
-  //   messaging().setBackgroundMessageHandler(onMessageReceived);
-  // }, [onMessageReceived]);
-
-  // Initialize everything on mount
+  // ---- Init on mount ----
   useEffect(() => {
-    console.log(':rocket: App mounted');
-    handlePermissions();
-    createNotificationChannel();
-    registerAndGetToken();
-  }, []);
-
-  // if (initializing) return null;
+    (async () => {
+      setInitializing(true);
+      const enabled = await requestUserPermission();
+      if (!enabled) {
+        Alert.alert('Notifications disabled', 'Enable from Settings to receive alerts.');
+      }
+      await configureNotificationRouting();
+      await registerAndGetTokens();
+      setInitializing(false);
+    })();
+  }, [requestUserPermission, configureNotificationRouting, registerAndGetTokens]);
 
   return (
     <QueryClientProvider client={queryClient}>
