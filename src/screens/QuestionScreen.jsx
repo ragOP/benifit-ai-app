@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
+import Sound from 'react-native-sound';
 
 const { width } = Dimensions.get('window');
 
@@ -35,11 +36,13 @@ const initialMessages = [
     id: 1,
     sender: 'bot',
     text: 'Congratulations on taking the first step toward claiming the benefits you rightfully deserve!',
+    audio: 'first_question',
   },
   {
     id: 2,
     sender: 'bot',
     text: "Let's just get to know you a little better, so I can help unlock all the benefits, subsidies, and allowances you might qualify for.",
+    audio: 'second_question',
   },
   {
     id: 3,
@@ -47,6 +50,7 @@ const initialMessages = [
     text: "Tap the button below and we'll get started — it only takes a minute.",
     type: 'choice',
     options: ['Lets Start'],
+    audio: 'third_question',
   },
 ];
 
@@ -156,14 +160,32 @@ const QuestionScreen = ({ navigation }) => {
   const [chat, setChat] = useState([]);
   const shimmerAnimation = useRef(new Animated.Value(0)).current;
 
+  let currentSound = null;
+
+  const playAudio = audioFile => {
+    if (!audioFile) return;
+    if (currentSound) {
+      currentSound.stop(() => currentSound.release());
+    }
+    currentSound = new Sound(audioFile, Sound.MAIN_BUNDLE, error => {
+      if (error) return;
+      currentSound.play(() => currentSound.release());
+    });
+  };
+
   useEffect(() => {
     const timers = [];
+    let totalDelay = 0;
+
     initialMessages.forEach((msg, index) => {
+      totalDelay += delays[index];
       const t = setTimeout(() => {
         setChat(prev => [...prev, msg]);
-      }, delays[index]);
+        playAudio(msg.audio);
+      }, totalDelay);
       timers.push(t);
     });
+
     return () => timers.forEach(clearTimeout);
   }, []);
 

@@ -16,6 +16,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BACKEND_URL } from '../utils/backendUrl';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Sound from 'react-native-sound';
 
 const localAvatar = require('../assets/bot.png');
 
@@ -46,26 +47,30 @@ const questions = [
     text: "What's your full name?",
     type: 'text',
     keyType: 'alphabet',
+    audio: 'fifth_question'
   },
   {
     id: 2,
     text: 'Okay, what is your age today?',
     type: 'text',
     keyType: 'numeric',
+    audio: 'fourth_question'
   },
   {
     id: 3,
     text: "Nice, and what's your zip code?",
     type: 'text',
     keyType: 'numeric',
+    audio: 'sixth_question'
   },
   {
     id: 5,
     text: 'Please enter your 10-digit phone number below:',
     type: 'text',
     keyType: 'numeric',
+    audio: 'phone'
   },
-  { id: 6, text: 'Thank you', type: 'info' },
+  { id: 6, text: 'Thank you', type: 'info', audio: 'seven_question' },
   {
     id: 7,
     text: 'Now, are you on medicare?',
@@ -79,6 +84,7 @@ const questions = [
     type: 'choice',
     options: ['Alzheimers', 'Diabetes', 'Hypertension', 'Arthritis', 'No'],
     tag: TAGS.ssdi,
+    audio: 'eigth_question'
   },
   {
     id: 9,
@@ -86,8 +92,9 @@ const questions = [
     type: 'choice',
     options: ['I Own', 'I Rent'],
     tag: TAGS.mortgage,
+    audio: 'nine_question'
   },
-  { id: 10, text: "Great, We're almost there!", type: 'info' },
+  { id: 10, text: "Great, We're almost there!", type: 'info', audio: 'ten_question' },
   {
     id: 11,
     text: 'Do you have a car that you drive at least once a week?',
@@ -101,11 +108,13 @@ const questions = [
     type: 'choice',
     options: ['Yes', 'No'],
     tag: TAGS.mva,
+    audio: 'evelen_question'
   },
   {
     id: 13,
     text: "Alright, we're almost done.",
     type: 'info',
+    audio: 'tweleve_question'
   },
   {
     id: 14,
@@ -119,11 +128,13 @@ const questions = [
     type: 'choice',
     options: ['Yes', 'No'],
     tag: TAGS.debt,
+    audio: 'thir_question'
   },
   {
     id: 16,
     text: 'I got it, Just one last question!',
     type: 'info',
+    audio: 'for_question'
   },
   {
     id: 17,
@@ -189,7 +200,7 @@ const AnimatedBubble = ({ isBot, text, showAvatar, children }) => {
             duration: 250,
             useNativeDriver: true,
           }),
-        ])
+        ]),
       ).start();
     } else {
       dotBounce.setValue(0);
@@ -200,17 +211,15 @@ const AnimatedBubble = ({ isBot, text, showAvatar, children }) => {
     <Animated.View
       style={[
         isBot ? styles.botBubbleWrap : styles.userBubbleWrap,
-        { 
-          opacity: fade, 
+        {
+          opacity: fade,
           transform: [{ scale }, { translateY }],
         },
       ]}
     >
       {isBot && (
         <View style={styles.botAvatar}>
-          {showAvatar && (
-            <Image source={localAvatar} style={styles.avatar} />
-          )}
+          {showAvatar && <Image source={localAvatar} style={styles.avatar} />}
         </View>
       )}
       <View style={isBot ? styles.botBubble : styles.userBubble}>
@@ -249,6 +258,19 @@ export default function FormQuestion({ navigation }) {
   const inputAnim = useRef(new Animated.Value(0)).current;
   const scrollViewRef = useRef();
 
+  let currentSound = null;
+
+  const playAudio = useCallback(audioFile => {
+    if (!audioFile) return;
+    if (currentSound) {
+      currentSound.stop(() => currentSound.release());
+    }
+    currentSound = new Sound(audioFile, Sound.MAIN_BUNDLE, error => {
+      if (error) return;
+      currentSound.play(() => currentSound.release());
+    });
+  }, []);
+
   const handleFinalAnswers = async allAnswers => {
     setIsSubmitting(true);
 
@@ -268,13 +290,13 @@ export default function FormQuestion({ navigation }) {
       tags.push(TAGS.auto);
     if (
       allAnswers[
-      'Have you faced any motor vehicle accidents in the last 2 years?'
+        'Have you faced any motor vehicle accidents in the last 2 years?'
       ] === 'Yes'
     )
       tags.push(TAGS.mva);
     if (
       allAnswers[
-      'Okay, and do you have a credit card debt of $10,000 or more?'
+        'Okay, and do you have a credit card debt of $10,000 or more?'
       ] === 'Yes'
     )
       tags.push(TAGS.debt);
@@ -284,7 +306,7 @@ export default function FormQuestion({ navigation }) {
 
     const userUniqueId = await AsyncStorage.getItem('userId');
 
-    console.log(userUniqueId, "<<<<<<");
+    console.log(userUniqueId, '<<<<<<');
 
     const payload = {
       userId,
@@ -296,7 +318,7 @@ export default function FormQuestion({ navigation }) {
       sendMessageOn: 'SMS',
       number: allAnswers['Please enter your 10-digit phone number below:'],
       consentAgreed: true,
-      user: userUniqueId
+      user: userUniqueId,
     };
 
     console.log('Final Payload:', payload);
@@ -304,7 +326,6 @@ export default function FormQuestion({ navigation }) {
     try {
       await AsyncStorage.setItem('userUnique', userId);
       console.log('Saved userId in AsyncStorage:', userId);
-
 
       const res = await fetch(
         `${BACKEND_URL}/api/v1/users/response`,
@@ -352,13 +373,20 @@ export default function FormQuestion({ navigation }) {
       setAllDone(true);
       return;
     }
+
     setShowTyping(true);
-    setTimeout(() => {
+
+    const timer = setTimeout(() => {
       setShowTyping(false);
       setChat(prev => [...prev, { from: 'bot', text: q.text, qid: idx }]);
       setCurrent(idx);
+      if (q.audio) {
+        playAudio(q.audio);
+      }
     }, 2000);
-  }, []);
+
+    return () => clearTimeout(timer);
+  }, [playAudio]);
 
   useEffect(() => {
     const q = questions[current];
@@ -477,8 +505,12 @@ export default function FormQuestion({ navigation }) {
             <View style={styles.loadingSpinner}>
               <ActivityIndicator size="large" color={COLORS.white} />
             </View>
-            <Text style={styles.loadingText}>Submitting your information...</Text>
-            <Text style={styles.loadingSubtext}>Please wait while we process your benefits</Text>
+            <Text style={styles.loadingText}>
+              Submitting your information...
+            </Text>
+            <Text style={styles.loadingSubtext}>
+              Please wait while we process your benefits
+            </Text>
           </View>
         </View>
       )}
