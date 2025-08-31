@@ -93,8 +93,6 @@ const ClaimedScreen = () => {
   const fetchClaimedOffers = useCallback(async () => {
     try {
       const id = await AsyncStorage.getItem('userId');
-      console.log("userid>>>", id);
-      setUserId(id);
 
       if (!id) {
         console.warn('User ID not found in AsyncStorage');
@@ -115,6 +113,9 @@ const ClaimedScreen = () => {
       normalizedUnclaimed = normalizedUnclaimed.filter(
         offer => !normalizedClaimed.includes(offer),
       );
+      console.log(json.data, "<<<json");
+      console.log(json.data.userId, "<<<json");
+      setUserId(json.data.userId)
 
       setClaimedOffers(normalizedClaimed);
       setUnclaimedOffers(normalizedUnclaimed);
@@ -141,6 +142,8 @@ const ClaimedScreen = () => {
       setClaimedOffers(prev => [...prev, offerKey]);
       setUnclaimedOffers(prev => prev.filter(item => item !== offerKey));
 
+      console.log('claimedOfferid>>>>>>>', claimedOfferId);
+
       const response = await fetch(
         'https://benifit-ai-app-be.onrender.com/api/v1/users/abandoned-claim',
         {
@@ -161,13 +164,13 @@ const ClaimedScreen = () => {
         Alert.alert('Error', result.message || 'Failed to claim offer');
       } else {
         const benefitCard = ALL_BENEFIT_CARDS[offerKey];
-        if (benefitCard?.phone) {
-          if (benefitCard.phone.startsWith('http')) {
-            Linking.openURL(benefitCard.phone);
-          } else {
-            Linking.openURL(`tel:${benefitCard.phone}`);
-          }
-        }
+        // if (benefitCard?.phone) {
+        //   if (benefitCard.phone.startsWith('http')) {
+        //     Linking.openURL(benefitCard.phone);
+        //   } else {
+        //     Linking.openURL(`tel:${benefitCard.phone}`);
+        //   }
+        // }
       }
     } catch (error) {
       setClaimedOffers(prev => prev.filter(item => item !== offerKey));
