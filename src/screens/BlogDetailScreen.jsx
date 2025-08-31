@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   Animated,
   Dimensions,
-  Linking
+  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChevronLeft } from 'lucide-react-native';
@@ -22,6 +22,9 @@ const ALL_BENEFIT_CARDS = {
       'Get thousands of dollars a year to spend on groceries, rent, prescriptions, and more.',
     img: require('../assets/card.png'),
     badge: 'Easiest To Claim',
+    phone: '+18333381762',
+    call: 'CALL (323) 689-7861',
+    isWebsite: false,
   },
   is_debt: {
     title: 'Credit Card Debt Relief',
@@ -29,6 +32,9 @@ const ALL_BENEFIT_CARDS = {
       'Eligible for full debt relief under the new Emergency Debt Relief program.',
     img: require('../assets/benifit2.webp'),
     badge: 'Takes 10 Minutes Or More',
+    phone: '+18333402442',
+    call: 'CALL (833) 340-2442',
+    isWebsite: false,
   },
   is_auto: {
     title: 'Auto Insurance',
@@ -36,6 +42,9 @@ const ALL_BENEFIT_CARDS = {
       'Qualify for a Discounted Auto Insurance Plan with comprehensive coverage.',
     img: require('../assets/benifit3.webp'),
     badge: 'Assured Monthly Savings!',
+    phone: '+16197753027',
+    call: 'CALL (619) 775-3027',
+    isWebsite: false,
   },
   is_mva: {
     title: 'MVA',
@@ -43,6 +52,9 @@ const ALL_BENEFIT_CARDS = {
       'Potentially eligible for 3x past compensation after a motor vehicle accident.',
     img: require('../assets/benifit4.webp'),
     badge: 'Could Be Worth $100,000+',
+    phone: 'https://www.roadwayrelief.com/get-quote-am/',
+    call: 'CLICK HERE TO PROCEED',
+    isWebsite: true,
   },
 };
 
@@ -94,7 +106,7 @@ export default function BlogDetailScreen({ route, navigation }) {
   const benefitsList = benefitExplanations[benefit] || [];
 
   const shimmerAnimation = useRef(new Animated.Value(0)).current;
-    useEffect(() => {
+  useEffect(() => {
     const shimmer = () => {
       Animated.sequence([
         Animated.timing(shimmerAnimation, {
@@ -195,7 +207,17 @@ export default function BlogDetailScreen({ route, navigation }) {
           <TouchableOpacity
             style={styles.claimButton}
             activeOpacity={0.9}
-            onPress={() => Linking.openURL('tel:+1234567890')}
+            onPress={() => {
+              try {
+                if (!card.isWebsite) {
+                  Linking.openURL(`tel:${card.phone}`);
+                } else {
+                  Linking.openURL(`${card.phone}`);
+                }
+              } catch (err) {
+                console.error('Error opening phone dialer:', err);
+              }
+            }}
           >
             <Animated.View
               style={[
@@ -214,7 +236,7 @@ export default function BlogDetailScreen({ route, navigation }) {
               ]}
             />
             <View style={styles.claimButtonContent}>
-              <Text style={styles.claimText}>Call Now</Text>
+              <Text style={styles.claimText}>{card.call}</Text>
             </View>
           </TouchableOpacity>
         </View>
