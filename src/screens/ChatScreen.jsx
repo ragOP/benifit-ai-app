@@ -9,12 +9,13 @@ import {
   KeyboardAvoidingView,
   Platform,
   StatusBar,
+  SafeAreaView,
 } from 'react-native';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import MaterialIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { LinearGradient } from 'react-native-linear-gradient';
 import { getMessages, sendMessage } from '../services/ChatService';
-import { SafeAreaView } from 'react-native-safe-area-context';
+// import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const COLORS = {
@@ -293,14 +294,15 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   header: {
-    paddingTop: 16,
-    paddingBottom: 20,
-    paddingHorizontal: 20,
+    // paddingTop: 16,
+    // paddingBottom: 20,
+    // paddingHorizontal: 20,
   },
   headerContent: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    padding: 10
   },
   headerTitle: {
     fontSize: 20,
@@ -425,17 +427,18 @@ const styles = StyleSheet.create({
   },
   inputWrapper: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
+    alignItems: 'center',
     backgroundColor: COLORS.background,
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 8,
+    marginBottom: Platform.OS === 'ios' ? 16 : 0
   },
   textInput: {
     flex: 1,
     fontSize: 16,
     color: COLORS.text,
-    maxHeight: 100,
+    // maxHeight: 100,
     paddingVertical: 8,
   },
   sendButton: {
