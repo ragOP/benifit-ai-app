@@ -9,6 +9,7 @@ import {
   StatusBar,
   ScrollView,
   ImageBackground,
+  BackHandler,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChevronLeft } from 'lucide-react-native';
@@ -45,6 +46,24 @@ export default function AfterQuizScreen({ navigation }) {
     };
     shimmer();
   }, [shimmerAnimation]);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('beforeRemove', e => {
+      if (e.data.action.type === 'GO_BACK' || e.data.action.type === 'POP') {
+        e.preventDefault();
+      }
+    });
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      () => true,
+    );
+
+    return () => {
+      unsubscribe();
+      backHandler.remove();
+    };
+  }, [navigation]);
 
   const buttons = [
     { title: '🎁 Your Offers', route: 'BottomNavigation', params: 1 },
@@ -101,7 +120,10 @@ export default function AfterQuizScreen({ navigation }) {
                 navigation.reset({
                   index: 0,
                   routes: [
-                    { name: 'BottomNavigation', params: { initialTab: btn.params } },
+                    {
+                      name: 'BottomNavigation',
+                      params: { initialTab: btn.params },
+                    },
                   ],
                 })
               }
