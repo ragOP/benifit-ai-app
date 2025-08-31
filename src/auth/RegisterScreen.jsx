@@ -217,7 +217,7 @@ const RegisterScreen = ({ navigation }) => {
             )}
 
             <Text style={styles.subText2}>
-              free fast secure at signup register
+              free fast secure
             </Text>
 
             <View style={styles.registerContainer}>

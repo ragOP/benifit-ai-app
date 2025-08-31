@@ -9,12 +9,16 @@ import {
   Animated,
   ScrollView,
   Dimensions,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import Sound from 'react-native-sound';
 
 const { width } = Dimensions.get('window');
+
+// Enable playback in silence mode
+Sound.setCategory('Playback');
 
 const COLORS = {
   black: '#000000',
@@ -36,13 +40,13 @@ const initialMessages = [
     id: 1,
     sender: 'bot',
     text: 'Congratulations on taking the first step toward claiming the benefits you rightfully deserve!',
-    audio: 'first_question',
+    audio: 'first_question.wav',
   },
   {
     id: 2,
     sender: 'bot',
     text: "Let's just get to know you a little better, so I can help unlock all the benefits, subsidies, and allowances you might qualify for.",
-    audio: 'second_question',
+    audio: 'second_question.wav',
   },
   {
     id: 3,
@@ -50,7 +54,7 @@ const initialMessages = [
     text: "Tap the button below and we'll get started — it only takes a minute.",
     type: 'choice',
     options: ['Lets Start'],
-    audio: 'third_question',
+    audio: 'third_question.wav',
   },
 ];
 
@@ -164,12 +168,27 @@ const QuestionScreen = ({ navigation }) => {
 
   const playAudio = audioFile => {
     if (!audioFile) return;
+    
     if (currentSound) {
       currentSound.stop(() => currentSound.release());
     }
-    currentSound = new Sound(audioFile, Sound.MAIN_BUNDLE, error => {
-      if (error) return;
-      currentSound.play(() => currentSound.release());
+    
+    // For iOS, we need to include the file extension
+    const audioPath = Platform.OS === 'ios' ? audioFile : audioFile.replace('.wav', '');
+    
+    currentSound = new Sound(audioPath, Sound.MAIN_BUNDLE, error => {
+      if (error) {
+        console.log('Error loading audio:', error);
+        return;
+      }
+      
+      currentSound.setVolume(1.0);
+      currentSound.play(error => {
+        if (error) {
+          console.log('Error playing audio:', error);
+        }
+        currentSound.release();
+      });
     });
   };
 

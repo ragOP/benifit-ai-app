@@ -12,11 +12,15 @@ import {
   ScrollView,
   Keyboard,
   ActivityIndicator,
+  Platform,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BACKEND_URL } from '../utils/backendUrl';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Sound from 'react-native-sound';
+
+// Enable playback in silence mode
+Sound.setCategory('Playback');
 
 const localAvatar = require('../assets/bot.png');
 
@@ -47,30 +51,30 @@ const questions = [
     text: "What's your full name?",
     type: 'text',
     keyType: 'alphabet',
-    audio: 'fifth_question'
+    audio: 'fifth_question.wav'
   },
   {
     id: 2,
     text: 'Okay, what is your age today?',
     type: 'text',
     keyType: 'numeric',
-    audio: 'fourth_question'
+    audio: 'fourth_question.wav'
   },
   {
     id: 3,
     text: "Nice, and what's your zip code?",
     type: 'text',
     keyType: 'numeric',
-    audio: 'sixth_question'
+    audio: 'sixth_question.wav'
   },
   {
     id: 5,
     text: 'Please enter your 10-digit phone number below:',
     type: 'text',
     keyType: 'numeric',
-    audio: 'phone'
+    audio: 'phone.mp3'
   },
-  { id: 6, text: 'Thank you', type: 'info', audio: 'seven_question' },
+  { id: 6, text: 'Thank you', type: 'info', audio: 'seven_question.wav' },
   {
     id: 7,
     text: 'Now, are you on medicare?',
@@ -84,7 +88,7 @@ const questions = [
     type: 'choice',
     options: ['Alzheimers', 'Diabetes', 'Hypertension', 'Arthritis', 'No'],
     tag: TAGS.ssdi,
-    audio: 'eigth_question'
+    audio: 'eigth_question.wav'
   },
   {
     id: 9,
@@ -92,9 +96,9 @@ const questions = [
     type: 'choice',
     options: ['I Own', 'I Rent'],
     tag: TAGS.mortgage,
-    audio: 'nine_question'
+    audio: 'nine_question.wav'
   },
-  { id: 10, text: "Great, We're almost there!", type: 'info', audio: 'ten_question' },
+  { id: 10, text: "Great, We're almost there!", type: 'info', audio: 'ten_question.wav' },
   {
     id: 11,
     text: 'Do you have a car that you drive at least once a week?',
@@ -108,13 +112,13 @@ const questions = [
     type: 'choice',
     options: ['Yes', 'No'],
     tag: TAGS.mva,
-    audio: 'evelen_question'
+    audio: 'evelen_question.wav'
   },
   {
     id: 13,
     text: "Alright, we're almost done.",
     type: 'info',
-    audio: 'tweleve_question'
+    audio: 'tweleve_question.wav'
   },
   {
     id: 14,
@@ -128,13 +132,13 @@ const questions = [
     type: 'choice',
     options: ['Yes', 'No'],
     tag: TAGS.debt,
-    audio: 'thir_question'
+    audio: 'thir_question.wav'
   },
   {
     id: 16,
     text: 'I got it, Just one last question!',
     type: 'info',
-    audio: 'for_question'
+    audio: 'for_question.wav'
   },
   {
     id: 17,
@@ -262,12 +266,27 @@ export default function FormQuestion({ navigation }) {
 
   const playAudio = useCallback(audioFile => {
     if (!audioFile) return;
+    
     if (currentSound) {
       currentSound.stop(() => currentSound.release());
     }
-    currentSound = new Sound(audioFile, Sound.MAIN_BUNDLE, error => {
-      if (error) return;
-      currentSound.play(() => currentSound.release());
+    
+    // For iOS, we need to include the file extension
+    const audioPath = Platform.OS === 'ios' ? audioFile : audioFile.replace('.wav', '');
+    
+    currentSound = new Sound(audioPath, Sound.MAIN_BUNDLE, error => {
+      if (error) {
+        console.log('Error loading audio:', error);
+        return;
+      }
+      
+      currentSound.setVolume(1.0);
+      currentSound.play(error => {
+        if (error) {
+          console.log('Error playing audio:', error);
+        }
+        currentSound.release();
+      });
     });
   }, []);
 
