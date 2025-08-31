@@ -108,6 +108,8 @@ const App = () => {
       const apns = await messaging().getAPNSToken();
       if (apns) {
         console.log('🍏 APNs Token (hex):', apns);
+        await AsyncStorage.setItem('apnToken', apns);
+        console.log('💾 APNs Token saved to AsyncStorage');
       } else {
         console.log('⚠️ APNs token not yet available (will be provided after registration).');
       }

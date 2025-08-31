@@ -27,6 +27,7 @@ const RegisterScreen = ({ navigation }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [fcmToken, setFcmToken] = useState('');
+  const [apnToken, setApnToken] = useState('');
 
   // Use the custom toast hook
   const {
@@ -53,7 +54,24 @@ const RegisterScreen = ({ navigation }) => {
       }
     };
 
+    const fetchApnToken = async () => {
+      try {
+        if (Platform.OS === 'ios') {
+          const token = await AsyncStorage.getItem('apnToken');
+          if (token) {
+            setApnToken(token);
+            console.log('Fetched APN token from storage:', token);
+          } else {
+            console.warn('APN token not found in storage.');
+          }
+        }
+      } catch (error) {
+        console.error('Error retrieving APN token:', error);
+      }
+    };
+
     fetchFcmToken();
+    fetchApnToken();
   }, []);
 
   const handleRegister = async () => {
@@ -78,10 +96,11 @@ const RegisterScreen = ({ navigation }) => {
             username,
             password,
             fcmToken,
+            apnToken,
           }),
         },
       );
-      console.log('paylod', fcmToken);
+      console.log('paylod', { fcmToken, apnToken });
       const data = await response.json();
       console.log('Register RESPONSE:', data);
 

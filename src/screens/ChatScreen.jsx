@@ -9,14 +9,17 @@ import {
   KeyboardAvoidingView,
   Platform,
   StatusBar,
-  // SafeAreaView,
+  SafeAreaView as RNSafeAreaView,
 } from 'react-native';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import MaterialIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { LinearGradient } from 'react-native-linear-gradient';
 import { getMessages, sendMessage } from '../services/ChatService';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView as ContextSafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+// Conditionally use SafeAreaView based on platform
+const SafeAreaView = Platform.OS === 'ios' ? RNSafeAreaView : ContextSafeAreaView;
 
 const COLORS = {
   primary: '#0F766E',

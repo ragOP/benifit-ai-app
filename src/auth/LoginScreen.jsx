@@ -27,6 +27,7 @@ const LoginScreen = ({ navigation }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [fcmToken, setFcmToken] = useState('');
+  const [apnToken, setApnToken] = useState('');
   const [googleLoading, setGoogleLoading] = useState(false);
 
   // Use the custom toast hook
@@ -54,7 +55,24 @@ const LoginScreen = ({ navigation }) => {
       }
     };
 
+    const fetchApnToken = async () => {
+      try {
+        if (Platform.OS === 'ios') {
+          const token = await AsyncStorage.getItem('apnToken');
+          if (token) {
+            setApnToken(token);
+            console.log('Fetched APN token from storage:', token);
+          } else {
+            console.warn('APN token not found in storage.');
+          }
+        }
+      } catch (error) {
+        console.error('Error retrieving APN token:', error);
+      }
+    };
+
     fetchFcmToken();
+    fetchApnToken();
   }, []);
 
   const checkIfUserExist = async userId => {
@@ -111,12 +129,14 @@ const LoginScreen = ({ navigation }) => {
           loginId: emailOrUsername,
           password,
           fcmToken,
+          apnToken,
         }),
       });
       console.log('PAYLOAD', {
         loginId: emailOrUsername,
         password,
         fcmToken,
+        apnToken,
       });
       const data = await response.json();
       console.log('LOGIN RESPONSE:', data);
