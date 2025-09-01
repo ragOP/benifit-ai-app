@@ -245,6 +245,7 @@ import ClaimedScreen from '../screens/ClaimedScreen';
 import ChatScreen from '../screens/ChatScreen';
 
 import Logout from '../screens/Logout';
+import AfterQuizScreen from '../screens/AfterQuizScreen';
 
 const HomeStack = createStackNavigator();
 
@@ -256,6 +257,7 @@ function HomeStackScreen() {
       <HomeStack.Screen name="Form" component={FormQuestion} />
       <HomeStack.Screen name="Middle" component={MiddleScreen} />
       <HomeStack.Screen name="Congrats" component={CongratsScreen} />
+      <HomeStack.Screen name="AfterQuizScreen" component={AfterQuizScreen} />
     </HomeStack.Navigator>
   );
 }
