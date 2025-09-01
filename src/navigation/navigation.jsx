@@ -75,21 +75,16 @@ export default function Navigation() {
           component={LoaderScreen}
           screenOptions={{ headerShown: false }}
         />
-        <Stack.Screen
-          name="Congrats"
-          component={CongratsScreen}
-          screenOptions={{ headerShown: false }}
-        />
-        <Stack.Screen
+        {/* <Stack.Screen
           name="Middle"
           component={MiddleScreen}
           screenOptions={{ headerShown: false }}
-        />
-        <Stack.Screen
+        /> */}
+        {/* <Stack.Screen
           name="AfterQuizScreen"
           component={AfterQuizScreen}
           screenOptions={{ headerShown: false }}
-        />
+        /> */}
       </Stack.Navigator>
     </NavigationContainer>
   );

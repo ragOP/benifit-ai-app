@@ -311,7 +311,7 @@ const CongratsScreen = ({ route }) => {
   const filteredBenefits = getFilteredBenefits();
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <View style={styles.safe}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.black} />
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
@@ -353,7 +353,7 @@ const CongratsScreen = ({ route }) => {
           </Text>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 const styles = StyleSheet.create({

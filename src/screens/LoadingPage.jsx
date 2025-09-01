@@ -1,8 +1,8 @@
-import React, {useEffect, useState} from 'react';
-import {View, Text, StyleSheet, StatusBar} from 'react-native';
-import {AnimatedCircularProgress} from 'react-native-circular-progress';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, StatusBar } from 'react-native';
+import { AnimatedCircularProgress } from 'react-native-circular-progress';
 
-export default function LoadingPage({navigation, route}) {
+export default function LoadingPage({ navigation, route }) {
   const {
     fullName,
     tags,
@@ -18,10 +18,13 @@ export default function LoadingPage({navigation, route}) {
         if (next >= 100) {
           clearInterval(interval);
           setTimeout(() => {
-            navigation.navigate('Middle', {
-              fullName: fullName,
-              tags: tags,
-              userId,
+            navigation.navigate('BottomNavigation', {
+              screen: 'Middle',
+              params: {
+                fullName: fullName,
+                tags: tags,
+                userId,
+              },
             });
           }, 2000);
           return 100;

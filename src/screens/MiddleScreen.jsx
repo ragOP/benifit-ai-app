@@ -117,7 +117,7 @@ const MiddleScreen = ({ route, navigation }) => {
   };
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <View style={styles.safe}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.bg} />
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
@@ -233,7 +233,7 @@ const MiddleScreen = ({ route, navigation }) => {
           </Text>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 
