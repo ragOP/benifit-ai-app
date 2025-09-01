@@ -14,6 +14,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChevronLeft } from 'lucide-react-native';
 import LinearGradient from 'react-native-linear-gradient';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width } = Dimensions.get('window');
 
@@ -65,15 +66,33 @@ export default function AfterQuizScreen({ navigation }) {
     };
   }, [navigation]);
 
+  const handleRoute = async btn => {
+    if (
+      btn.title === '✅ Recheck My Eligibility' ||
+      btn.title === '🔄 Refresh'
+    ) {
+      await AsyncStorage.removeItem('userFlowCompleted');
+    }
+    navigation.reset({
+      index: 0,
+      routes: [
+        {
+          name: 'BottomNavigation',
+          params: { initialTab: btn.params },
+        },
+      ],
+    });
+  };
+
   const buttons = [
     { title: '🎁 Your Offers', route: 'BottomNavigation', params: 1 },
     { title: '📰 Blog', route: 'BottomNavigation', params: 3 },
     {
       title: '✅ Recheck My Eligibility',
       route: 'BottomNavigation',
-      params: 2,
+      params: 0,
     },
-    { title: '💬 Live Support', route: 'BottomNavigation', params: 3 },
+    { title: '💬 Live Support', route: 'BottomNavigation', params: 2 },
     { title: '🔄 Refresh', route: 'BottomNavigation', params: 0 },
   ];
 
@@ -116,17 +135,7 @@ export default function AfterQuizScreen({ navigation }) {
               key={idx}
               style={styles.actionButton}
               activeOpacity={0.9}
-              onPress={() =>
-                navigation.reset({
-                  index: 0,
-                  routes: [
-                    {
-                      name: 'BottomNavigation',
-                      params: { initialTab: btn.params },
-                    },
-                  ],
-                })
-              }
+              onPress={() => handleRoute(btn)}
             >
               <LinearGradient
                 colors={[COLORS.green, COLORS.teal]}

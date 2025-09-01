@@ -358,7 +358,7 @@ export default function FormQuestion({ navigation }) {
       const data = await res.json();
 
       console.log('Successfully submitted:', data);
-
+      await AsyncStorage.setItem('userFlowCompleted', 'true');
       navigation.navigate('Middle', { fullName, tags, userId });
       setAllDone(true);
     } catch (err) {

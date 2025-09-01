@@ -97,7 +97,7 @@ const LoginScreen = ({ navigation }) => {
       console.log(">>>>>>222", data);
 
       if (data.success && data.data) {
-        await AsyncStorage.setItem('userFlowCompleted', JSON.stringify(data));
+        await AsyncStorage.setItem('userFlowCompleted', 'true');
         setTimeout(() => {
           navigation.navigate('AfterQuizScreen');
         }, 1500);

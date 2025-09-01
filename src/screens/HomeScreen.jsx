@@ -54,7 +54,7 @@ export default function HomeScreen({ navigation }) {
   const [showCongratulations, setShowCongratulations] = useState(false);
   // const [redirectTimer, setRedirectTimer] = useState(5);
   // const [isCheckingUser, setIsCheckingUser] = useState(false);
-  // const [hasCompletedFlow, setHasCompletedFlow] = useState(false);
+  const [hasCompletedFlow, setHasCompletedFlow] = useState(false);
   const fingerAnimation = useRef(new Animated.Value(0)).current;
   const shimmerAnimation = useRef(new Animated.Value(0)).current;
 
@@ -86,7 +86,10 @@ export default function HomeScreen({ navigation }) {
           const validCount = Math.max(69, Math.min(90, count));
           setClaimingCounter(validCount);
           if (validCount !== count) {
-            await AsyncStorage.setItem('claimingCounter', validCount.toString());
+            await AsyncStorage.setItem(
+              'claimingCounter',
+              validCount.toString(),
+            );
           }
         } else {
           // Start with 80 if no stored value (middle of 69-90 range)
@@ -98,20 +101,18 @@ export default function HomeScreen({ navigation }) {
         setClaimingCounter(80);
       }
     };
-    
+
     loadClaimingCounter();
   }, []);
-
-
 
   // Dynamic claiming counter that increases slowly and randomly
   useEffect(() => {
     if (claimingCounter === 0) return; // Don't start until loaded
-    
+
     const claimingInterval = setInterval(() => {
       setClaimingCounter(prev => {
         let newCount;
-        
+
         // If we're at the upper limit, gradually decrease instead of random jump
         if (prev >= 87) {
           // Decrease by 1-2 to bring it back down naturally
@@ -122,10 +123,12 @@ export default function HomeScreen({ navigation }) {
           const increment = Math.floor(Math.random() * 3) + 1;
           newCount = Math.min(90, prev + increment);
         }
-        
+
         // Save to async storage
-        AsyncStorage.setItem('claimingCounter', newCount.toString()).catch(console.error);
-        
+        AsyncStorage.setItem('claimingCounter', newCount.toString()).catch(
+          console.error,
+        );
+
         return newCount;
       });
     }, 3000 + Math.random() * 2000); // Random interval between 3-5 seconds
@@ -158,6 +161,18 @@ export default function HomeScreen({ navigation }) {
 
   //   checkStoredUserFlow();
   // }, []);
+
+  const checkIfUserCompletedFlow = async () => {
+    const isUserCompleted = await AsyncStorage.getItem('userFlowCompleted');
+    if (isUserCompleted) {
+      setHasCompletedFlow(true);
+      navigation.navigate('AfterQuizScreen');
+    }
+  };
+
+  useEffect(() => {
+    checkIfUserCompletedFlow();
+  }, []);
 
   useEffect(() => {
     const moveFinger = () => {
@@ -229,7 +244,6 @@ export default function HomeScreen({ navigation }) {
 
       // const data = await response.json();
 
-
       // // if (data.success && data.data && data.data.userId) {
       //   if (data.success && data.data && data.data.userId) {
       //   // User has completed the flow - store in AsyncStorage
@@ -289,9 +303,7 @@ export default function HomeScreen({ navigation }) {
     // Reset navigation stack to ensure fresh state
     navigation.reset({
       index: 0,
-      routes: [
-        { name: 'BottomNavigation', params: { initialTab: 1 } }
-      ],
+      routes: [{ name: 'BottomNavigation', params: { initialTab: 1 } }],
     });
   };
 
@@ -313,7 +325,7 @@ export default function HomeScreen({ navigation }) {
             </Text>
           </View>
         </View>
-        
+
         <View style={styles.content}>
           <View style={styles.pill}>
             <Text style={styles.pillText}>AVERAGE BENEFITS: </Text>
@@ -483,7 +495,7 @@ export default function HomeScreen({ navigation }) {
       </ScrollView>
 
       {/* Congratulations Overlay */}
-      {showCongratulations && (
+      {hasCompletedFlow && (
         <View style={styles.congratulationsOverlay}>
           <View style={styles.congratulationsCard}>
             <Text style={styles.congratulationsEmoji}>🎉</Text>
@@ -495,12 +507,7 @@ export default function HomeScreen({ navigation }) {
               Redirecting to offers section in 5 seconds...
             </Text>
             <View style={styles.progressBar}>
-              <View
-                style={[
-                  styles.progressFill,
-                  { width: '100%' }
-                ]}
-              />
+              <View style={[styles.progressFill, { width: '100%' }]} />
             </View>
           </View>
         </View>
@@ -553,7 +560,7 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     fontWeight: '800',
     letterSpacing: 0.4,
-    fontSize: 13, 
+    fontSize: 13,
   },
   headline: {
     color: COLORS.text,
@@ -569,10 +576,10 @@ const styles = StyleSheet.create({
     gap: 12,
     // paddingHorizontal: 4,
   },
-  checkRow: { 
-    flexDirection: 'row', 
+  checkRow: {
+    flexDirection: 'row',
     alignItems: 'flex-start',
-    flexWrap: 'wrap'
+    flexWrap: 'wrap',
   },
   checkIconWrap: {
     width: 25,
@@ -583,12 +590,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginRight: 10,
   },
-  checkText: { 
-    color: '#1b1f22', 
-    fontSize: 16, 
+  checkText: {
+    color: '#1b1f22',
+    fontSize: 16,
     fontWeight: '700',
     flex: 1,
-    flexWrap: 'wrap'
+    flexWrap: 'wrap',
   },
   ctaContainer: {
     position: 'relative',

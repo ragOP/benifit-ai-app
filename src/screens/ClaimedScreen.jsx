@@ -164,13 +164,13 @@ const ClaimedScreen = () => {
         Alert.alert('Error', result.message || 'Failed to claim offer');
       } else {
         const benefitCard = ALL_BENEFIT_CARDS[offerKey];
-        // if (benefitCard?.phone) {
-        //   if (benefitCard.phone.startsWith('http')) {
-        //     Linking.openURL(benefitCard.phone);
-        //   } else {
-        //     Linking.openURL(`tel:${benefitCard.phone}`);
-        //   }
-        // }
+        if (benefitCard?.phone) {
+          if (benefitCard.phone.startsWith('http')) {
+            Linking.openURL(benefitCard.phone);
+          } else {
+            Linking.openURL(`tel:${benefitCard.phone}`);
+          }
+        }
       }
     } catch (error) {
       setClaimedOffers(prev => prev.filter(item => item !== offerKey));
