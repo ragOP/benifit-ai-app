@@ -10,6 +10,7 @@ import {
   ScrollView,
   ImageBackground,
   BackHandler,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChevronLeft } from 'lucide-react-native';
@@ -19,6 +20,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const { width } = Dimensions.get('window');
 
 const COLORS = {
+  background: '#f6f7f2',
   black: '#000',
   white: '#fff',
   green: '#10b981',
@@ -99,14 +101,31 @@ export default function AfterQuizScreen({ navigation }) {
   return (
     <View style={styles.safe} edges={['top']}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.black} />
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Welcome Back</Text>
-      </View>
+      <ScrollView showsVerticalScrollIndicator={false}>
 
+        {/* <View style={styles.header}>
+        <Text style={styles.headerTitle}>Welcome Back</Text>
+      </View> */}
+        <View style={styles.header}>
+          <Image
+            source={require('../assets/center.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+        </View>
+
+        <View style={styles.ribbonWrap}>
+          <View style={styles.ribbon}>
+            <Text style={styles.ribbonText}>
+              22,578 Americans Helped In Last 24 Hours!
+            </Text>
+          </View>
+        </View>
+        {/* 
       <ScrollView
         contentContainerStyle={{ paddingBottom: 30 }}
         showsVerticalScrollIndicator={false}
-      >
+      > */}
         {/* Banner */}
         <View style={styles.bannerContainer}>
           <ImageBackground
@@ -149,6 +168,7 @@ export default function AfterQuizScreen({ navigation }) {
           ))}
         </View>
       </ScrollView>
+      {/* </ScrollView> */}
     </View>
   );
 }
@@ -156,15 +176,35 @@ export default function AfterQuizScreen({ navigation }) {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: COLORS.black,
+    backgroundColor: COLORS.white,
   },
   header: {
     backgroundColor: COLORS.black,
-    paddingVertical: 16,
-    paddingHorizontal: 10,
-    flexDirection: 'row',
+  },
+  logo: {
+    width: 'auto',
+    height: 60,
+    marginRight: 10,
+  },
+  ribbon: {
+    backgroundColor: COLORS.teal,
+    paddingVertical: 14,
     alignItems: 'center',
-    gap: 14,
+    justifyContent: 'center',
+    borderBottomLeftRadius: 40,
+    borderBottomRightRadius: 40,
+  },
+  ribbonText: {
+    color: COLORS.white,
+    letterSpacing: 0.3,
+    fontStyle: 'italic',
+    fontSize: 12,
+    fontWeight: '600',
+
+  },
+  ribbonWrap: {
+    paddingBottom: 20
+
   },
   headerTitle: {
     fontSize: 22,
@@ -181,8 +221,8 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 220,
     marginBottom: 20,
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
+    // borderBottomLeftRadius: 24,
+    // borderBottomRightRadius: 24,
     overflow: 'hidden',
   },
   banner: {
