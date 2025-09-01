@@ -292,7 +292,11 @@ const LoginScreen = ({ navigation }) => {
                   <Text style={styles.googleButtonText}>Continue with Google</Text>
                 )}
               </TouchableOpacity> */}
+            <Text style={styles.subText2}>
+              Free Fast Secure
+            </Text>
             </View>
+
 
             <View style={styles.registerContainer}>
               <Text style={styles.registerText}>Don't have an account? </Text>
@@ -349,6 +353,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: Math.max(20, width * 0.05),
     paddingTop: height * 0.08,
     paddingBottom: height * 0.05,
+  },
+    subText2: {
+    fontSize: 16,
+    color: '#999',
+    marginBottom: 20,
+    textAlign: 'center',
+    marginTop: 10,
   },
   content: {
     flex: 1,

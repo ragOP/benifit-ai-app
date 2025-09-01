@@ -236,9 +236,9 @@ const RegisterScreen = ({ navigation }) => {
             )}
 
             <Text style={styles.subText2}>
-              free fast secure
+              Free Fast Secure
             </Text>
-
+            
             <View style={styles.registerContainer}>
               <Text style={styles.registerText}>Already have an account? </Text>
               <TouchableOpacity onPress={() => navigation.navigate('Login')}>

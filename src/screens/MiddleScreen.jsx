@@ -178,7 +178,7 @@ const MiddleScreen = ({ route, navigation }) => {
             style={styles.claimButton}
             activeOpacity={0.9}
             onPress={() =>
-              navigation.navigate('LoadingPage', {
+              navigation.navigate('Congrats', {
                 fullName: fullName,
                 tags: tags,
                 userId,

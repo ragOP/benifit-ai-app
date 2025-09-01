@@ -359,7 +359,7 @@ export default function FormQuestion({ navigation }) {
 
       console.log('Successfully submitted:', data);
       await AsyncStorage.setItem('userFlowCompleted', 'true');
-      navigation.navigate('Middle', { fullName, tags, userId });
+      navigation.navigate('LoadingPage', { fullName, tags, userId });
       setAllDone(true);
     } catch (err) {
       console.error('Error submitting chatbot answers:', err);
@@ -518,7 +518,7 @@ export default function FormQuestion({ navigation }) {
       <StatusBar barStyle="light-content" backgroundColor={COLORS.black} />
 
       {/* Loading Overlay */}
-      {isSubmitting && (
+      {/* {isSubmitting && (
         <View style={styles.loadingOverlay}>
           <View style={styles.loadingContent}>
             <View style={styles.loadingSpinner}>
@@ -532,7 +532,7 @@ export default function FormQuestion({ navigation }) {
             </Text>
           </View>
         </View>
-      )}
+      )} */}
 
       <ScrollView
         ref={scrollViewRef}

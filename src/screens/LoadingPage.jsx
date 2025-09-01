@@ -18,7 +18,7 @@ export default function LoadingPage({navigation, route}) {
         if (next >= 100) {
           clearInterval(interval);
           setTimeout(() => {
-            navigation.navigate('Congrats', {
+            navigation.navigate('Middle', {
               fullName: fullName,
               tags: tags,
               userId,

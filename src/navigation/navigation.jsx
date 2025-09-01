@@ -14,6 +14,7 @@ import ReferralScreen from '../screens/ReferralScreen';
 import LoaderScreen from '../screens/LoadingPage';
 import CongratsScreen from '../screens/CongratsScreen';
 import AfterQuizScreen from '../screens/AfterQuizScreen';
+import MiddleScreen from '../screens/MiddleScreen';
 
 const Stack = createStackNavigator();
 
@@ -79,11 +80,16 @@ export default function Navigation() {
           component={CongratsScreen}
           screenOptions={{ headerShown: false }}
         />
-        {/* <Stack.Screen
+        <Stack.Screen
+          name="Middle"
+          component={MiddleScreen}
+          screenOptions={{ headerShown: false }}
+        />
+        <Stack.Screen
           name="AfterQuizScreen"
           component={AfterQuizScreen}
           screenOptions={{ headerShown: false }}
-        /> */}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
