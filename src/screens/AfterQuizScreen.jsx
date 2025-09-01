@@ -251,6 +251,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     gap: 24,
     marginTop: 10,
+    marginBottom: 20,
   },
   actionButton: {
     borderRadius: 28,

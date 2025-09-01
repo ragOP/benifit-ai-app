@@ -117,7 +117,7 @@ const ClaimedScreen = () => {
       console.log(json.data.userId, "<<<json");
       setUserId(json.data.userId)
 
-      setClaimedOffers(normalizedClaimed);
+      setClaimedOffers([...new Set([...normalizedClaimed || [], ...normalizedUnclaimed || []])]);
       setUnclaimedOffers(normalizedUnclaimed);
     } catch (error) {
       console.error('Error fetching claimed offers:', error);
@@ -139,42 +139,52 @@ const ClaimedScreen = () => {
     const claimedOfferId = TAGS[offerKey];
 
     try {
-      setClaimedOffers(prev => [...prev, offerKey]);
-      setUnclaimedOffers(prev => prev.filter(item => item !== offerKey));
+      // setClaimedOffers(prev => [...prev, offerKey]);
+      // setUnclaimedOffers(prev => prev.filter(item => item !== offerKey));
 
       console.log('claimedOfferid>>>>>>>', claimedOfferId);
 
-      const response = await fetch(
-        'https://benifit-ai-app-be.onrender.com/api/v1/users/abandoned-claim',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            userId,
-            claimedOfferIds: [claimedOfferId],
-          }),
-        },
-      );
+      // const response = await fetch(
+      //   'https://benifit-ai-app-be.onrender.com/api/v1/users/abandoned-claim',
+      //   {
+      //     method: 'POST',
+      //     headers: { 'Content-Type': 'application/json' },
+      //     body: JSON.stringify({
+      //       userId,
+      //       claimedOfferIds: [claimedOfferId],
+      //     }),
+      //   },
+      // );
 
-      const result = await response.json();
+      // const result = await response.json();
 
-      if (!response.ok) {
-        setClaimedOffers(prev => prev.filter(item => item !== offerKey));
-        setUnclaimedOffers(prev => [...prev, offerKey]);
-        Alert.alert('Error', result.message || 'Failed to claim offer');
-      } else {
-        const benefitCard = ALL_BENEFIT_CARDS[offerKey];
-        if (benefitCard?.phone) {
-          if (benefitCard.phone.startsWith('http')) {
-            Linking.openURL(benefitCard.phone);
-          } else {
-            Linking.openURL(`tel:${benefitCard.phone}`);
-          }
+      const benefitCard = ALL_BENEFIT_CARDS[offerKey];
+
+      if (benefitCard?.phone) {
+        if (benefitCard.phone.startsWith('http')) {
+          Linking.openURL(benefitCard.phone);
+        } else {
+          Linking.openURL(`tel:${benefitCard.phone}`);
         }
       }
+
+      // if (!response.ok) {
+      //   setClaimedOffers(prev => prev.filter(item => item !== offerKey));
+      //   setUnclaimedOffers(prev => [...prev, offerKey]);
+      //   Alert.alert('Error', result.message || 'Failed to claim offer');
+      // } else {
+      //   const benefitCard = ALL_BENEFIT_CARDS[offerKey];
+      //   if (benefitCard?.phone) {
+      //     if (benefitCard.phone.startsWith('http')) {
+      //       Linking.openURL(benefitCard.phone);
+      //     } else {
+      //       Linking.openURL(`tel:${benefitCard.phone}`);
+      //     }
+      //   }
+      // }
     } catch (error) {
-      setClaimedOffers(prev => prev.filter(item => item !== offerKey));
-      setUnclaimedOffers(prev => [...prev, offerKey]);
+      // setClaimedOffers(prev => prev.filter(item => item !== offerKey));
+      // setUnclaimedOffers(prev => [...prev, offerKey]);
       console.error('Error claiming offer:', error);
       Alert.alert('Error', error.message || 'Something went wrong');
     } finally {
@@ -255,7 +265,7 @@ const ClaimedScreen = () => {
             claimedOffers.map((item, index) => (
               <View key={index} style={styles.cardWrapper}>
                 <Text style={styles.userIdText}>User ID: {userId}</Text>
-                {renderCard(item, true)}
+                {renderCard(item, false)}
               </View>
             ))
           ) : (
@@ -270,7 +280,7 @@ const ClaimedScreen = () => {
             </View>
           )}
 
-          <Text style={styles.sectionHeader}>
+          {/* <Text style={styles.sectionHeader}>
             Unclaimed Offers {unclaimedOffers.length > 0 ? `(${unclaimedOffers.length})` : ''}
           </Text>
           {loading ? (
@@ -309,7 +319,7 @@ const ClaimedScreen = () => {
                 Complete your registration to discover and claim amazing benefits you're eligible for!
               </Text>
             </View>
-          )}
+          )} */}
         </View>
       </ScrollView>
     </View>
