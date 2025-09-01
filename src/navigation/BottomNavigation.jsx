@@ -246,6 +246,7 @@ import ChatScreen from '../screens/ChatScreen';
 
 import Logout from '../screens/Logout';
 import AfterQuizScreen from '../screens/AfterQuizScreen';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const HomeStack = createStackNavigator();
 
@@ -364,12 +365,12 @@ const CustomBottomNavigation = ({ route }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.contentContainer}>{renderScene()}</View>
       <View style={styles.bottomNavBar}>
         {routes.map((route, index) => renderTab(route, index))}
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 

@@ -233,7 +233,7 @@ const QuestionScreen = ({ navigation }) => {
   const thirdShown = chat.some(m => m.id === 3);
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <View style={styles.safe}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.black} />
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
@@ -291,7 +291,7 @@ const QuestionScreen = ({ navigation }) => {
           )}
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 

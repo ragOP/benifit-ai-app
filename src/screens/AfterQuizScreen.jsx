@@ -97,16 +97,14 @@ export default function AfterQuizScreen({ navigation }) {
   ];
 
   return (
-    <View style={{ flex: 1, backgroundColor: COLORS.bg }}>
-      <SafeAreaView style={styles.safe} edges={['top']}>
-        <StatusBar barStyle="light-content" backgroundColor={COLORS.black} />
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Welcome Back</Text>
-        </View>
-      </SafeAreaView>
+    <View style={styles.safe} edges={['top']}>
+      <StatusBar barStyle="light-content" backgroundColor={COLORS.black} />
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Welcome Back</Text>
+      </View>
 
       <ScrollView
-        contentContainerStyle={{ paddingBottom: 50 }}
+        contentContainerStyle={{ paddingBottom: 30 }}
         showsVerticalScrollIndicator={false}
       >
         {/* Banner */}
@@ -119,11 +117,13 @@ export default function AfterQuizScreen({ navigation }) {
               colors={['rgba(0,0,0,0.6)', 'rgba(0,0,0,0.2)']}
               style={styles.bannerOverlay}
             >
-              <Text style={styles.bannerTitle}>Your Journey Continues 🚀</Text>
-              <Text style={styles.bannerSubtitle}>
-                Pick where you want to go next and make the most of your
-                benefits
-              </Text>
+              <View style={{ padding: 20 }}>
+                <Text style={styles.bannerTitle}>Your Journey Continues 🚀</Text>
+                <Text style={styles.bannerSubtitle}>
+                  Pick where you want to go next and make the most of your
+                  benefits
+                </Text>
+              </View>
             </LinearGradient>
           </ImageBackground>
         </View>
@@ -131,21 +131,21 @@ export default function AfterQuizScreen({ navigation }) {
         {/* Buttons Section */}
         <View style={styles.buttonsWrapper}>
           {buttons.map((btn, idx) => (
-            <TouchableOpacity
+            <LinearGradient
               key={idx}
+              colors={[COLORS.green, COLORS.teal]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
               style={styles.actionButton}
-              activeOpacity={0.9}
-              onPress={() => handleRoute(btn)}
             >
-              <LinearGradient
-                colors={[COLORS.green, COLORS.teal]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.gradientBg}
+              <TouchableOpacity
+                style={styles.touchableArea}
+                activeOpacity={0.9}
+                onPress={() => handleRoute(btn)}
               >
                 <Text style={styles.actionText}>{btn.title}</Text>
-              </LinearGradient>
-            </TouchableOpacity>
+              </TouchableOpacity>
+            </LinearGradient>
           ))}
         </View>
       </ScrollView>
@@ -155,6 +155,7 @@ export default function AfterQuizScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   safe: {
+    flex: 1,
     backgroundColor: COLORS.black,
   },
   header: {
@@ -191,7 +192,7 @@ const styles = StyleSheet.create({
   bannerOverlay: {
     flex: 1,
     justifyContent: 'flex-end',
-    padding: 20,
+    // padding: 20,
   },
   bannerTitle: {
     fontSize: 28,
@@ -208,20 +209,19 @@ const styles = StyleSheet.create({
   // Buttons
   buttonsWrapper: {
     paddingHorizontal: 24,
+    gap: 24,
     marginTop: 10,
-    gap: 18,
   },
   actionButton: {
     borderRadius: 28,
-    overflow: 'hidden',
     elevation: 4,
   },
-  gradientBg: {
-    paddingVertical: 18,
+  touchableArea: {
     borderRadius: 28,
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
+    padding: 16,
   },
   actionText: {
     color: COLORS.white,

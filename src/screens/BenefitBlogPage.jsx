@@ -80,7 +80,7 @@ export default function BenefitBlogPage() {
   const navigation = useNavigation();
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <View style={styles.safe}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.black} />
       <View style={styles.header}>
         <View style={styles.headerContent}>
@@ -126,7 +126,7 @@ export default function BenefitBlogPage() {
           paddingHorizontal: 14,
         }}
       />
-    </SafeAreaView>
+    </View>
   );
 }
 

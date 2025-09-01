@@ -514,7 +514,7 @@ export default function FormQuestion({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <View style={styles.safe}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.black} />
 
       {/* Loading Overlay */}
@@ -598,7 +598,7 @@ export default function FormQuestion({ navigation }) {
           )}
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 

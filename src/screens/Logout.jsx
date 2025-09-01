@@ -125,7 +125,7 @@ export default function ProfileScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <View style={styles.safe}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.black} />
 
       <View style={styles.header}>
@@ -198,6 +198,26 @@ export default function ProfileScreen() {
                 </TouchableOpacity>
               );
             }
+            if (item.label === 'Refer Your Friends') {
+              return (
+                <TouchableOpacity
+                  key={item.label}
+                  style={styles.row}
+                  activeOpacity={0.7}
+                  onPress={() => navigation.navigate('ReferralScreen')}
+                >
+                  <View style={[styles.chip, { backgroundColor: item.chipBg }]}>
+                    {item.icon}
+                  </View>
+                  <Text style={styles.rowText}>{item.label}</Text>
+                  <ChevronRight
+                    size={22}
+                    color="#BBC3BA"
+                    style={{ marginLeft: 'auto' }}
+                  />
+                </TouchableOpacity>
+              );
+            }
             if (item.label === 'Refer & Earn') {
               return (
                 <TouchableOpacity
@@ -238,7 +258,7 @@ export default function ProfileScreen() {
           })}
         </ScrollView>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 

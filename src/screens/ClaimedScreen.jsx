@@ -225,7 +225,7 @@ const ClaimedScreen = () => {
   );
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <View style={styles.safe} >
       <StatusBar barStyle="light-content" backgroundColor={COLORS.black} />
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
@@ -312,7 +312,7 @@ const ClaimedScreen = () => {
           )}
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 const styles = StyleSheet.create({

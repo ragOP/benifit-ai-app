@@ -308,7 +308,7 @@ export default function HomeScreen({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <View style={styles.safe}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.black} />
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
@@ -512,7 +512,7 @@ export default function HomeScreen({ navigation }) {
           </View>
         </View>
       )}
-    </SafeAreaView>
+    </View>
   );
 }
 

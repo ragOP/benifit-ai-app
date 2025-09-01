@@ -71,7 +71,7 @@ export default function MyProfileScreen() {
   }, []);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.black} />
       
       {/* Header */}
@@ -175,7 +175,7 @@ export default function MyProfileScreen() {
 
         <View style={styles.bottomSpacer} />
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
