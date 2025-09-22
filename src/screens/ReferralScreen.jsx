@@ -43,10 +43,19 @@ const COLORS = {
 };
 
 export default function ReferralScreen() {
-  const [referralCode, setReferralCode] = useState('');
+  const [referralCode, setReferralCode] = useState(
+    'Check out Benefit AI! An amazing app with AI-powered benefits and exclusive offers. Download it now!',
+  );
   const [isLoading, setIsLoading] = useState(true);
   const navigation = useNavigation();
-  const { toastVisible, toastMessage, toastType, showSuccessToast, showErrorToast, hideToast } = useToast();
+  const {
+    toastVisible,
+    toastMessage,
+    toastType,
+    showSuccessToast,
+    showErrorToast,
+    hideToast,
+  } = useToast();
 
   const fetchReferralUrl = async () => {
     try {
@@ -56,9 +65,8 @@ export default function ReferralScreen() {
       const data = await response.json();
 
       if (response.ok && data.data) {
-        const platformUrl = Platform.OS === 'android'
-          ? data.data.androidLink
-          : data.data.ios;
+        const platformUrl =
+          Platform.OS === 'android' ? data.data.androidLink : data.data.ios;
 
         setReferralCode(platformUrl);
       } else {
@@ -178,11 +186,18 @@ export default function ReferralScreen() {
 
           <View style={styles.benefitContainer}>
             <View style={styles.benefitIcon}>
-              <MaterialIcon name="rocket-launch" size={24} color={COLORS.teal} />
+              <MaterialIcon
+                name="rocket-launch"
+                size={24}
+                color={COLORS.teal}
+              />
             </View>
             <View style={styles.benefitContent}>
               <Text style={styles.benefitTitle}>Discover Amazing Benefits</Text>
-              <Text style={styles.benefitDescription}>Help your friends discover AI-powered benefits and exclusive offers</Text>
+              <Text style={styles.benefitDescription}>
+                Help your friends discover AI-powered benefits and exclusive
+                offers
+              </Text>
             </View>
           </View>
 
@@ -192,7 +207,9 @@ export default function ReferralScreen() {
             </View>
             <View style={styles.benefitContent}>
               <Text style={styles.benefitTitle}>Premium Experience</Text>
-              <Text style={styles.benefitDescription}>Give them access to premium features and smart recommendations</Text>
+              <Text style={styles.benefitDescription}>
+                Give them access to premium features and smart recommendations
+              </Text>
             </View>
           </View>
 
@@ -202,12 +219,12 @@ export default function ReferralScreen() {
             </View>
             <View style={styles.benefitContent}>
               <Text style={styles.benefitTitle}>Spread the Love</Text>
-              <Text style={styles.benefitDescription}>Share something valuable with people you care about</Text>
+              <Text style={styles.benefitDescription}>
+                Share something valuable with people you care about
+              </Text>
             </View>
           </View>
         </View>
-
-
 
         <View style={styles.bottomSpacer} />
       </ScrollView>
@@ -506,4 +523,4 @@ const styles = StyleSheet.create({
   bottomSpacer: {
     height: 40,
   },
-}); 
+});

@@ -12,11 +12,224 @@ import {
   Alert,
   Animated,
   Dimensions,
+  AppState,
 } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
+import MaterialIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { BACKEND_URL } from '../utils/backendUrl';
 import { SafeAreaView } from 'react-native-safe-area-context';
 const { width } = Dimensions.get('window');
+
+// Shake Animation Call Icon Component with milder Ringing
+const ShakeCallIcon = ({ benefit }) => {
+  const shakeAnimation = useRef(new Animated.Value(0)).current;
+  const ringingRotation = useRef(new Animated.Value(0)).current;
+  const iconScale = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    const shake = () => {
+      Animated.sequence([
+        Animated.timing(shakeAnimation, {
+          toValue: 6, // was 10
+          duration: 120, // slower
+          useNativeDriver: true,
+        }),
+        Animated.timing(shakeAnimation, {
+          toValue: -6, // was -10
+          duration: 120,
+          useNativeDriver: true,
+        }),
+        Animated.timing(shakeAnimation, {
+          toValue: 0,
+          duration: 120,
+          useNativeDriver: true,
+        }),
+        Animated.delay(2600), // longer pause between shakes
+      ]).start(() => shake());
+    };
+    shake();
+  }, [shakeAnimation]);
+
+  useEffect(() => {
+    const ringing = () => {
+      Animated.sequence([
+        Animated.timing(ringingRotation, {
+          toValue: -8, // was -12
+          duration: 140,
+          useNativeDriver: true,
+        }),
+        Animated.timing(ringingRotation, {
+          toValue: 8, // was 12
+          duration: 140,
+          useNativeDriver: true,
+        }),
+        Animated.timing(ringingRotation, {
+          toValue: 0,
+          duration: 140,
+          useNativeDriver: true,
+        }),
+        Animated.delay(2000),
+      ]).start(() => ringing());
+    };
+    ringing();
+  }, [ringingRotation]);
+
+  useEffect(() => {
+    const pulse = () => {
+      Animated.sequence([
+        Animated.timing(iconScale, {
+          toValue: 1.07, // was 1.15
+          duration: 280,
+          useNativeDriver: true,
+        }),
+        Animated.timing(iconScale, {
+          toValue: 1,
+          duration: 280,
+          useNativeDriver: true,
+        }),
+        Animated.delay(1700),
+      ]).start(() => pulse());
+    };
+    pulse();
+  }, [iconScale]);
+
+  return (
+    <View style={[styles.callIconContainer, { marginTop: 2 }]}>
+      <Animated.View
+        style={{
+          transform: [
+            { translateX: shakeAnimation },
+            {
+              rotate: ringingRotation.interpolate({
+                inputRange: [-12, 12],
+                outputRange: ['-12deg', '12deg'],
+              }),
+            },
+            { scale: iconScale },
+            { translateY: 1.5 }, // render a bit below
+          ],
+        }}
+      >
+        <MaterialIcon
+          name={benefit.title === 'Higher Compensation On Your Accident! ' ? 'web' : 'phone'}
+          size={20} // smaller icon (was 24)
+          color="white"
+          style={styles.callIcon}
+        />
+      </Animated.View>
+    </View>
+  );
+};
+
+// Ping Animation Call Icon Component with milder effects
+const PingCallIcon = ({ benefit }) => {
+  const pingScale = useRef(new Animated.Value(1)).current;
+  const pingOpacity = useRef(new Animated.Value(0)).current;
+  const ringingRotation = useRef(new Animated.Value(0)).current;
+  const iconScale = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    const ping = () => {
+      pingScale.setValue(1);
+      pingOpacity.setValue(0.6); // was 0.8
+      
+      Animated.parallel([
+        Animated.timing(pingScale, {
+          toValue: 1.45, // was 1.8
+          duration: 1400, // slightly slower
+          useNativeDriver: true,
+        }),
+        Animated.timing(pingOpacity, {
+          toValue: 0,
+          duration: 1400,
+          useNativeDriver: true,
+        }),
+      ]).start(() => {
+        setTimeout(() => ping(), 600); // longer delay between pings
+      });
+    };
+    ping();
+  }, [pingScale, pingOpacity]);
+
+  useEffect(() => {
+    const ringing = () => {
+      Animated.sequence([
+        Animated.timing(ringingRotation, {
+          toValue: -8, // was -15
+          duration: 90,
+          useNativeDriver: true,
+        }),
+        Animated.timing(ringingRotation, {
+          toValue: 8, // was 15
+          duration: 90,
+          useNativeDriver: true,
+        }),
+        Animated.timing(ringingRotation, {
+          toValue: 0,
+          duration: 90,
+          useNativeDriver: true,
+        }),
+        Animated.delay(1400),
+      ]).start(() => ringing());
+    };
+    ringing();
+  }, [ringingRotation]);
+
+  useEffect(() => {
+    const pulse = () => {
+      Animated.sequence([
+        Animated.timing(iconScale, {
+          toValue: 1.06, // was 1.1
+          duration: 320,
+          useNativeDriver: true,
+        }),
+        Animated.timing(iconScale, {
+          toValue: 1,
+          duration: 320,
+          useNativeDriver: true,
+        }),
+        Animated.delay(1400),
+      ]).start(() => pulse());
+    };
+    pulse();
+  }, [iconScale]);
+
+  return (
+    <View style={[styles.callIconContainer, { marginTop: 1 }]}>
+      {/* Single soft ping ring instead of two */}
+      <Animated.View
+        style={[
+          styles.pingBackground,
+          {
+            transform: [{ scale: pingScale }, { translateY: 1 }], // a bit below
+            opacity: pingOpacity,
+          },
+        ]}
+      />
+      <Animated.View
+        style={{
+          transform: [
+            {
+              rotate: ringingRotation.interpolate({
+                inputRange: [-15, 15],
+                outputRange: ['-15deg', '15deg'],
+              }),
+            },
+            { scale: iconScale },
+            { translateY: 1.5 }, // render a bit below
+          ],
+        }}
+      >
+        <MaterialIcon
+          name={benefit.title === 'Higher Compensation On Your Accident! ' ? 'web' : 'phone'}
+          size={20} // smaller icon (was 24)
+          color="white"
+          style={styles.callIcon}
+        />
+      </Animated.View>
+    </View>
+  );
+};
 
 const COLORS = {
   black: '#000000',
@@ -35,11 +248,11 @@ const COLORS = {
 
 const TAGS = {
   is_md: 'Medicare',
-  // is_ssdi: 'SSDI',
+  // is_ssdi: 'SSDI'
   is_auto: 'Auto',
-  is_mva: 'MVA',
+  is_mva: 'Higher Compensation On Your Accident!',
   is_debt: 'Debt',
-  // is_rvm: 'Reverse Mortgage',
+  // is_rvm: 'Reverse Mortgage'
 };
 
 const LockIcon = ({ size = 16, color = '#94a3b8' }) => (
@@ -55,7 +268,7 @@ const ALL_BENEFIT_CARDS = {
       'This food allowance card gives you thousands of dollars a year to spend on groceries, rent, prescriptions, etc.',
     img: require('../assets/card.png'),
     badge: 'Easiest To Claim',
-    phone: '+18333381762',
+    phone: '+13236897861',
     call: 'CALL (323) 689-7861',
   },
   is_debt: {
@@ -71,16 +284,16 @@ const ALL_BENEFIT_CARDS = {
     title: 'Auto Insurance',
     description:
       "You're eligible for a Discounted Auto Insurance Plan with all the coverage.",
-    img: require('../assets/benifit3.webp'),
+    img: require('../assets/benifit4.webp'),
     badge: 'Assured Monthly Savings!',
     phone: '+16197753027',
     call: 'CALL (619) 775-3027',
   },
   is_mva: {
-    title: 'MVA',
+    title: 'Higher Compensation On Your Accident!',
     description:
       'You might be eligible for a higher compensation. Most people get 3x of their past compensations.',
-    img: require('../assets/benifit4.webp'),
+    img: require('../assets/benifit3.webp'),
     badge: 'Could Be Worth $100,000+',
     phone: 'https://www.roadwayrelief.com/get-quote-am/',
     call: 'CLICK HERE TO PROCEED',
@@ -89,12 +302,13 @@ const ALL_BENEFIT_CARDS = {
 
 const BenefitCard = ({ benefit, onClaim }) => {
   const shimmerAnimation = useRef(new Animated.Value(0)).current;
+
   useEffect(() => {
     const shimmer = () => {
       Animated.sequence([
         Animated.timing(shimmerAnimation, {
           toValue: 1,
-          duration: 4000,
+          duration: 5200, // slower pass
           useNativeDriver: true,
         }),
         Animated.timing(shimmerAnimation, {
@@ -102,31 +316,29 @@ const BenefitCard = ({ benefit, onClaim }) => {
           duration: 0,
           useNativeDriver: true,
         }),
+        Animated.delay(1200), // rest between sweeps
       ]).start(() => shimmer());
     };
     shimmer();
   }, [shimmerAnimation]);
+
   const handlePress = async () => {
     try {
-      await onClaim?.();
       if (benefit.title === 'MVA') {
         await Linking.openURL(benefit.phone);
       } else {
         const phoneNumber = benefit.phone.replace(/[^\d+]/g, '');
         const telUrl =
-          Platform.OS === 'ios'
-            ? `telprompt:${phoneNumber}`
-            : `tel:${phoneNumber}`;
+          Platform.OS === 'ios' ? `tel:${phoneNumber}` : `tel:${phoneNumber}`; // use tel: to be snappier
 
         try {
           await Linking.openURL(telUrl);
         } catch (error) {
-          Alert.alert(
-            'Phone Error',
-            'Phone dialer is not available on this device.',
-          );
+          Alert.alert('Phone Error', 'Phone dialer is not available on this device.');
         }
       }
+
+      await onClaim?.();
     } catch (error) {
       Alert.alert('Error', error.message);
     }
@@ -138,23 +350,20 @@ const BenefitCard = ({ benefit, onClaim }) => {
         <Text style={styles.pillText}>{benefit.badge}</Text>
       </View>
       <View style={{ alignItems: 'center', marginBottom: 13 }}>
-        <Image
-          source={benefit.img}
-          style={styles.foodImage}
-          resizeMode="cover"
-        />
+        <Image source={benefit.img} style={styles.foodImage} resizeMode="cover" />
       </View>
       <Text style={styles.foodCardTitle}>{benefit.title}</Text>
       <Text style={styles.foodCardDesc}>{benefit.description}</Text>
-      <TouchableOpacity
-        style={styles.callButton}
-        onPress={handlePress}
-        activeOpacity={0.9}
-      >
+
+      <TouchableOpacity style={styles.callButton} onPress={handlePress} activeOpacity={0.9}>
+        {/* Softer + smaller shimmer, slightly lower */}
         <Animated.View
           style={[
             styles.shimmer,
             {
+              height: '55%', // smaller band (was full)
+              top: '22%', // render a bit below center
+              opacity: 0.22, // softer
               transform: [
                 {
                   translateX: shimmerAnimation.interpolate({
@@ -162,23 +371,20 @@ const BenefitCard = ({ benefit, onClaim }) => {
                     outputRange: [-width, width],
                   }),
                 },
-                { rotate: '13deg' },
+                { rotate: '12deg' },
               ],
             },
           ]}
         />
-        <Text style={styles.callIcon}>
-          {benefit.title === 'MVA ' ? '🌐' : '📞'}
-        </Text>
+
+        {/* Always using the gentler Ping icon now */}
+        <PingCallIcon benefit={benefit} />
+
         <Text style={styles.callButtonText}>{benefit.call}</Text>
       </TouchableOpacity>
-      {/* {benefit.title !== 'MVA' && (
-        <Text style={styles.altDial}>Or dial: {benefit.phone}</Text>
-      )} */}
+
       <View style={styles.unlockBox}>
-        <Text style={styles.unlockText}>
-          Complete this step to unlock the next benefit.
-        </Text>
+        <Text style={styles.unlockText}>Call now and claim this benefit to unlock the next one.</Text>
       </View>
     </View>
   );
@@ -186,9 +392,7 @@ const BenefitCard = ({ benefit, onClaim }) => {
 
 const StepperCard = ({ benefits, userId }) => {
   const benefitKeys = Object.keys(benefits);
-  const [activeBenefitKey, setActiveBenefitKey] = useState(
-    benefitKeys[0] || '',
-  );
+  const [activeBenefitKey, setActiveBenefitKey] = useState(benefitKeys[0] || '');
   const [completedBenefits, setCompletedBenefits] = useState({});
 
   const handleBenefitClaim = async key => {
@@ -204,17 +408,11 @@ const StepperCard = ({ benefits, userId }) => {
     console.log('📦 API Payload:', payload);
 
     try {
-      const response = await fetch(
-        `${BACKEND_URL}/api/v1/users/abandoned-claim`,
-        // 'http://10.0.2.2:9005/api/v1/users/abandoned-claim',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(payload),
-        },
-      );
+      const response = await fetch(`${BACKEND_URL}/api/v1/users/abandoned-claim`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
 
       const data = await response.json();
       console.log('✅ Claimed offer API response:', data);
@@ -232,47 +430,25 @@ const StepperCard = ({ benefits, userId }) => {
     <View style={styles.cardContainer}>
       {benefitKeys.map((key, index) => {
         const isActive = key === activeBenefitKey;
-        const isUnlocked =
-          index === 0 || completedBenefits[benefitKeys[index - 1]];
+        const isUnlocked = index === 0 || completedBenefits[benefitKeys[index - 1]];
 
         return (
           <View key={key} style={{ marginBottom: 12 }}>
             <TouchableOpacity
-              style={[
-                isActive ? styles.stepActive : styles.stepInactive,
-                { opacity: isUnlocked ? 1 : 0.4 },
-              ]}
+              style={[isActive ? styles.stepActive : styles.stepInactive, { opacity: isUnlocked ? 1 : 0.4 }]}
               disabled={!isUnlocked}
               onPress={() => setActiveBenefitKey(key)}
             >
-              <View
-                style={
-                  isActive ? styles.stepNumberActive : styles.stepNumberInactive
-                }
-              >
-                <Text
-                  style={
-                    isActive
-                      ? styles.stepNumberActiveText
-                      : styles.stepNumberInactiveText
-                  }
-                >
+              <View style={isActive ? styles.stepNumberActive : styles.stepNumberInactive}>
+                <Text style={isActive ? styles.stepNumberActiveText : styles.stepNumberInactiveText}>
                   {index + 1}
                 </Text>
               </View>
               <View style={{ marginLeft: 7, flex: 1 }}>
-                <Text
-                  style={
-                    isActive ? styles.stepTitleActive : styles.stepTitleInactive
-                  }
-                >
+                <Text style={isActive ? styles.stepTitleActive : styles.stepTitleInactive}>
                   {benefits[key].title}
                 </Text>
-                <Text
-                  style={
-                    isActive ? styles.stepSubtitle : styles.stepSubtitleInactive
-                  }
-                >
+                <Text style={isActive ? styles.stepSubtitle : styles.stepSubtitleInactive}>
                   {benefits[key].badge}
                 </Text>
               </View>
@@ -282,11 +458,9 @@ const StepperCard = ({ benefits, userId }) => {
                 </View>
               )}
             </TouchableOpacity>
+
             {(isActive || completedBenefits[key]) && isUnlocked && (
-              <BenefitCard
-                benefit={benefits[key]}
-                onClaim={() => handleBenefitClaim(key)}
-              />
+              <BenefitCard benefit={benefits[key]} onClaim={() => handleBenefitClaim(key)} />
             )}
           </View>
         );
@@ -294,9 +468,10 @@ const StepperCard = ({ benefits, userId }) => {
     </View>
   );
 };
+
 const CongratsScreen = ({ route }) => {
   const { fullName, tags = [], userId } = route.params || {};
-  console.log('tags');
+
   const getFilteredBenefits = () => {
     const filteredBenefits = {};
     if (tags.length === 0) return ALL_BENEFIT_CARDS;
@@ -315,29 +490,22 @@ const CongratsScreen = ({ route }) => {
       <StatusBar barStyle="light-content" backgroundColor={COLORS.black} />
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
-          <Image
-            source={require('../assets/center.png')}
-            style={styles.logo}
-            resizeMode="contain"
-          />
+          <Image source={require('../assets/center.png')} style={styles.logo} resizeMode="contain" />
         </View>
+
         <View style={styles.congratsCard}>
           <Text style={styles.congratsTitle}>
-            Congratulations,{' '}
-            <Text style={{ fontWeight: '900' }}>{fullName || 'User'}! 🎉</Text>
+            Congratulations, <Text style={{ fontWeight: '900' }}>{fullName || 'User'}! 🎉</Text>
           </Text>
           <Text style={styles.description}>
-            We've found that you immediately qualify for{' '}
+            We've found that you immediately qualify for these{' '}
             <Text style={styles.greenText}>{Object.keys(filteredBenefits).length} benefits</Text> worth
             thousands of dollars combined.
           </Text>
           <View style={styles.claimBox}>
             <Text style={styles.claimText}>
-              Claim all of your {Object.keys(filteredBenefits).length} qualified
-              benefits by calling on their official hotlines in{' '}
-              <Text style={styles.boldText}>
-                order. Each call takes ~3–5 minutes.
-              </Text>
+              Claim all of your {Object.keys(filteredBenefits).length} qualified benefits by calling on their
+              official hotlines in <Text style={styles.boldText}>order. Each call takes ~3–5 minutes.</Text>
             </Text>
           </View>
         </View>
@@ -346,16 +514,16 @@ const CongratsScreen = ({ route }) => {
 
         <View style={{ ...styles.noteContainer, alignItems: 'center' }}>
           <Text style={{ textAlign: 'center', ...styles.noteBody2 }}>
-            Beware of other fraudulent & similar looking websites that might
-            look exactly like ours, we have no affiliation with them. This is
-            the only official website to claim your Benefits with the domain
-            name mybenefitsai.org.
+            Beware of other fraudulent & similar looking websites that might look exactly like ours, we have no
+            affiliation with them. This is the only official website to claim your Benefits with the domain name
+            mybenefitsai.org.
           </Text>
         </View>
       </ScrollView>
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: COLORS.bg },
   header: { backgroundColor: COLORS.black },
@@ -458,14 +626,10 @@ const styles = StyleSheet.create({
   },
   shimmer: {
     position: 'absolute',
-    top: 0,
     left: 0,
     right: 0,
-    bottom: 0,
-    width: '5%',
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-    boxShadow: '0 0 15px rgba(255, 255, 255, 0.3)',
-    transform: [{ skewX: '-20deg' }],
+    width: '3%', // thinner beam (was 5%)
+    backgroundColor: 'rgba(255, 255, 255, 0.22)',
     zIndex: 0,
   },
   pill: {
@@ -480,7 +644,7 @@ const styles = StyleSheet.create({
   },
   pillText: { color: '#fff', fontWeight: 'bold', fontSize: 15 },
   foodImage: {
-    height: 200,
+    height: 220,
     width: '100%',
     objectFit: 'contain',
   },
@@ -516,8 +680,24 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     paddingVertical: 16,
     marginBottom: 9,
+    overflow: 'hidden', // to keep the smaller shimmer clipped
   },
-  callIcon: { fontSize: 23, color: 'white', marginRight: 8 },
+  callIcon: { fontSize: 20, color: 'white', marginRight: 8 },
+  callIconContainer: {
+    position: 'relative',
+    marginRight: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  pingBackground: {
+    position: 'absolute',
+    width: 32, // smaller ring (was 40)
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.35)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255, 255, 255, 0.25)',
+  },
   callButtonText: { color: 'white', fontSize: 18.5, fontWeight: 'bold' },
   altDial: { textAlign: 'center', fontSize: 14.5, color: '#516a5c' },
   noteContainer: { marginTop: 36, marginBottom: 40, paddingHorizontal: 30 },

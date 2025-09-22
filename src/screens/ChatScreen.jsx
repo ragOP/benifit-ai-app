@@ -9,6 +9,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   StatusBar,
+  Keyboard,
 } from 'react-native';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import MaterialIcon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -86,6 +87,7 @@ const ChatScreen = () => {
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
   const [isFirstMsg, setIsFirstMsg] = useState(true);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
   const flatListRef = useRef(null);
   const queryClient = useQueryClient();
 
@@ -157,11 +159,30 @@ const ChatScreen = () => {
     }
   };
 
-  const scrollToBottom = useCallback(() => {
-    if (flatListRef.current && messages.length > 0) {
-      flatListRef.current.scrollToEnd({ animated: true });
+  // Safe scroll to end for FlatList (defensive)
+  const safeScrollToEnd = useCallback((animated = true) => {
+    try {
+      if (!flatListRef.current) return;
+      // try scrollToEnd (exists on underlying ScrollView)
+      if (typeof flatListRef.current.scrollToEnd === 'function') {
+        flatListRef.current.scrollToEnd({ animated });
+        return;
+      }
+      // fallback: scrollToOffset with a big offset
+      if (typeof flatListRef.current.scrollToOffset === 'function') {
+        flatListRef.current.scrollToOffset({ offset: 999999, animated });
+      }
+    } catch (e) {
+      // ignore
+      console.warn('scroll error', e);
     }
-  }, [messages.length]);
+  }, []);
+
+  const scrollToBottom = useCallback(() => {
+    if (messages.length > 0) {
+      safeScrollToEnd(true);
+    }
+  }, [messages.length, safeScrollToEnd]);
 
   useEffect(() => {
     scrollToBottom();
@@ -171,6 +192,9 @@ const ChatScreen = () => {
   useEffect(() => {
     if (chatMessages && chatMessages.length > 0) {
       setMessages(chatMessages);
+    } else {
+      // keep empty if none
+      setMessages([]);
     }
   }, [chatMessages]);
 
@@ -184,6 +208,39 @@ const ChatScreen = () => {
   const renderMessage = ({ item }) => (
     <MessageBubble message={item} isAdmin={false} />
   );
+
+  // Keyboard listeners to adjust bottom padding so input isn't covered
+  useEffect(() => {
+    const onKeyboardShow = e => {
+      const height = e.endCoordinates ? e.endCoordinates.height : 250;
+      setKeyboardHeight(height);
+      // scroll to bottom when keyboard opens
+      setTimeout(() => {
+        safeScrollToEnd(true);
+      }, 50);
+    };
+    const onKeyboardHide = () => {
+      setKeyboardHeight(0);
+    };
+
+    const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+
+    const showSub = Keyboard.addListener(showEvent, onKeyboardShow);
+    const hideSub = Keyboard.addListener(hideEvent, onKeyboardHide);
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, [safeScrollToEnd]);
+
+  // ensure we scroll when TextInput focuses
+  const handleInputFocus = () => {
+    setTimeout(() => {
+      safeScrollToEnd(true);
+    }, 50);
+  };
 
   if (isLoading) {
     return (
@@ -240,16 +297,22 @@ const ChatScreen = () => {
         renderItem={renderMessage}
         keyExtractor={item => item.id}
         style={styles.messagesList}
-        contentContainerStyle={styles.messagesContainer}
+        contentContainerStyle={[
+          styles.messagesContainer,
+          // add dynamic bottom padding so input won't cover messages
+          { paddingBottom: Math.max(16, keyboardHeight + 16) },
+        ]}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
       />
 
       {/* Input Area */}
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
         style={styles.inputContainer}
       >
-        <View style={styles.inputWrapper}>
+        <View style={[styles.inputWrapper, { marginBottom: Platform.OS === 'ios' ? 16 : 0 }]}>
           <TextInput
             style={styles.textInput}
             value={message}
@@ -258,6 +321,18 @@ const ChatScreen = () => {
             placeholderTextColor={COLORS.textLight}
             multiline
             maxLength={500}
+            onFocus={handleInputFocus}
+            // keep cursor visible & keyboard behaving
+            underlineColorAndroid="transparent"
+            returnKeyType="send"
+            blurOnSubmit={false}
+            onSubmitEditing={() => {
+              // only send on single-line return; for multiline this won't trigger often.
+              if (Platform.OS === 'android') {
+                // Android: sometimes SubmitEditing fires on "enter" depending on keyboard; keep safe.
+                handleSendMessage();
+              }
+            }}
           />
           <TouchableOpacity
             style={[

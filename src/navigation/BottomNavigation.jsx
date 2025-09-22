@@ -247,6 +247,7 @@ import ChatScreen from '../screens/ChatScreen';
 import Logout from '../screens/Logout';
 import AfterQuizScreen from '../screens/AfterQuizScreen';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const HomeStack = createStackNavigator();
 
@@ -276,6 +277,26 @@ const CustomBottomNavigation = ({ route }) => {
     }
   }, [route?.params?.initialTab]);
 
+  // Assume guestUser is available via route.params or set to false by default
+  // Try to get guestUser from route params, else from AsyncStorage, else default to false
+  const [guestUser, setGuestUser] = useState(route?.params?.guestUser || false);
+
+  useEffect(() => {
+    const checkGuestUser = async () => {
+      if (route?.params?.guestUser !== undefined) {
+        setGuestUser(route.params.guestUser);
+      } else {
+        try {
+          const value = await AsyncStorage.getItem('guestUser');
+          setGuestUser(value === 'true');
+        } catch (e) {
+          setGuestUser(false);
+        }
+      }
+    };
+    checkGuestUser();
+  }, [route?.params?.guestUser]);
+
   const routes = [
     {
       key: 'home',
@@ -287,18 +308,23 @@ const CustomBottomNavigation = ({ route }) => {
     {
       key: 'menu',
       // title: 'Unclaimed Offer',
-      title: 'Your Offer',
+      title: 'Your Offers',
       focusedIcon: 'menu',
       unfocusedIcon: 'menu',
       component: ClaimedScreen,
     },
-    {
-      key: 'chat',
-      title: 'Chat',
-      focusedIcon: 'chat',
-      unfocusedIcon: 'chat-outline',
-      component: ChatScreen,
-    },
+    // Only include Chat tab if not guestUser
+    ...(!guestUser
+      ? [
+          {
+            key: 'chat',
+            title: 'Chat',
+            focusedIcon: 'chat',
+            unfocusedIcon: 'chat-outline',
+            component: ChatScreen,
+          },
+        ]
+      : []),
     {
       key: 'blog',
       title: 'Blog',

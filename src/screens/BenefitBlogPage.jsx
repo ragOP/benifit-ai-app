@@ -52,7 +52,7 @@ const DATA = [
   {
     id: '4',
     badge: 'Could Be Worth $100,000+',
-    title: 'MVA',
+    title: 'Higher Compensation On Your Accident!',
     image: require('../assets/benifit4.webp'),
     benefitKey: 'is_mva',
   },

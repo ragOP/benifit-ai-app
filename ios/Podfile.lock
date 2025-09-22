@@ -1,14 +1,4 @@
 PODS:
-  - AppAuth (1.7.6):
-    - AppAuth/Core (= 1.7.6)
-    - AppAuth/ExternalUserAgent (= 1.7.6)
-  - AppAuth/Core (1.7.6)
-  - AppAuth/ExternalUserAgent (1.7.6):
-    - AppAuth/Core
-  - AppCheckCore (11.2.0):
-    - GoogleUtilities/Environment (~> 8.0)
-    - GoogleUtilities/UserDefaults (~> 8.0)
-    - PromisesObjC (~> 2.4)
   - boost (1.84.0)
   - BVLinearGradient (2.8.3):
     - React-Core
@@ -17,9 +7,6 @@ PODS:
   - FBLazyVector (0.81.0)
   - Firebase (12.1.0):
     - Firebase/Core (= 12.1.0)
-  - Firebase/Auth (12.1.0):
-    - Firebase/CoreOnly
-    - FirebaseAuth (~> 12.1.0)
   - Firebase/Core (12.1.0):
     - Firebase/CoreOnly
     - FirebaseAnalytics (~> 12.1.0)
@@ -46,17 +33,6 @@ PODS:
     - GoogleUtilities/Network (~> 8.1)
     - "GoogleUtilities/NSData+zlib (~> 8.1)"
     - nanopb (~> 3.30910.0)
-  - FirebaseAppCheckInterop (12.1.0)
-  - FirebaseAuth (12.1.0):
-    - FirebaseAppCheckInterop (~> 12.1.0)
-    - FirebaseAuthInterop (~> 12.1.0)
-    - FirebaseCore (~> 12.1.0)
-    - FirebaseCoreExtension (~> 12.1.0)
-    - GoogleUtilities/AppDelegateSwizzler (~> 8.1)
-    - GoogleUtilities/Environment (~> 8.1)
-    - GTMSessionFetcher/Core (< 6.0, >= 3.4)
-    - RecaptchaInterop (~> 101.0)
-  - FirebaseAuthInterop (12.1.0)
   - FirebaseCore (12.1.0):
     - FirebaseCoreInternal (~> 12.1.0)
     - GoogleUtilities/Environment (~> 8.1)
@@ -110,11 +86,6 @@ PODS:
   - GoogleDataTransport (10.1.0):
     - nanopb (~> 3.30910.0)
     - PromisesObjC (~> 2.4)
-  - GoogleSignIn (8.0.0):
-    - AppAuth (< 2.0, >= 1.7.3)
-    - AppCheckCore (~> 11.0)
-    - GTMAppAuth (< 5.0, >= 4.1.1)
-    - GTMSessionFetcher/Core (~> 3.3)
   - GoogleUtilities (8.1.0):
     - GoogleUtilities/AppDelegateSwizzler (= 8.1.0)
     - GoogleUtilities/Environment (= 8.1.0)
@@ -155,10 +126,6 @@ PODS:
   - GoogleUtilities/UserDefaults (8.1.0):
     - GoogleUtilities/Logger
     - GoogleUtilities/Privacy
-  - GTMAppAuth (4.1.1):
-    - AppAuth/Core (~> 1.7)
-    - GTMSessionFetcher/Core (< 4.0, >= 3.3)
-  - GTMSessionFetcher/Core (3.5.0)
   - hermes-engine (0.81.0):
     - hermes-engine/Pre-built (= 0.81.0)
   - hermes-engine/Pre-built (0.81.0)
@@ -2470,7 +2437,6 @@ PODS:
     - React-perflogger (= 0.81.0)
     - React-utils (= 0.81.0)
     - SocketRocket
-  - RecaptchaInterop (101.0.0)
   - RNCAsyncStorage (2.2.0):
     - boost
     - DoubleConversion
@@ -2499,13 +2465,11 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
+  - RNCPushNotificationIOS (1.11.0):
+    - React-Core
   - RNFBApp (23.1.2):
     - Firebase/CoreOnly (= 12.1.0)
     - React-Core
-  - RNFBAuth (23.1.2):
-    - Firebase/Auth (= 12.1.0)
-    - React-Core
-    - RNFBApp
   - RNFBMessaging (23.1.2):
     - Firebase/Messaging (= 12.1.0)
     - FirebaseCoreExtension
@@ -2517,35 +2481,6 @@ PODS:
     - fast_float
     - fmt
     - glog
-    - hermes-engine
-    - RCT-Folly
-    - RCT-Folly/Fabric
-    - RCTRequired
-    - RCTTypeSafety
-    - React-Core
-    - React-debug
-    - React-Fabric
-    - React-featureflags
-    - React-graphics
-    - React-ImageManager
-    - React-jsi
-    - React-NativeModulesApple
-    - React-RCTFabric
-    - React-renderercss
-    - React-rendererdebug
-    - React-utils
-    - ReactCodegen
-    - ReactCommon/turbomodule/bridging
-    - ReactCommon/turbomodule/core
-    - SocketRocket
-    - Yoga
-  - RNGoogleSignin (15.0.0):
-    - boost
-    - DoubleConversion
-    - fast_float
-    - fmt
-    - glog
-    - GoogleSignIn (~> 8.0)
     - hermes-engine
     - RCT-Folly
     - RCT-Folly/Fabric
@@ -2660,6 +2595,64 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
+  - RNShare (12.2.0):
+    - boost
+    - DoubleConversion
+    - fast_float
+    - fmt
+    - glog
+    - hermes-engine
+    - RCT-Folly
+    - RCT-Folly/Fabric
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - SocketRocket
+    - Yoga
+  - RNSound (0.12.0):
+    - boost
+    - DoubleConversion
+    - fast_float
+    - fmt
+    - glog
+    - hermes-engine
+    - RCT-Folly
+    - RCT-Folly/Fabric
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - SocketRocket
+    - Yoga
+  - RNSoundPlayer (0.14.5):
+    - React-Core
   - RNSVG (15.12.1):
     - boost
     - DoubleConversion
@@ -2755,12 +2748,9 @@ DEPENDENCIES:
   - fast_float (from `../node_modules/react-native/third-party-podspecs/fast_float.podspec`)
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
   - Firebase
-  - FirebaseAppCheckInterop
-  - FirebaseAuth
-  - FirebaseAuthInterop
   - FirebaseCore
-  - FirebaseCoreExtension
   - FirebaseCoreInternal
+  - FirebaseMessaging
   - fmt (from `../node_modules/react-native/third-party-podspecs/fmt.podspec`)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - GoogleUtilities
@@ -2830,16 +2820,17 @@ DEPENDENCIES:
   - ReactAppDependencyProvider (from `build/generated/ios`)
   - ReactCodegen (from `build/generated/ios`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
-  - RecaptchaInterop
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
+  - "RNCPushNotificationIOS (from `../node_modules/@react-native-community/push-notification-ios`)"
   - "RNFBApp (from `../node_modules/@react-native-firebase/app`)"
-  - "RNFBAuth (from `../node_modules/@react-native-firebase/auth`)"
   - "RNFBMessaging (from `../node_modules/@react-native-firebase/messaging`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
-  - "RNGoogleSignin (from `../node_modules/@react-native-google-signin/google-signin`)"
   - "RNNotifee (from `../node_modules/@notifee/react-native`)"
   - RNPermissions (from `../node_modules/react-native-permissions`)
   - RNScreens (from `../node_modules/react-native-screens`)
+  - RNShare (from `../node_modules/react-native-share`)
+  - RNSound (from `../node_modules/react-native-sound`)
+  - RNSoundPlayer (from `../node_modules/react-native-sound-player`)
   - RNSVG (from `../node_modules/react-native-svg`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - SocketRocket (~> 0.7.1)
@@ -2847,13 +2838,8 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
-    - AppAuth
-    - AppCheckCore
     - Firebase
     - FirebaseAnalytics
-    - FirebaseAppCheckInterop
-    - FirebaseAuth
-    - FirebaseAuthInterop
     - FirebaseCore
     - FirebaseCoreExtension
     - FirebaseCoreInternal
@@ -2862,13 +2848,9 @@ SPEC REPOS:
     - GoogleAdsOnDeviceConversion
     - GoogleAppMeasurement
     - GoogleDataTransport
-    - GoogleSignIn
     - GoogleUtilities
-    - GTMAppAuth
-    - GTMSessionFetcher
     - nanopb
     - PromisesObjC
-    - RecaptchaInterop
     - SocketRocket
 
 EXTERNAL SOURCES:
@@ -3019,22 +3001,26 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   RNCAsyncStorage:
     :path: "../node_modules/@react-native-async-storage/async-storage"
+  RNCPushNotificationIOS:
+    :path: "../node_modules/@react-native-community/push-notification-ios"
   RNFBApp:
     :path: "../node_modules/@react-native-firebase/app"
-  RNFBAuth:
-    :path: "../node_modules/@react-native-firebase/auth"
   RNFBMessaging:
     :path: "../node_modules/@react-native-firebase/messaging"
   RNGestureHandler:
     :path: "../node_modules/react-native-gesture-handler"
-  RNGoogleSignin:
-    :path: "../node_modules/@react-native-google-signin/google-signin"
   RNNotifee:
     :path: "../node_modules/@notifee/react-native"
   RNPermissions:
     :path: "../node_modules/react-native-permissions"
   RNScreens:
     :path: "../node_modules/react-native-screens"
+  RNShare:
+    :path: "../node_modules/react-native-share"
+  RNSound:
+    :path: "../node_modules/react-native-sound"
+  RNSoundPlayer:
+    :path: "../node_modules/react-native-sound-player"
   RNSVG:
     :path: "../node_modules/react-native-svg"
   RNVectorIcons:
@@ -3043,8 +3029,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
-  AppAuth: d4f13a8fe0baf391b2108511793e4b479691fb73
-  AppCheckCore: cc8fd0a3a230ddd401f326489c99990b013f0c4f
   boost: 7e761d76ca2ce687f7cc98e698152abd03a18f90
   BVLinearGradient: 880f91a7854faff2df62518f0281afb1c60d49a3
   DoubleConversion: cb417026b2400c8f53ae97020b2be961b59470cb
@@ -3052,9 +3036,6 @@ SPEC CHECKSUMS:
   FBLazyVector: a867936a67af0d09c37935a1b900a1a3c795b6d1
   Firebase: 9edc9acf71313eb20e209c42e5469a42564fe1aa
   FirebaseAnalytics: e89a37004bce8789cb53f4cb3e80160d925e6624
-  FirebaseAppCheckInterop: de890554a81967f16a0eb8d3def541c2bb42dece
-  FirebaseAuth: 6d0f2d449195c401e6d6ef1a891fff22bc60356d
-  FirebaseAuthInterop: ede927b03baf02453e6e9de2df513cc28d3eb742
   FirebaseCore: 5a452ffa66f37c8e281076996837626c5d08c090
   FirebaseCoreExtension: dd89d73548ee9be5d8dc60e5c76bc421b965853b
   FirebaseCoreInternal: ff526c22671bb564d1b34a47615e29ba99389dee
@@ -3065,10 +3046,7 @@ SPEC CHECKSUMS:
   GoogleAdsOnDeviceConversion: b225b50f2ee6bbf856fd51a26684929b32657215
   GoogleAppMeasurement: 61605c4152a142d797383a713ecfa5df98fe46ca
   GoogleDataTransport: aae35b7ea0c09004c3797d53c8c41f66f219d6a7
-  GoogleSignIn: ce8c89bb9b37fb624b92e7514cc67335d1e277e4
   GoogleUtilities: 00c88b9a86066ef77f0da2fab05f65d7768ed8e1
-  GTMAppAuth: f69bd07d68cd3b766125f7e072c45d7340dea0de
-  GTMSessionFetcher: 5aea5ba6bd522a239e236100971f10cb71b96ab6
   hermes-engine: e7491a2038f2618c8cd444ed411a6deb350a3742
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
@@ -3136,21 +3114,22 @@ SPEC CHECKSUMS:
   ReactAppDependencyProvider: 562d731311d0524a577cf8a01faa97874bacbdfe
   ReactCodegen: a5d5626f71299d374b87e9a7dc92f968a963b4ef
   ReactCommon: c235ebd26d63fde9a2dfa72cee9f8294b910fee1
-  RecaptchaInterop: 11e0b637842dfb48308d242afc3f448062325aba
   RNCAsyncStorage: 302f2fac014fd450046c120567ca364632da682b
+  RNCPushNotificationIOS: 64218f3c776c03d7408284a819b2abfda1834bc8
   RNFBApp: b9065cfe36448f3b00fab933420c10acf27d97c5
-  RNFBAuth: ef142af906a87c4341d1bead0187615b49e4a69e
   RNFBMessaging: e00b41a6356ad43fdd125438ac1e8975bd0ed28c
   RNGestureHandler: 4f7cc97a71d4fe0fcba38c94acdd969f5f17c91c
-  RNGoogleSignin: 87502f82bf180fefb16e160149bfe5b380c558e6
   RNNotifee: 4a6ee5c7deaf00e005050052d73ee6315dff7ec9
   RNPermissions: d8e8115a8b557c630fcd45ec37f2ce71c96ddd38
   RNScreens: 91c5aa4dd200d0cf73f86429218fd8e5863e77ba
+  RNShare: 5d5c5158bc67618ed3f8b5cc008171f1c0607cbe
+  RNSound: 900f145a7611f93db8bf802a965849a72afd222d
+  RNSoundPlayer: 95b72e12a6990e4fabfd71b1c7fac579f9e60e75
   RNSVG: 8d87cff016edf1b6ca409ed39804101836d75e90
   RNVectorIcons: 6acc19c833be864e9c70894e101a587fe491150a
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   Yoga: 00013dd9cde63a2d98e8002fcc4f5ddb66c10782
 
-PODFILE CHECKSUM: c06042aa5f446bf9473da279be1d5305788a2041
+PODFILE CHECKSUM: e8281f31b096610c62d4be5c0547fd7829716ada
 
 COCOAPODS: 1.16.2

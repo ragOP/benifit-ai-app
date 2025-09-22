@@ -30,6 +30,8 @@ const FAQSection = ({ items = [], initiallyOpenId = null, title = 'FAQ' }) => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      {title ? <Text style={styles.title}>{title}</Text> : null}
+
       {data.map(item => {
         const expanded = openId === item.id;
         return (
@@ -66,8 +68,8 @@ const FAQSection = ({ items = [], initiallyOpenId = null, title = 'FAQ' }) => {
           <Text style={styles.noteStrong}>NOTE: </Text>
           <Text style={styles.noteBody}>
             We don't spam OR sell information & we aren't affiliated with any
-            gov. branch. We are not sponsored by any External Private
-            Organisation.
+            government branch. We are not sponsored by any external private
+            organisation.
           </Text>
         </Text>
       </View>
@@ -79,46 +81,52 @@ export default FAQSection;
 
 const DEFAULT_ITEMS = [
   {
-    id: 'why-dollar',
-    question: 'Why is there a $1 charge?',
+    id: 'why-free',
+    question: 'Why is this free?',
     answer:
-      'The $1 charge helps verify real users, reduce spam, and support the cost of keeping this platform running. It also gives you lifetime access to your report and updates. If you don’t qualify for any benefit, it’s fully refundable.',
+      'We’ve made the app completely free so that every user can check their benefits without any upfront cost.',
   },
   {
-    id: 'govt',
-    question: 'Is this a government website?',
+    id: 'govt-app',
+    question: 'Is this a government app?',
     answer:
-      'No. We’re an independent service that helps seniors easily check what programs they may qualify for. All listed programs are legitimate and widely available.',
+      'No, MyBenefitsAI is not a government app. We are an independent platform that helps you discover benefits and relief programs you may qualify for.',
   },
   {
     id: 'benefits',
     question: 'What kind of benefits can I expect?',
     answer:
-      'Depending on your answers, you may see programs like food cards, healthcare savings, accident compensation, debt relief options, and other senior support programs.',
+      'Depending on your situation, you may see benefits such as Medicare allowances, food cards, debt relief, accident compensation, auto insurance savings, and more.',
   },
   {
     id: 'report-time',
     question: 'How long will it take to receive my benefits report?',
-    answe:
-      'Your report is generated instantly using AI, right after you complete the check. You’ll get it sent to your email within seconds. It’s fast, secure, and ready when you are.',
+    answer:
+      'Your personalized benefits report is generated instantly after you answer a few simple questions.',
   },
   {
     id: 'safe',
     question: 'Is my information safe?',
     answer:
-      'Yes. Your information is encrypted and never sold or shared. We take privacy and security seriously.',
+      'Yes. We take your privacy seriously and use encryption and secure protocols to protect your data.',
   },
   {
     id: 'share',
     question: 'Can I share this with a friend or family member?',
     answer:
-      'Yes, if they’re 65 or older, they can also complete the check and receive their own personalized benefits report for $1 as well.',
+      'Absolutely. Many people recommend the app so their loved ones can check if they qualify too.',
   },
   {
-    id: 'refund',
-    question: 'Can I get a refund if I don’t qualify?',
+    id: 'age',
+    question: 'Do I need to be a certain age to use the app?',
     answer:
-      "Yes. If you don’t qualify for any program or you're not satisfied for any other reason, we refund the $1 automatically.",
+      'Most benefits are available to adults over 18, with some programs specific to seniors (50+ or 65+). The app guides you automatically based on your answers.',
+  },
+  {
+    id: 'how-often',
+    question: 'How often should I check for benefits?',
+    answer:
+      'Programs and eligibility rules change regularly. We recommend checking at least once every few months to make sure you don’t miss anything new.',
   },
 ];
 
@@ -127,6 +135,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 12,
     backgroundColor: '#ffffff',
+    paddingBottom: 40,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#0F766E',
+    marginBottom: 12,
   },
 
   card: {
@@ -134,9 +149,9 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#005e54',
+    borderColor: '#E6F2EE',
     shadowColor: '#000',
-    shadowOpacity: 0.08,
+    shadowOpacity: 0.06,
     shadowOffset: { width: 0, height: 4 },
     shadowRadius: 8,
     elevation: 2,
@@ -172,7 +187,7 @@ const styles = StyleSheet.create({
   },
   noteContainer: {
     marginTop: 36,
-    marginBottom: 40,
+    marginBottom: 20,
     paddingHorizontal: 8,
   },
   noteStrong: {

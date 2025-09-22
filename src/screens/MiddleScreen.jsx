@@ -163,7 +163,7 @@ const MiddleScreen = ({ route, navigation }) => {
           <View style={{ marginTop: 18 }}>
             <Text style={styles.reportDetail}>
               • You're approved for {tags.length} exclusive benefits, worth over{' '}
-              {roundedTotal > 0 ? roundedTotal.toLocaleString() : '15,000'}+ if
+              {roundedTotal > 0 ? roundedTotal.toLocaleString() : '15,000'}$ + if
               claimed on time.
             </Text>
             <Text style={styles.reportDetail}>
@@ -212,7 +212,7 @@ const MiddleScreen = ({ route, navigation }) => {
             Due to high demand, your benefit report is available to claim for
             only 5 minutes.
           </Text>
-          <Timer />
+          {/* <Timer /> */}
         </View>
 
         <TestimonialSlider />

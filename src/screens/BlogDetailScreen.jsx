@@ -47,7 +47,7 @@ const ALL_BENEFIT_CARDS = {
     isWebsite: false,
   },
   is_mva: {
-    title: 'MVA',
+    title: 'Higher Compensation On Your Accident!',
     description:
       'Potentially eligible for 3x past compensation after a motor vehicle accident.',
     img: require('../assets/benifit4.webp'),

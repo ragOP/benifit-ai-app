@@ -149,7 +149,8 @@ const RegisterScreen = ({ navigation }) => {
       >
         <ScrollView
           style={styles.scrollView}
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={[styles.scrollContent, { paddingBottom: 160 }]}
+
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
@@ -160,9 +161,9 @@ const RegisterScreen = ({ navigation }) => {
               resizeMode="contain"
             />
             <Text style={styles.mainHeading}>Create Account</Text>
-            <Text style={styles.welcomeText}>
-              Join us create your account!www
-            </Text>
+            <Text style={styles.welcomeText}>Join us create your account!</Text>
+              {/* <Text style={styles.welcomeText}>   Find out what benefits you qualify for in just 60 seconds — fast, free, and secure.   </Text> */}
+      
             <View style={styles.inputContainer}>
               <Text style={styles.label}>Email</Text>
               <View style={styles.inputBox}>
@@ -231,14 +232,12 @@ const RegisterScreen = ({ navigation }) => {
                 activeOpacity={0.9}
                 onPress={handleRegister}
               >
-                <Text style={styles.loginButtonText}>Create</Text>
+                <Text style={styles.loginButtonText}>Create Now</Text>
               </TouchableOpacity>
             )}
 
-            <Text style={styles.subText2}>
-              Free Fast Secure
-            </Text>
-            
+            <Text style={styles.subText2}>Find out what benefits you qualify for in just 60 seconds — fast, free, and secure.</Text>
+
             <View style={styles.registerContainer}>
               <Text style={styles.registerText}>Already have an account? </Text>
               <TouchableOpacity onPress={() => navigation.navigate('Login')}>

@@ -1,119 +1,85 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
-  Animated,
-  Dimensions,
   StatusBar,
   ScrollView,
-  ImageBackground,
-  BackHandler,
   Image,
+  BackHandler,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ChevronLeft } from 'lucide-react-native';
-import LinearGradient from 'react-native-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const { width } = Dimensions.get('window');
-
 const COLORS = {
-  background: '#f6f7f2',
-  black: '#000',
-  white: '#fff',
-  green: '#10b981',
-  teal: '#14b8a6',
-  subtitleText: '#1a1a1a',
-  bg: '#f9fafb',
+  bg: '#F2F4F7',        // page background
+  sheet: '#FFFFFF',     // big rounded container
+  text: '#111827',
+  sub: '#6B7280',
+  border: '#E6EAF0',
+
+  // tile colors (match screenshot vibe)
+  tGreen: '#32D583',
+  tRed: '#F97066',
+  tAmber: '#F7B84B',
+  tBlue: '#60A5FA',
+
+  // chips
+  chipBg: '#F3F4F6',
+  chipBorder: '#E5E7EB',
+  chipText: '#111827',
 };
 
 export default function AfterQuizScreen({ navigation }) {
-  const shimmerAnimation = useRef(new Animated.Value(0)).current;
-
   useEffect(() => {
-    const shimmer = () => {
-      Animated.sequence([
-        Animated.timing(shimmerAnimation, {
-          toValue: 1,
-          duration: 4000,
-          useNativeDriver: true,
-        }),
-        Animated.timing(shimmerAnimation, {
-          toValue: 0,
-          duration: 0,
-          useNativeDriver: true,
-        }),
-      ]).start(() => shimmer());
-    };
-    shimmer();
-  }, [shimmerAnimation]);
-
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('beforeRemove', e => {
-      if (e.data.action.type === 'GO_BACK' || e.data.action.type === 'POP') {
-        e.preventDefault();
-      }
+    const unsub = navigation.addListener('beforeRemove', e => {
+      if (e.data.action.type === 'GO_BACK' || e.data.action.type === 'POP') e.preventDefault();
     });
-
-    const backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',
-      () => true,
-    );
-
+    const bh = BackHandler.addEventListener('hardwareBackPress', () => true);
     return () => {
-      unsubscribe();
-      backHandler.remove();
+      unsub();
+      bh.remove();
     };
   }, [navigation]);
 
-  const handleRoute = async btn => {
-    if (
-      btn.title === '✅ Recheck My Eligibility' ||
-      btn.title === '🔄 Refresh'
-    ) {
+  const handleRoute = async (item) => {
+    if (item.clear || item.title === '🔄 Refresh' || item.title === '✅ Recheck My Eligibility') {
       await AsyncStorage.removeItem('userFlowCompleted');
     }
     navigation.reset({
       index: 0,
-      routes: [
-        {
-          name: 'BottomNavigation',
-          params: { initialTab: btn.params },
-        },
-      ],
+      routes: [{ name: 'BottomNavigation', params: { initialTab: item.params } }],
     });
   };
 
-  const buttons = [
-    { title: '🎁 Your Offers', route: 'BottomNavigation', params: 1 },
-    { title: '📰 Blog', route: 'BottomNavigation', params: 3 },
-    {
-      title: '✅ Recheck My Eligibility',
-      route: 'BottomNavigation',
-      params: 0,
-    },
-    { title: '💬 Live Support', route: 'BottomNavigation', params: 2 },
-    { title: '🔄 Refresh', route: 'BottomNavigation', params: 0 },
+  const tiles = [
+    { title: '🎁 Your Offers', color: COLORS.tGreen, params: 1 },
+    { title: '📰 Blog', color: COLORS.tRed, params: 3 },
+    { title: '✅ Recheck My Eligibility', color: COLORS.tAmber, params: 0, clear: true },
+    { title: '💬 Live Support', color: COLORS.tBlue, params: 2 },
+  ];
+
+  // compact quick actions (replaces the big gradient list)
+  const quickActions = [
+    { title: '🎁 Offers', params: 1 },
+    { title: '📰 Blog', params: 3 },
+    { title: '✅ Recheck', params: 0, clear: true },
+    { title: '💬 Support', params: 2 },
+    { title: '🔄 Refresh', params: 0, clear: true },
   ];
 
   return (
-    <View style={styles.safe} edges={['top']}>
-      <StatusBar barStyle="light-content" backgroundColor={COLORS.black} />
-      <ScrollView showsVerticalScrollIndicator={false}>
-
-        {/* <View style={styles.header}>
-        <Text style={styles.headerTitle}>Welcome Back</Text>
-      </View> */}
-        <View style={styles.header}>
+   
+     <>
+         <View style={styles.header}>
           <Image
             source={require('../assets/center.png')}
             style={styles.logo}
             resizeMode="contain"
           />
         </View>
-
         <View style={styles.ribbonWrap}>
           <View style={styles.ribbon}>
             <Text style={styles.ribbonText}>
@@ -121,165 +87,205 @@ export default function AfterQuizScreen({ navigation }) {
             </Text>
           </View>
         </View>
-        {/* 
-      <ScrollView
-        contentContainerStyle={{ paddingBottom: 30 }}
-        showsVerticalScrollIndicator={false}
-      > */}
-        {/* Banner */}
-        <View style={styles.bannerContainer}>
-          <ImageBackground
-            source={require('../assets/benifit4.webp')} // 🔹 replace with your image
-            style={styles.banner}
-          >
-            <LinearGradient
-              colors={['rgba(0,0,0,0.6)', 'rgba(0,0,0,0.2)']}
-              style={styles.bannerOverlay}
-            >
-              <View style={{ padding: 20 }}>
-                <Text style={styles.bannerTitle}>Your Journey Continues 🚀</Text>
-                <Text style={styles.bannerSubtitle}>
-                  Pick where you want to go next and make the most of your
-                  benefits
-                </Text>
-              </View>
-            </LinearGradient>
-          </ImageBackground>
-        </View>
+ <View style={styles.sheet}>
 
-        {/* Buttons Section */}
-        <View style={styles.buttonsWrapper}>
-          {buttons.map((btn, idx) => (
-            <LinearGradient
-              key={idx}
-              colors={[COLORS.green, COLORS.teal]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.actionButton}
-            >
+          {/* Header (your content only) */}
+          <Text style={styles.welcome}>WELCOME BACK</Text>
+          <Text style={styles.name}>Welcome Back</Text>
+
+          {/* 2×2 colorful tiles mapped from your actions */}
+          <View style={styles.grid}>
+            {tiles.map((t, i) => (
               <TouchableOpacity
-                style={styles.touchableArea}
+                key={i}
                 activeOpacity={0.9}
-                onPress={() => handleRoute(btn)}
+                style={[styles.tile, { backgroundColor: t.color }]}
+                onPress={() => handleRoute(t)}
               >
-                <Text style={styles.actionText}>{btn.title}</Text>
+                <Text style={styles.tileTitle}>{t.title}</Text>
               </TouchableOpacity>
-            </LinearGradient>
-          ))}
-        </View>
-      </ScrollView>
-      {/* </ScrollView> */}
-    </View>
+            ))}
+          </View>
+
+          {/* Ribbon (same copy) */}
+          <View style={styles.ribbonWrap}>
+            <View style={styles.ribbon}>
+              <Text style={styles.ribbonText}>22,578 Americans Helped In Last 24 Hours!</Text>
+            </View>
+          </View>
+
+          {/* Banner (image-free, soft card) */}
+          <View style={styles.banner}>
+            <Text style={styles.bannerTitle}>Your Journey Continues 🚀</Text>
+            <Text style={styles.bannerSubtitle}>
+              Pick where you want to go next and make the most of your benefits
+            </Text>
+          </View>
+
+          {/* QUICK ACTIONS: compact chips (replaces the big gradient buttons) */}
+          <Text style={styles.quickLabel}>Quick Actions</Text>
+          <View style={styles.chipsWrap}>
+            {quickActions.map((a, idx) => (
+              <TouchableOpacity
+                key={idx}
+                style={styles.chip}
+                activeOpacity={0.9}
+                onPress={() => handleRoute(a)}
+              >
+                <Text style={styles.chipText}>{a.title}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+        </View></>
+     
+  
   );
 }
+
+const SHADOW_SHEET = {
+  shadowColor: '#000',
+  shadowOpacity: 0.10,
+  shadowRadius: 22,
+  shadowOffset: { width: 0, height: 12 },
+  elevation: 6,
+};
+
+const SHADOW_CARD = {
+  shadowColor: '#000',
+  shadowOpacity: 0.08,
+  shadowRadius: 14,
+  shadowOffset: { width: 0, height: 10 },
+  elevation: 4,
+};
 
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.bg,
   },
-  header: {
-    backgroundColor: COLORS.black,
+
+  sheet: {
+    marginHorizontal: 14,
+    marginTop: 8,
+    backgroundColor: COLORS.sheet,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    paddingHorizontal: 18,
+    paddingTop: 16,
+    paddingBottom: 20,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    ...SHADOW_SHEET,
   },
-  logo: {
-    width: 'auto',
-    height: 60,
-    marginRight: 10,
+
+  welcome: {
+    color: COLORS.sub,
+    fontSize: 12,
+    fontWeight: '800',
+    letterSpacing: 0.6,
+    marginBottom: 2,
   },
+  name: {
+    color: COLORS.text,
+    fontSize: 24,
+    fontWeight: '900',
+    marginBottom: 14,
+  },
+
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    rowGap: 12,
+    marginBottom: 14,
+  },
+  tile: {
+    width: '48%',
+    borderRadius: 18,
+    paddingVertical: 18,
+    paddingHorizontal: 14,
+    ...SHADOW_CARD,
+  },
+  tileTitle: {
+    color: '#FFFFFF',
+    fontWeight: '800',
+    fontSize: 14.5,
+  },
+
+  ribbonWrap: { marginTop: 6, marginBottom: 8 },
   ribbon: {
-    backgroundColor: COLORS.teal,
-    paddingVertical: 14,
+    backgroundColor: '#14b8a6',
+    paddingVertical: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    borderBottomLeftRadius: 40,
-    borderBottomRightRadius: 40,
+    borderRadius: 16,
   },
   ribbonText: {
-    color: COLORS.white,
-    letterSpacing: 0.3,
+    color: '#FFFFFF',
+    letterSpacing: 0.2,
     fontStyle: 'italic',
     fontSize: 12,
-    fontWeight: '600',
-
-  },
-  ribbonWrap: {
-    paddingBottom: 20
-
-  },
-  headerTitle: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: COLORS.white,
-    flex: 1,
-  },
-  backButton: {
-    padding: 8,
+    fontWeight: '800',
   },
 
-  // Banner
-  bannerContainer: {
-    width: '100%',
-    height: 220,
-    marginBottom: 20,
-    // borderBottomLeftRadius: 24,
-    // borderBottomRightRadius: 24,
-    overflow: 'hidden',
-  },
   banner: {
-    flex: 1,
-    resizeMode: 'cover',
-  },
-  bannerOverlay: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    // padding: 20,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 18,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    marginBottom: 12,
+    ...SHADOW_CARD,
   },
   bannerTitle: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: COLORS.white,
+    fontSize: 20,
+    fontWeight: '900',
+    color: COLORS.text,
     marginBottom: 6,
   },
   bannerSubtitle: {
-    fontSize: 16,
-    color: COLORS.white,
-    opacity: 0.9,
+    fontSize: 14.5,
+    color: COLORS.sub,
+    lineHeight: 21,
   },
 
-  // Buttons
-  buttonsWrapper: {
-    paddingHorizontal: 24,
-    gap: 24,
-    marginTop: 10,
-    marginBottom: 20,
+  /* Quick Actions */
+  quickLabel: {
+    color: COLORS.sub,
+    fontWeight: '800',
+    fontSize: 12,
+    letterSpacing: 0.4,
+    marginTop: 2,
+    marginBottom: 8,
   },
-  actionButton: {
-    borderRadius: 28,
-    elevation: 4,
+  chipsWrap: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
   },
-  touchableArea: {
-    borderRadius: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
-    padding: 16,
+  chip: {
+    backgroundColor: COLORS.chipBg,
+    borderColor: COLORS.chipBorder,
+    borderWidth: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 999,
   },
-  actionText: {
-    color: COLORS.white,
-    fontWeight: '700',
-    fontSize: 18,
-    letterSpacing: 0.3,
-    zIndex: 1,
+  chipText: {
+    color: COLORS.chipText,
+    fontWeight: '800',
+    fontSize: 13,
   },
-  shimmer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    width: '6%',
-    backgroundColor: 'rgba(255,255,255,0.4)',
-    transform: [{ skewX: '-20deg' }],
-    zIndex: 0,
+  header: {
+    backgroundColor: "#000000",
+    paddingTop: 0,
   },
+  logo: {
+    width: 'auto',
+    height: 50,
+    marginRight: 10,
+  },
+  
+
 });

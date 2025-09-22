@@ -14,6 +14,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import Sound from 'react-native-sound';
+import { AnimatedBubble } from './FormQuestion';
 
 const { width } = Dimensions.get('window');
 
@@ -163,50 +164,69 @@ const MessageBubble = ({ text, showAvatar, index }) => {
 const QuestionScreen = ({ navigation }) => {
   const [chat, setChat] = useState([]);
   const shimmerAnimation = useRef(new Animated.Value(0)).current;
+  const [showTyping, setShowTyping] = useState(true); // Start with loading
+  const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
 
   let currentSound = null;
 
-  const playAudio = audioFile => {
+  const playAudio = (audioFile, onComplete) => {
     if (!audioFile) return;
-    
+
     if (currentSound) {
       currentSound.stop(() => currentSound.release());
     }
-    
-    // For iOS, we need to include the file extension
+
     const audioPath = Platform.OS === 'ios' ? audioFile : audioFile.replace('.wav', '');
-    
+
     currentSound = new Sound(audioPath, Sound.MAIN_BUNDLE, error => {
       if (error) {
         console.log('Error loading audio:', error);
+        onComplete && onComplete(); // Call onComplete even if error
         return;
       }
-      
+
       currentSound.setVolume(1.0);
       currentSound.play(error => {
         if (error) {
           console.log('Error playing audio:', error);
         }
         currentSound.release();
+        onComplete && onComplete(); // Call onComplete when audio ends
       });
     });
   };
 
-  useEffect(() => {
-    const timers = [];
-    let totalDelay = 0;
+  const showNextMessage = () => {
+    if (currentMessageIndex < initialMessages.length) {
+      const msg = initialMessages[currentMessageIndex];
 
-    initialMessages.forEach((msg, index) => {
-      totalDelay += delays[index];
-      const t = setTimeout(() => {
+      // Show loading for 2 seconds
+      setShowTyping(true);
+
+      setTimeout(() => {
+        // Hide loading and show message
+        setShowTyping(false);
         setChat(prev => [...prev, msg]);
-        playAudio(msg.audio);
-      }, totalDelay);
-      timers.push(t);
-    });
 
-    return () => timers.forEach(clearTimeout);
+        // Play audio and when it ends, show next message
+        playAudio(msg.audio, () => {
+          setCurrentMessageIndex(prev => prev + 1);
+        });
+      }, 2000);
+    }
+  };
+
+  useEffect(() => {
+    // Start the cycle
+    showNextMessage();
   }, []);
+
+  useEffect(() => {
+    // When currentMessageIndex changes, show next message
+    if (currentMessageIndex > 0 && currentMessageIndex < initialMessages.length) {
+      showNextMessage();
+    }
+  }, [currentMessageIndex]);
 
   useEffect(() => {
     const shimmer = () => {
@@ -260,9 +280,14 @@ const QuestionScreen = ({ navigation }) => {
           {chat.map((m, index) => {
             const showAvatar = index === chat.length - 1;
             return (
-              <MessageBubble key={m.id} text={m.text} showAvatar={showAvatar} />
+              <MessageBubble key={m.id} text={m.text} showAvatar={showAvatar} index={index} />
             );
           })}
+          {showTyping && (
+            <View style={styles.loadingView}>
+              <AnimatedBubble isBot={true} text={"..."} showAvatar={true} />
+            </View>
+          )}
           {thirdShown && (
             <View style={styles.ctaWrap}>
               <TouchableOpacity
@@ -342,6 +367,9 @@ const styles = StyleSheet.create({
     marginTop: 6,
     overflow: 'hidden',
     marginTop: 'auto',
+  },
+  loadingView: {
+    paddingTop: 16,
   },
   shimmer: {
     position: 'absolute',

@@ -27,7 +27,7 @@ const TAGS = {
   is_md: 'Medicare',
   is_debt: 'Debt',
   is_auto: 'Auto',
-  is_mva: 'MVA',
+  is_mva: 'Higher Compensation On Your Accident!',
 };
 
 const ALL_BENEFIT_CARDS = {
@@ -59,7 +59,7 @@ const ALL_BENEFIT_CARDS = {
     call: 'CALL (619) 775-3027',
   },
   is_mva: {
-    title: 'MVA',
+    title: 'Higher Compensation On Your Accident!',
     description:
       'You might be eligible for a higher compensation. Most people get 3x of their past compensations.',
     img: require('../assets/benifit4.webp'),
@@ -329,11 +329,11 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: COLORS.bg, },
   header: {
     backgroundColor: COLORS.black,
-    paddingTop: 0,
+    padding: 5,
   },
   logo: {
     width: 'auto',
-    height: 60,
+    height: 50,
     marginRight: 10,
   },
   ribbon: {
@@ -411,8 +411,8 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   benefitBadge: {
-    backgroundColor: COLORS.teal,
-    color: COLORS.white,
+   color: '#099f34',
+    backgroundColor: '#e7f8e9',
     paddingVertical: 4,
     paddingHorizontal: 10,
     borderRadius: 8,

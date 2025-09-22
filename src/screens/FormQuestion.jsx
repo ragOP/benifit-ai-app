@@ -9,10 +9,11 @@ import {
   TouchableOpacity,
   Animated,
   TextInput,
-  ScrollView,
+  FlatList,
   Keyboard,
   ActivityIndicator,
   Platform,
+  KeyboardAvoidingView,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BACKEND_URL } from '../utils/backendUrl';
@@ -160,7 +161,7 @@ const infoDelay = 1000;
 const inputAnimDuration = 400;
 const messageAnimDuration = 750;
 
-const AnimatedBubble = ({ isBot, text, showAvatar, children }) => {
+export const AnimatedBubble = ({ isBot, text, showAvatar, children }) => {
   const fade = useRef(new Animated.Value(0)).current;
   const scale = useRef(new Animated.Value(0.8)).current;
   const translateY = useRef(new Animated.Value(30)).current;
@@ -260,26 +261,27 @@ export default function FormQuestion({ navigation }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const inputAnim = useRef(new Animated.Value(0)).current;
-  const scrollViewRef = useRef();
+  const flatListRef = useRef();
+  const textInputRef = useRef();
 
   let currentSound = null;
 
   const playAudio = useCallback(audioFile => {
     if (!audioFile) return;
-    
+
     if (currentSound) {
       currentSound.stop(() => currentSound.release());
     }
-    
+
     // For iOS, we need to include the file extension
     const audioPath = Platform.OS === 'ios' ? audioFile : audioFile.replace('.wav', '');
-    
+
     currentSound = new Sound(audioPath, Sound.MAIN_BUNDLE, error => {
       if (error) {
         console.log('Error loading audio:', error);
         return;
       }
-      
+
       currentSound.setVolume(1.0);
       currentSound.play(error => {
         if (error) {
@@ -309,13 +311,13 @@ export default function FormQuestion({ navigation }) {
       tags.push(TAGS.auto);
     if (
       allAnswers[
-        'Have you faced any motor vehicle accidents in the last 2 years?'
+      'Have you faced any motor vehicle accidents in the last 2 years?'
       ] === 'Yes'
     )
       tags.push(TAGS.mva);
     if (
       allAnswers[
-        'Okay, and do you have a credit card debt of $10,000 or more?'
+      'Okay, and do you have a credit card debt of $10,000 or more?'
       ] === 'Yes'
     )
       tags.push(TAGS.debt);
@@ -374,7 +376,13 @@ export default function FormQuestion({ navigation }) {
       toValue: 1,
       duration: inputAnimDuration,
       useNativeDriver: true,
-    }).start();
+    }).start(() => {
+      // Focus input and scroll to bottom to show input field
+      setTimeout(() => {
+        textInputRef.current?.focus();
+        flatListRef.current?.scrollToEnd({ animated: true });
+      }, 100);
+    });
   }, [inputAnim]);
 
   const hideInput = useCallback(() => {
@@ -419,43 +427,85 @@ export default function FormQuestion({ navigation }) {
     }
   }, [current, showInput, nextQuestion, allDone]);
 
+  // Only scroll when there's an input field or typing indicator
+  // useEffect(() => {
+  //   if (inputVisible || showTyping) {
+  //     const timer = setTimeout(() => {
+  //       flatListRef.current?.scrollToEnd({ animated: true });
+  //     }, 300);
+  //     return () => clearTimeout(timer);
+  //   }
+  // }, [chat, inputVisible, showTyping]);
+
+  // Additional scroll when input is visible
+  // useEffect(() => {
+  //   if (inputVisible) {
+  //     const timer = setTimeout(() => {
+  //       flatListRef.current?.scrollToEnd({ animated: true });
+  //     }, 500); // Longer delay to ensure input is rendered
+  //     return () => clearTimeout(timer);
+  //   }
+  // }, [inputVisible]);
+
+  // Handle keyboard events - only scroll if input is visible
   useEffect(() => {
-    setTimeout(() => {
-      scrollViewRef.current?.scrollToEnd({ animated: true });
-    }, 900);
-  }, [chat, inputVisible, showTyping]);
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
+      if (inputVisible) {
+        setTimeout(() => {
+          flatListRef.current?.scrollToEnd({ animated: true });
+        }, 100);
+      }
+    });
+
+    return () => {
+      keyboardDidShowListener?.remove();
+    };
+  }, [inputVisible]);
+  
 
   const validatePincode = pincode => /^\d{5,6}$/.test(pincode);
   const validatePhone = val => /^\d{10}$/.test((val || '').trim());
 
   const onSend = useCallback(
     answer => {
-      if ((answer === undefined || answer === null) && input.trim() === '')
-        return;
-
       const response = answer !== undefined ? answer : input.trim();
-      if (questions[current].text.includes('zip code')) {
-        if (!validatePincode(response)) {
-          alert('Please enter a valid 5 or 6 digit zip code.');
-          return;
+
+      // Validate input for text questions
+      if (questions[current].type === 'text') {
+        if (!response) {
+          return; // Don't submit empty responses
+        }
+
+        if (questions[current].text.includes('zip code')) {
+          if (!validatePincode(response)) {
+            alert('Please enter a valid 5 or 6 digit zip code.');
+            return;
+          }
+        }
+        if (questions[current].text.includes('phone number')) {
+          if (!validatePhone(response)) {
+            alert('Please enter a valid 10-digit phone number.');
+            return;
+          }
         }
       }
-      if (questions[current].text.includes('phone number')) {
-        if (!validatePhone(response)) {
-          alert('Please enter a valid 10-digit phone number.');
-          return;
-        }
-      }
+
+      // Add user response to chat
       setChat(prev => [...prev, { from: 'user', text: response }]);
       setAnswers(prevAnswers => ({
         ...prevAnswers,
         [questions[current].text]: response,
       }));
+
+      // Clear input and hide keyboard
       setInput('');
+      Keyboard.dismiss();
       hideInput();
+
+      // Move to next question
       setTimeout(() => nextQuestion(current), messageAnimDuration / 1.1);
     },
-    [input, current, nextQuestion],
+    [input, current, nextQuestion, hideInput],
   );
 
   useEffect(() => {
@@ -474,12 +524,110 @@ export default function FormQuestion({ navigation }) {
 
   const q = questions[current];
 
+  // Create data for FlatList
+  const flatListData = [
+    { type: 'header', key: 'header' },
+    ...chat.map((msg, i) => ({ ...msg, key: `msg-${i}`, type: 'message', index: i })),
+    ...(showTyping ? [{ type: 'typing', key: 'typing' }] : []),
+    ...(allDone ? [{ type: 'done', key: 'done' }] : []),
+    ...(inputVisible ? [{ type: 'input', key: 'input' }] : []),
+  ];
+
+  const renderItem = ({ item, index }) => {
+    const isLastItem = index === flatListData.length - 1;
+    
+    if (item.type === 'header') {
+      return (
+        <View style={isLastItem ? { paddingBottom: 50 } : {}}>
+          <View style={styles.header}>
+            <Image
+              source={require('../assets/center.png')}
+              style={styles.logo}
+              resizeMode="contain"
+            />
+          </View>
+          <View style={styles.ribbonWrap}>
+            <View style={styles.ribbon}>
+              <Text style={styles.ribbonText}>
+                22,578 Americans Helped In Last 24 Hours!
+              </Text>
+            </View>
+          </View>
+          <View style={styles.content}>
+            <View style={styles.pill}>
+              <Text style={styles.pillText}>AVERAGE BENEFITS: </Text>
+              <Text style={styles.pillText}>$2500+ </Text>
+            </View>
+          </View>
+        </View>
+      );
+    }
+
+    if (item.type === 'message') {
+      return (
+        <View style={[styles.chatWrap, isLastItem ? { paddingBottom: 250 } : {}]}>
+          {item.from === 'bot' ? (
+            <AnimatedBubble
+              isBot={true}
+              showAvatar={item.index === lastBotIndex && !allDone}
+              text={item.text}
+            />
+          ) : (
+            <AnimatedBubble
+              isBot={false}
+              showAvatar={false}
+              text={item.text}
+            />
+          )}
+        </View>
+      );
+    }
+
+    if (item.type === 'typing') {
+      return (
+        <View style={[styles.chatWrap, isLastItem ? { paddingBottom: 250 } : {}]}>
+          <AnimatedBubble isBot={true} showAvatar={true} text="..." />
+        </View>
+      );
+    }
+
+    if (item.type === 'done') {
+      return (
+        <View style={[styles.chatWrap, isLastItem ? { paddingBottom: 1000 } : {}]}>
+          <View style={{ paddingTop: 30, paddingHorizontal: 20 }}>
+            <Text
+              style={{
+                textAlign: 'center',
+                fontSize: 18,
+                color: COLORS.text,
+                fontWeight: '600',
+              }}
+            ></Text>
+          </View>
+        </View>
+      );
+    }
+
+    if (item.type === 'input') {
+      return (
+        <View style={[styles.chatWrap, isLastItem ? { paddingBottom: 50 } : {}]}>
+          {renderInput()}
+          <View style={{ padding: 40 }} />
+        </View>
+      );
+    }
+
+    return null;
+  };
+
   const renderInput = () => {
     if (!inputVisible || !q) return null;
     if (q.type === 'text') {
       return (
+
         <Animated.View style={[styles.inlineInputWrap, { opacity: inputAnim }]}>
           <TextInput
+            ref={textInputRef}
             style={styles.input}
             value={input}
             onChangeText={setInput}
@@ -487,9 +635,16 @@ export default function FormQuestion({ navigation }) {
             placeholder="Type your message..."
             onSubmitEditing={() => onSend()}
             placeholderTextColor="#bbb"
-            autoFocus
+            returnKeyType="send"
+            blurOnSubmit={false}
+            autoFocus={false}
           />
-          <TouchableOpacity style={styles.checkBtn} onPress={() => onSend()}>
+          <TouchableOpacity
+            style={[styles.checkBtn, !input.trim() && styles.checkBtnDisabled]}
+            onPress={() => onSend()}
+            disabled={!input.trim()}
+            activeOpacity={0.7}
+          >
             <Check size={18} color="#fff" />
           </TouchableOpacity>
         </Animated.View>
@@ -534,70 +689,21 @@ export default function FormQuestion({ navigation }) {
         </View>
       )} */}
 
-      <ScrollView
-        ref={scrollViewRef}
-        contentContainerStyle={{ paddingBottom: 60 }}
-        showsVerticalScrollIndicator={false}
+      <KeyboardAvoidingView
         style={{ flex: 1 }}
-        onTouchStart={() => Keyboard.dismiss()}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <View style={styles.header}>
-          <Image
-            source={require('../assets/center.png')}
-            style={styles.logo}
-            resizeMode="contain"
-          />
-        </View>
-        <View style={styles.ribbonWrap}>
-          <View style={styles.ribbon}>
-            <Text style={styles.ribbonText}>
-              22,578 Americans Helped In Last 24 Hours!
-            </Text>
-          </View>
-        </View>
-        <View style={styles.content}>
-          <View style={styles.pill}>
-            <Text style={styles.pillText}>AVERAGE BENEFITS: </Text>
-            <Text style={styles.pillText}>$2500+ </Text>
-          </View>
-        </View>
-        <View style={styles.chatWrap}>
-          {chat.map((msg, i) =>
-            msg.from === 'bot' ? (
-              <AnimatedBubble
-                key={i}
-                isBot={true}
-                showAvatar={i === lastBotIndex && !allDone}
-                text={msg.text}
-              />
-            ) : (
-              <AnimatedBubble
-                key={i}
-                isBot={false}
-                showAvatar={false}
-                text={msg.text}
-              />
-            ),
-          )}
-          {showTyping && (
-            <AnimatedBubble isBot={true} showAvatar={true} text="..." />
-          )}
-          {allDone ? (
-            <View style={{ paddingTop: 30, paddingHorizontal: 20 }}>
-              <Text
-                style={{
-                  textAlign: 'center',
-                  fontSize: 18,
-                  color: COLORS.text,
-                  fontWeight: '600',
-                }}
-              ></Text>
-            </View>
-          ) : (
-            renderInput()
-          )}
-        </View>
-      </ScrollView>
+        <FlatList
+          ref={flatListRef}
+          data={flatListData}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.key}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          style={{ paddingBottom: 150}}
+          contentContainerStyle={{ flexGrow: 1, paddingBottom: 350 }}
+        />
+      </KeyboardAvoidingView>
     </View>
   );
 }
@@ -605,7 +711,7 @@ export default function FormQuestion({ navigation }) {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: COLORS.bg },
   header: { backgroundColor: COLORS.black },
-  logo: { width: 'auto', height: 60, marginRight: 10 },
+  logo: { width: 'auto', height: 50, marginRight: 10 },
   ribbonWrap: {},
   ribbon: {
     backgroundColor: COLORS.teal,
@@ -684,8 +790,9 @@ const styles = StyleSheet.create({
   inlineInputWrap: {
     flexDirection: 'row',
     alignItems: 'center',
-    margin: 10,
+    // margin: 10,
     gap: 10,
+    // marginBottom: 20, // Add bottom margin for keyboard
   },
   input: {
     flex: 1,
@@ -706,6 +813,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 5,
+  },
+  checkBtnDisabled: {
+    backgroundColor: '#ccc',
+    opacity: 0.6,
   },
   optionsWrap: {
     flexDirection: 'row',

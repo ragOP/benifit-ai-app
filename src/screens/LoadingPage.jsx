@@ -31,7 +31,7 @@ export default function LoadingPage({ navigation, route }) {
         }
         return next;
       });
-    }, 2000);
+    }, 2400); // ⬅️ made 20% slower (was 2000)
 
     return () => clearInterval(interval);
   }, []);
